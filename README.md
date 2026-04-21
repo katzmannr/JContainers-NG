@@ -3,7 +3,7 @@
 
 <img src="logo.png?raw=true" height="256">
 
-# JContainers (64-bit)
+# JContainers NG (64-bit)
 
 A project to extend [Skyrim's Papyrus
 scripting](https://www.creationkit.com/index.php?title=Category:Papyrus) with
@@ -14,6 +14,11 @@ scripting](https://www.creationkit.com/index.php?title=Category:Papyrus) with
 > This project is fork of the original [JContainers](https://github.com/SilverIce/JContainers). It
 > strives to convert and mash it up to the new Skyrim Special 64-bit edition. Cudos to the original
 > author and all of his supporters!
+>
+> JContainers NG is concentrating on simplifying the build and distribution
+> from [ryobgs fork](https://github.com/ryobg/JContainers/fork) by using CommonLibSSE-NG and removing
+> most dependencies from submodules 
+> CMake can resolve the dependencies or vcpkg be used as a dependency package manager
 
 ### Why?
 
@@ -50,10 +55,17 @@ or source code.
 
 ### Prerequisites
 
-* [Microsoft Visual Studio 2019](https://www.visualstudio.com/downloads/) 
+* [Microsoft Visual Studio Free](https://www.visualstudio.com/downloads/) 
   Community Edition with Visual C++ support would suffice. All project files are of that version,
   but with a bit of manual work they may be converted to older versions too (e.g. 2013, though
-  issues most certainly will arrise).
+  issues most certainly will arrise). If you want a leight weight IDE instead use
+* [Visual Studio Code](https://code.visualstudio.com/download)
+  Free and built on open source. Integrated Git, debugging and extensions. Runs on other platforms
+  like Ubuntu or Mac too. C/C++ support for Visual Studio Code is provided by a Microsoft C/C++ 
+  extension to enable cross-platform C and C++ development on Windows, Linux, and macOS. Only
+  g++, clang, xcode are supported by this extension. The VC Compiler can no longer be installed
+  separately from Visual Studio Community Edition (Build Tools have been removed). Some Installers
+  allow you to install the VC Compiler without the IDE, but for me this option didn't work.
 * A [Python](https://www.python.org/downloads/) environment for Windows, version 3.4 or later.
   This is needed to run some helper scripts for testing, building distributions and any other small
   helpful tasks. Its `python.exe` should be available on the PATH variable.
@@ -62,23 +74,36 @@ or source code.
 
 ### First time setup
 
-1. Run `git submodule update --init --recursive` so that all dependencies like Jannson, Google Test
-   and etc. get downloaded and linked to the correct revisions.
-2. Run the JContainer's `tools\build_boost.bat` file. It should manage to download, unpack,
-   bootstrap and build the neccessary libraries from Boost (version 1.67 currently). If you encounter
-   boost linking errors later on, you can attempt to specify the msvc version when running the batch
-   file, e.g. `tools\build_boost.bat vc141`.
-3. Run also the `tools\merge_skse.bat` file. It should extract the stripped down and bundled SKSE64
-   and SKSE VR distributions into the local source tree.
-4. Open the `JContainers.sln` file with Visual Studio and Rebuild the whole solution. It will take
-   some time.
+1. Run `git submodule update --init --recursive` so that CommonLibSSE NG dependency gets downloaded 
+   and linked to the project folder.
+2. If you have vcpkg installed, use it to install the preinstalled boost package:
+   cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+3. The SKSE CommonLibSSE-NG is already in the correct format, so no manual build steps required.
+4. Open the `CMakeLists.txt` file with Visual Studio. The solution is created from the CMake
+   extension. Rebuild the whole solution. It will take some time. 
 5. After successfull build, run from the command line `python tools\install.py x64\Release 64`.
    Eventually swap `Release` for `Debug` - depending on what kind of distribution was build and
-   actually is wanted in the `dist\` folder. The last argument, `64` could be also `VR`, but then
-   the configuration should be either `ReleaseVR` or `DebugVR`.
-6. Optionaly, run `python tools\test.py x64\Release\Data\SKSE\Plugins\JContainers64.dll`. Again it
-   depends whether `Release` or `Debug` (or `ReleaseVR` and `DebugVR`) builds should be tested. Note
-   however that step 4, must be ran first!
+   actually is wanted in the `dist\` folder.
+6. Optionally, run `python tools\test.py x64\Release\Data\SKSE\Plugins\JContainers64.dll`. Again it
+   depends whether `Release` or `Debug` builds should be tested.
+
+### Building from github CI
+
+If you do not want to download build tools you can run a test build from CI. You need to create
+a merge request for that. The projects comes with github action definition. After creating the
+request you can run it to create a test build from your changes.
+
+### Merging changes into this repository
+
+I can merge changes to this repository. The drawback is though that the maintainers will
+not see the changes you want to contribute. Because of that I recommend you to create a
+merge request on the original github page from [JContainer 64](https://github.com/ryobg/JContainers/fork)
+
+### Use of other IDE
+
+While the team does only support VisualStudio, other IDE that integrate VS Compiler have
+been reported to be usable too, f.e. QtCreator. Other IDE usually do not convert the CMake
+project so the build is done in a similar way as on the CI (github actions).
 
 That's it!
 

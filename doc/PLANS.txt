@@ -1,0 +1,37 @@
+JContainers64-NG
+================
+
+This documents contains small summaries of planned changes.
+
+1) Port to CMake
+
+Each part of the project will be moved to CMake. This wil remove the
+existing complex dependencies handling. All dependencies are on github
+making handling of new dependent packages much easier.
+
+2) Github Actions
+
+The build for releases will always be done on github. The goal is to
+allow developers to work on the project without actually needing
+Visual Studio or even a compiler installed on the local machine and
+to provide a way to have consistant build independent of local installation.
+
+3) Switch to CommonLibSSE-NG
+
+Main goal of the project is to get rid of multiple separate builds for
+different Skyrim platforms. The CommonLibSSE-NG removes many headaches
+of the large Skyrim Release Platforms (Steam, GOG, VR). New platforms as
+well as different release are handled in this project as well.
+
+4) Issue tracking
+
+Issue tracking is done for issues only concerning the port. The team may
+provide preliminary support for stability issues only that are both based
+on issues in the original JContainers64 code as well as the port.
+
+5) Support
+
+Support is limited to stability issues and the integration of JContainers64
+with CMake and github actions. Other problems and general JContainers64
+support will be provided on a dedicated page on Nexusmods.
+
