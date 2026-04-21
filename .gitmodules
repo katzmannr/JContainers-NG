@@ -7,3 +7,6 @@
 [submodule "dep/googletest/googletest"]
 	path = dep/googletest/googletest
 	url = https://github.com/google/googletest.git
+[submodule "dep/CommonLibSSE-NG"]
+	path = dep/CommonLibSSE-NG
+	url = https://github.com/CharmedBaryon/CommonLibSSE-NG.git
