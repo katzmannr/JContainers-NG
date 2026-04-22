@@ -50,51 +50,45 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ################################################################################
 # Target name
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        TARGET_NAME_DEBUG      "JContainers64"
-        TARGET_NAME_RELEASE    "JContainers64"
-    )
-endif()
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    TARGET_NAME_DEBUG      "JContainers64"
+    TARGET_NAME_RELEASE    "JContainers64"
+)
+
 ################################################################################
 # Output directory
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION            "TRUE"
-    )
-endif()
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    INTERPROCEDURAL_OPTIMIZATION            "TRUE"
+)
+
 ################################################################################
 # MSVC runtime library
 ################################################################################
 get_property(MSVC_RUNTIME_LIBRARY_DEFAULT TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY)
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
-        $<$<CONFIG:Debug>:
-            MultiThreadedDebug
-        >
-        $<$<CONFIG:Release>:
-            MultiThreaded
-        >
-        $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:Release>>>:${MSVC_RUNTIME_LIBRARY_DEFAULT}>
-    )
-endif()
+string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
+    $<$<CONFIG:Debug>:
+        MultiThreadedDebug
+    >
+    $<$<CONFIG:Release>:
+        MultiThreaded
+    >
+    $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:Release>>>:${MSVC_RUNTIME_LIBRARY_DEFAULT}>
+)
 set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY_STR})
 
 ################################################################################
 # Include directories
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    target_include_directories(${PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/JContainers/src;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dep/boost;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest/googletest/googletest/include;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/dep/luajit/luajit-2.0/src;"
-        "${CMAKE_CURRENT_SOURCE_DIR}/."
-    )
-endif()
+target_include_directories(${PROJECT_NAME} PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/JContainers/src;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/boost;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest/googletest/googletest/include;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/luajit/luajit-2.0/src;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/."
+)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
@@ -131,87 +125,54 @@ endif()
 # Compile and link options
 ################################################################################
 if(MSVC)
-    if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-        target_compile_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:
-                /GL-;
-                /Od;
-                /Ob0;
-                /sdl;
-                -D_SCL_SECURE_NO_WARNINGS
-            >
-            $<$<CONFIG:Release>:
-                /O1;
-                /Oi;
-                /sdl-;
-                /Os
-            >
-            /std:c++17;
-            /GF;
-            /W3;
-            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-            ${DEFAULT_CXX_EXCEPTION_HANDLING}
-        )
-        target_link_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:
-                /NODEFAULTLIB:LIBCMT.lib;
-                /DEBUG
-            >
-            /SUBSYSTEM:CONSOLE;
-            /OPT:REF;
-            /OPT:ICF;
-            /INCREMENTAL:NO
-        )
-    endif()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:
+            /GL-;
+            /Od;
+            /Ob0;
+            /sdl;
+            -D_SCL_SECURE_NO_WARNINGS
+        >
+        $<$<CONFIG:Release>:
+            /O1;
+            /Oi;
+            /sdl-;
+            /Os
+        >
+        /std:c++17;
+        /GF;
+        /W3;
+        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
+        ${DEFAULT_CXX_EXCEPTION_HANDLING}
+    )
+    target_link_options(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:
+            /NODEFAULTLIB:LIBCMT.lib;
+            /DEBUG
+        >
+        /SUBSYSTEM:CONSOLE;
+        /OPT:REF;
+        /OPT:ICF;
+        /INCREMENTAL:NO
+    )
 endif()
 
 ################################################################################
 # Post build events
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    add_custom_command(
-        TARGET ${PROJECT_NAME}
-        POST_BUILD
-        COMMAND      $<CONFIG:Debug> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
-        COMMAND    $<CONFIG:Release> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
-    )
-endif()
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND      $<CONFIG:Debug> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
+    COMMAND    $<CONFIG:Release> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
+)
 
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    set(ADDITIONAL_LIBRARY_DEPENDENCIES
-        "$<$<CONFIG:Debug>:"
-            "common64;"
-            "skse64_common;"
-            "skse64"
-        ">"
-        "$<$<CONFIG:Release>:"
-            "common64;"
-            "skse64_common;"
-            "skse64"
-        ">"
-        "kernel32;"
-        "user32;"
-        "gdi32;"
-        "winspool;"
-        "comdlg32;"
-        "advapi32;"
-        "shell32;"
-        "ole32;"
-        "oleaut32;"
-        "uuid;"
-        "odbc32;"
-        "odbccp32"
-    )
-endif()
-target_link_libraries(${PROJECT_NAME} PUBLIC "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        CommonLibSSE::CommonLibSSE
+)
 
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    target_link_directories(${PROJECT_NAME} PUBLIC
-        "${CMAKE_SOURCE_DIR}/dep/boost/boost_lib/lib;"
-        "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>"
-    )
-elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
-    target_link_directories(${PROJECT_NAME} PUBLIC
-        "${CMAKE_SOURCE_DIR}/dep/boost/boost_lib/lib"
-    )
-endif()
+target_link_directories(${PROJECT_NAME} PUBLIC
+    "${CMAKE_SOURCE_DIR}/dep/boost/boost_lib/lib;"
+    "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>"
+)
