@@ -9,30 +9,16 @@ branches:
 
 configuration: 
     - Release 
-    - ReleaseVR
-    - ReleaseGOG
 
 environment:
     PYTHON: "C:\\Python312-x64"
     matrix:
         - JC_SKSE: "64"
-        - JC_SKSE: "VR"
-        - JC_SKSE: "GOG"
 
 matrix:
     exclude:
         - configuration: Release
-          JC_SKSE: "VR"
-        - configuration: Release
-          JC_SKSE: "GOG"
-        - configuration: ReleaseVR
           JC_SKSE: "64"
-        - configuration: ReleaseVR
-          JC_SKSE: "GOG"
-        - configuration: ReleaseGOG
-          JC_SKSE: "64"
-        - configuration: ReleaseGOG
-          JC_SKSE: "VR"
 
 install:
     - cmd: set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
@@ -40,11 +26,9 @@ install:
 
 before_build:
     - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-    - cmd: tools\\build_boost.bat vc141
-    - cmd: tools\\merge_skse.bat
 
 build:
-    project: JContainers.sln
+    project: CMakeLists.txt
 
 after_build:
     - cmd: python tools\\install.py x64\\%CONFIGURATION% %JC_SKSE%
