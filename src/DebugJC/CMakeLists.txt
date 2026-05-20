@@ -26,62 +26,54 @@ set(ROOT_NAMESPACE DebugJC)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE    "TRUE"
 )
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE    "TRUE"
-    )
-endif()
 ################################################################################
 # Compile definitions
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        "$<$<CONFIG:Debug>:"
-            "_DEBUG"
-        ">"
-        "$<$<CONFIG:Release>:"
-            "NDEBUG"
-        ">"
-        "_CONSOLE;"
-        "UNICODE;"
-        "_UNICODE"
-    )
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    "$<$<CONFIG:Debug>:"
+        "_DEBUG"
+    ">"
+    "$<$<CONFIG:Release>:"
+        "NDEBUG"
+    ">"
+    "_CONSOLE;"
+    "UNICODE;"
+    "_UNICODE"
+)
 
 ################################################################################
 # Compile and link options
 ################################################################################
 if(MSVC)
-    if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-        target_compile_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:
-                /Od
-            >
-            $<$<CONFIG:Release>:
-                /O2;
-                /Oi;
-                /Gy
-            >
-            /permissive-;
-            /std:c++17;
-            /sdl;
-            /W3;
-            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-            ${DEFAULT_CXX_EXCEPTION_HANDLING};
-            /Y-
-        )
-        target_link_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Debug>:
-                /INCREMENTAL
-            >
-            $<$<CONFIG:Release>:
-                /OPT:REF;
-                /OPT:ICF;
-                /INCREMENTAL:NO
-            >
-            /DEBUG;
-            /SUBSYSTEM:CONSOLE
-        )
-    endif()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:
+            /Od
+        >
+        $<$<CONFIG:Release>:
+            /O2;
+            /Oi;
+            /Gy
+        >
+        /permissive-;
+        /std:c++17;
+        /sdl;
+        /W3;
+        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
+        ${DEFAULT_CXX_EXCEPTION_HANDLING};
+        /Y-
+    )
+    target_link_options(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:
+            /INCREMENTAL
+        >
+        $<$<CONFIG:Release>:
+            /OPT:REF;
+            /OPT:ICF;
+            /INCREMENTAL:NO
+        >
+        /DEBUG;
+        /SUBSYSTEM:CONSOLE
+    )
 endif()

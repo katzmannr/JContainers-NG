@@ -102,24 +102,22 @@ target_sources(${PROJECT_NAME}
 ################################################################################
 # Compile definitions
 ################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        "$<$<CONFIG:Release>:"
-            "NO_JC_DEBUG"
-        ">"
-        "NOMINMAX;"
-        "_SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING;"
-        "_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;"
-        "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING;"
-        "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;"
-        "GTEST_LANG_CXX11;"
-        "GTEST_HAS_TR1_TUPLE=0;"
-        "_CRT_SECURE_NO_WARNINGS;"
-        "WIN32_LEAN_AND_MEAN;"
-        "BOOST_HAS_HASH;"
-        "_MBCS"
-    )
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    "$<$<CONFIG:Release>:"
+        "NO_JC_DEBUG"
+    ">"
+    "NOMINMAX;"
+    "_SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING;"
+    "_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;"
+    "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING;"
+    "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;"
+    "GTEST_LANG_CXX11;"
+    "GTEST_HAS_TR1_TUPLE=0;"
+    "_CRT_SECURE_NO_WARNINGS;"
+    "WIN32_LEAN_AND_MEAN;"
+    "BOOST_HAS_HASH;"
+    "_MBCS"
+)
 
 ################################################################################
 # Compile and link options
