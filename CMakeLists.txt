@@ -8,16 +8,22 @@ set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 project(JContainers LANGUAGES C CXX)
 
 ################################################################################
+# JContainers-NG does not support Skyrim LE. Don't ask
+################################################################################
+if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(FATAL_ERROR "This project only supports 64-bit builds.")
+endif()
+message("64bit architecture in use")
+
+################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################
-if(NOT CMAKE_VS_PLATFORM_NAME)
-    set(CMAKE_VS_PLATFORM_NAME "x64")
-endif()
-message("${CMAKE_VS_PLATFORM_NAME} architecture in use")
+#if(NOT WIN32)
+#    message(FATAL_ERROR "Only WIN32 is supported")
+#endif()
 
-if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"
-     OR "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86"))
-    message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
+if(NOT MSVC)
+    message(WARNING "Compiler mismatch. Continue at your own risk.")
 endif()
 
 ################################################################################
@@ -75,8 +81,6 @@ cmake_policy(SET CMP0167 OLD)
 #    serialization
 #    date_time
 #)
-#find_package(Jansson REQUIRED)
-#find_package(LuaJIT REQUIRED)
 #find_package(googletest REQUIRED)
 
 ################################################################################
