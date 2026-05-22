@@ -106,6 +106,7 @@ FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.12.0   # match CommonLib requirement
+    OVERRIDE_FIND_PACKAGE
 )
 
 FetchContent_MakeAvailable(spdlog)
@@ -117,6 +118,7 @@ FetchContent_Declare(
     rapidcsv
     GIT_REPOSITORY https://github.com/d99kris/rapidcsv.git
     GIT_TAG v8.92   # check exact version used by CommonLib
+    OVERRIDE_FIND_PACKAGE
 )
 
 FetchContent_MakeAvailable(rapidcsv)
