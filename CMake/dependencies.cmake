@@ -1,0 +1,5 @@
+include(CMake/Boost.cmake)
+include(CMake/Jansson.cmake)
+include(CMake/LuaJIT.cmake)
+include(CMake/googletest.cmake)
+include(CMake/spdlog.cmake)
