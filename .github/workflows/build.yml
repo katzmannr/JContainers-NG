@@ -25,5 +25,5 @@ jobs:
 
       - name: Build
         run: >
-          cmake --build build
+          cmake --build build --parallel
           --config Release
