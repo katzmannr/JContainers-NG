@@ -142,15 +142,18 @@ set(RAPIDCSV_INCLUDE_DIRS
 ################################################################################
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BUILD_API_EXAMPLE "Build old API example" OFF)
+set(BUILD_API_EXAMPLE OFF)
 set(COMMONLIBSSE_BUILD_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(dep/CommonLibSSE-NG)
 add_subdirectory(src/JContainers)
 add_subdirectory(src/json_validator)
 
 # Attention: ToDo - Example requires larger code changes for CommonLibNG
-if(BUILD_API_EXAMPLE)
+if(${BUILD_API_EXAMPLE})
+    message("Building API Usage Example. Build may break here!")
     add_subdirectory(src/api_usage_example)
+else()
+    message("Skipping Build of API Usage example")
 endif()
 
 add_subdirectory(src/DebugJC)
