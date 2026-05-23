@@ -10,11 +10,7 @@
 
 #include "jc_interface.h"
 
-#include "skse64/PluginAPI.h"
-#include "skse64_common/skse_version.h"
-#include "skse64/GameForms.h"
-#include "skse64/PapyrusNativeFunctions.h"
-#include "skse64/PapyrusForm.h"
+#include <SKSE/SKSE.h>
 
 class VMClassRegistry;
 
