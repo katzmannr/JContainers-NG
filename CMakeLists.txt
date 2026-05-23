@@ -8,6 +8,13 @@ set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 project(JContainers LANGUAGES C CXX)
 
 ################################################################################
+# A current compiler is needed, set it via C++ Standard (stricter code handling)
+################################################################################
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+################################################################################
 # JContainers-NG does not support Skyrim LE. Don't ask
 ################################################################################
 if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -135,11 +142,17 @@ set(RAPIDCSV_INCLUDE_DIRS
 ################################################################################
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_API_EXAMPLE "Build old API example" OFF)
 set(COMMONLIBSSE_BUILD_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(dep/CommonLibSSE-NG)
 add_subdirectory(src/JContainers)
 add_subdirectory(src/json_validator)
-add_subdirectory(src/api_usage_example)
+
+# Attention: ToDo - Example requires larger code changes for CommonLibNG
+if(BUILD_API_EXAMPLE)
+    add_subdirectory(src/api_usage_example)
+endif()
+
 add_subdirectory(src/DebugJC)
 
 ###############################################################################
