@@ -17,6 +17,10 @@ set(ALL_FILES
 ################################################################################
 add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 
+target_include_directories(API_example PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/JContainers/src
+)
+
 #use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set(ROOT_NAMESPACE CAPI)
 

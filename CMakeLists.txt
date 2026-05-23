@@ -24,6 +24,8 @@ message("64bit architecture in use")
 
 if(NOT MSVC)
     message(WARNING "Compiler mismatch. Continue at your own risk.")
+else()
+    add_compile_options(/EHsc)
 endif()
 
 ################################################################################
