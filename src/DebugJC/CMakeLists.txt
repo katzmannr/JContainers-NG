@@ -14,12 +14,8 @@ set(ALL_FILES
 
 ################################################################################
 # Target
-################################################################################
+#####################################p###########################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
-
-target_precompile_headers(${PROJECT_NAME} PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/stdafx.h>"
-)
 
 #use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set(ROOT_NAMESPACE DebugJC)
