@@ -53,7 +53,7 @@ if(MSVC)
             /Gy
         >
         /permissive-;
-        /std:c++17;
+        /std:c++20;
         /sdl;
         /W3;
         ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};

@@ -137,7 +137,7 @@ if(MSVC)
             /sdl-;
             /Os
         >
-        /std:c++17;
+        /std:c++20;
         /GF;
         /W3;
         ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
