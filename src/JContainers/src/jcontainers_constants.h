@@ -18,30 +18,48 @@ namespace collections {
 
 #   define JC_DATA_FILES            "JCData/"
 
-#ifdef JC_SKSE_VR
+// Previous constant have been replaced with inline functions (since we have one dll)
 
-#   define JC_PLUGIN_NAME           "JContainersVR"
-#   define JC_SKSE_LOGS             "\\My Games\\Skyrim VR\\SKSE\\"
-#   define JC_USER_FILES            "My Games/Skyrim VR/JCUser/"
-#   define JC_SKYRIM_RUNTIME        CURRENT_RELEASE_RUNTIME
+inline std::string_view plugin_name()
+{
+    if (REL::Module::IsVR()) {
+        return "JContainersVR";
+    }
 
-#elif JC_SKSE_GOG
+    if (REL::Module::GetRuntime() == REL::Module::Runtime::GOG) {
+        return "JContainersGOG";
+    }
 
-#   define JC_PLUGIN_NAME           "JContainersGOG"
-#   define JC_SKSE_LOGS             "\\My Games\\Skyrim Special Edition GOG\\SKSE\\"
-#   define JC_USER_FILES            "My Games/Skyrim Special Edition GOG/JCUser/"
-#   define JC_SKYRIM_RUNTIME        RUNTIME_VERSION_1_6_1179_GOG
+    return "JContainers64";
+}
 
-#else
+inline std::string_view skse_logs()
+{
+    if (REL::Module::IsVR()) {
+        return "\\My Games\\Skyrim VR\\SKSE\\";
+    }
 
-#   define JC_PLUGIN_NAME           "JContainers64"
-#   define JC_SKSE_LOGS             "\\My Games\\Skyrim Special Edition\\SKSE\\"
-#   define JC_USER_FILES            "My Games/Skyrim Special Edition/JCUser/"
-#   define JC_SKYRIM_RUNTIME        CURRENT_RELEASE_RUNTIME
+    if (REL::Module::GetRuntime() == REL::Module::Runtime::GOG) {
+        return "\\My Games\\Skyrim Special Edition GOG\\SKSE\\";
+    }
 
-#endif
+    return "\\My Games\\Skyrim Special Edition\\SKSE\\";
+}
 
-#   define JC_PLUGIN_FILENAME       JC_PLUGIN_NAME ".dll"
+inline std::string_view user_files()
+{
+    if (REL::Module::IsVR()) {
+        return "My Games/Skyrim VR/JCUser/";
+    }
+
+    if (REL::Module::GetRuntime() == REL::Module::Runtime::GOG) {
+        return "My Games/Skyrim Special Edition GOG/JCUser/";
+    }
+
+    return "My Games/Skyrim Special Edition/JCUser/";
+}
+
+#   define JC_PLUGIN_FILENAME       plugin_name() + ".dll"
 
     enum class consts : std::uint32_t {
         storage_chunk = 'JSTR',

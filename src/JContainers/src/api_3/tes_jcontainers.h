@@ -113,7 +113,7 @@ namespace tes_api_3 {
                 return std::string();
             }
 
-            strcat_s(path, sizeof(path), "/" JC_USER_FILES);
+            strcat_s(path, sizeof(path), "/" + user_files());
 
             // race condition possible. hope it's not critical
             if (!boost::filesystem::exists(path) && (boost::filesystem::create_directories(path), !boost::filesystem::exists(path))) {
@@ -126,7 +126,7 @@ namespace tes_api_3 {
         static skse::string_ref _userDirectory() {
             return userDirectory().c_str();
         }
-        REGISTERF_STATELESS(_userDirectory, "userDirectory", "", "A path to user-specific directory - " JC_USER_FILES);
+        REGISTERF_STATELESS(_userDirectory, "userDirectory", "", "A path to user-specific directory - " + user_files());
 
         REGISTER_TEXT([]() {
             const char fmt[] = R"===(

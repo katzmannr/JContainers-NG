@@ -1,15 +1,6 @@
-#include "skse/skse.h"
+#include <SKSE/SKSE.h>
 
-#include "skse64/GameData.h"
-#include "skse64/GameForms.h"
-#include "skse64/GameData.h"
-#include "skse64/InternalSerialization.h"
-#include "skse64/PluginAPI.h"
-#include "skse64/PapyrusVM.h"
-
-#ifdef JC_SKSE_VR
 #include "SkyrimVRESLAPI.h"
-#endif
 
 #include "util/stl_ext.h"
 #include "forms/form_handling.h"
@@ -127,31 +118,33 @@ struct real_api : public skse_api
     std::optional<std::uint32_t> form_from_file (std::string_view const& name, std::uint32_t form) override
     {
         using namespace std;
-#ifdef JC_SKSE_VR
-        if (g_SkyrimVRESLInterface)
+        if (!REL::Module::IsVR())
         {
-            if (ModInfo const* mi = SkyrimVRESLPluginAPI::LookupAllLoadedModByName (string (name).c_str ()))
+            if (g_SkyrimVRESLInterface)
             {
-                auto retval = make_optional (SkyrimVRESLPluginAPI::GetFullFormID(mi, form));
-                return retval;
+                if (ModInfo const* mi = SkyrimVRESLPluginAPI::LookupAllLoadedModByName (string (name).c_str ()))
+                {
+                    auto retval = make_optional (SkyrimVRESLPluginAPI::GetFullFormID(mi, form));
+                    return retval;
+                }
+            }
+            else
+            {
+                DataHandler* p = DataHandler::GetSingleton ();
+                if (ModInfo const* mi = p->LookupModByName (string (name).c_str ()))
+                {
+                    auto retval = make_optional (mi->GetFormID (form));
+                    return retval;
+                }
             }
         }
-        else
-        {
+        else {
             DataHandler* p = DataHandler::GetSingleton ();
             if (ModInfo const* mi = p->LookupModByName (string (name).c_str ()))
             {
-                auto retval = make_optional (mi->GetFormID (form));
-                return retval;
+                return make_optional (mi->GetFormID (form));
             }
         }
-#else
-        DataHandler* p = DataHandler::GetSingleton ();
-        if (ModInfo const* mi = p->LookupModByName (string (name).c_str ()))
-        {
-            return make_optional (mi->GetFormID (form));
-        }
-#endif
         return nullopt;
     }
 
@@ -159,37 +152,43 @@ struct real_api : public skse_api
     std::optional<std::string_view> loaded_mod_name (std::uint8_t i) override
     {
         DataHandler* p = DataHandler::GetSingleton ();
-#ifdef JC_SKSE_VR
-        if (i < p->modList.loadedModCount)
-#else
-        if (i < p->modList.loadedMods.count)
-#endif
+        if (!REL::Module::IsVR())
+        {
+            if (i < p->modList.loadedModCount)
+            {
+                return p->modList.loadedMods[i]->name;
+            }
+        }
+        else if (i < p->modList.loadedMods.count)
+        {
             return p->modList.loadedMods[i]->name;
+        }
         return std::nullopt;
     }
 
     std::optional<std::string_view> loaded_light_mod_name (std::uint16_t i) override
     {
-#ifdef JC_SKSE_VR
-    if (g_SkyrimVRESLInterface)
-    {
-		const SkyrimVRESLPluginAPI::TESFileCollection* fileCollection = g_SkyrimVRESLInterface->GetCompiledFileCollection();
-        if (i < fileCollection->smallFiles.count)
+        if (!REL::Module::IsVR())
         {
-            ModInfo* smallFile = nullptr;
-            fileCollection->smallFiles.GetNthItem(i, smallFile);
-            return smallFile->name;
+            if (g_SkyrimVRESLInterface)
+            {
+                const SkyrimVRESLPluginAPI::TESFileCollection* fileCollection = g_SkyrimVRESLInterface->GetCompiledFileCollection();
+                if (i < fileCollection->smallFiles.count)
+                {
+                    ModInfo* smallFile = nullptr;
+                    fileCollection->smallFiles.GetNthItem(i, smallFile);
+                    return smallFile->name;
+                }
+            }
+            else
+            {
+                JC_log("WARNING: Attempted to fetch a light plugin name in VR, but VR ESL support is not  present!");
+            }
+        } else {
+            DataHandler* p = DataHandler::GetSingleton ();
+            if (i < p->modList.loadedCCMods.count)
+                return p->modList.loadedCCMods[i]->name;
         }
-    }
-    else
-    {
-        JC_log("WARNING: Attempted to fetch a light plugin name in VR, but VR ESL support is not  present!");
-    }    
-#else
-        DataHandler* p = DataHandler::GetSingleton ();
-        if (i < p->modList.loadedCCMods.count)
-            return p->modList.loadedCCMods[i]->name;
-#endif
         return std::nullopt;
     }
 
