@@ -1,7 +1,7 @@
 #pragma once
 
 #include <set>
-#include "collections/collections.h"
+#include "collections.h"
 
 namespace collections {
 

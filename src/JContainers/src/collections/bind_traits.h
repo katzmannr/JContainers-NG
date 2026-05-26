@@ -3,8 +3,8 @@
 #include "util/stl_ext.h"
 #include "skse/skse.h"
 #include "reflection/tes_binding.h"
-#include "collections/collections.h"
-#include "collections/context.h"
+#include "collections.h"
+#include "context.h"
 
 namespace reflection { namespace binding {
 

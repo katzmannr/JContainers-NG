@@ -1,6 +1,6 @@
 #pragma once
 
-#include "collections/collections.h"
+#include "collections.h"
 
 #include <thread>
 #include "meta.h"
