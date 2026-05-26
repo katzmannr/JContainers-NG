@@ -1,18 +1,10 @@
 #include <boost/iostreams/stream.hpp>
 #include <ShlObj.h>
 
-#include "skse64/PluginAPI.h"
-#include "skse64_common/skse_version.h"
-#include "skse64/GameData.h"
-#include "skse64/GameForms.h"
-#include "skse64/GameData.h"
+#include <SKSE/SKSE.h>
 
-#ifdef JC_SKSE_VR
 #include "SkyrimVRESLAPI.h"
-#endif
 
-#include "skse/skse.h"
-#include "skse64/PapyrusVM.h"
 #include "util/util.h"
 #include "jc_interface.h"
 #include "reflection/reflection.h"
@@ -120,46 +112,43 @@ namespace {
     extern "C" {
 
         __declspec(dllexport)
-#ifndef JC_SKSE_VR
-        SKSEPluginVersionData SKSEPlugin_Version =
+        if (REL::Module::IsVR())
         {
-            SKSEPluginVersionData::kVersion,
-            JC_API_VERSION,
-            JC_PLUGIN_NAME,
-            "silvericed, ryobg & others",
-            "",
-            0,	// not version independent
-            0,
-            { JC_SKYRIM_RUNTIME, 0 },
-            0,	// works with any version of the script extender. you probably do not need to put anything here
-        };
-#endif
+            SKSEPluginVersionData SKSEPlugin_Version =
+            {
+                SKSEPluginVersionData::kVersion,
+                JC_API_VERSION,
+                plugin_name(),
+                "silvericed, ryobg & others",
+                "",
+                0,	// not version independent
+                0,
+                { CURRENT_RELEASE_RUNTIME, 0 },
+                0,	// works with any version of the script extender. you probably do not need to put anything here
+            };
+        }
 
         /// Since SKSE 2.3.1 it is not actually called, kept for minimizing changes
         bool SKSEPlugin_Query (const SKSEInterface * skse, PluginInfo * info)
         {
-            gLog.OpenRelative(CSIDL_MYDOCUMENTS, JC_SKSE_LOGS JC_PLUGIN_NAME ".log");
+            gLog.OpenRelative(CSIDL_MYDOCUMENTS, skse_logs() + plugin_name() + ".log");
             gLog.SetPrintLevel(IDebugLog::kLevel_Error);
             gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
 
             if (info)
             {
                 info->infoVersion = PluginInfo::kInfoVersion;
-                info->name = JC_PLUGIN_NAME;
+                info->name = plugin_name();
                 info->version = JC_API_VERSION;
             }
 
             // store plugin handle so we can identify ourselves later
             g_pluginHandle = skse->GetPluginHandle();
 
-            JC_log(JC_PLUGIN_NAME " " JC_VERSION_STR);
+            JC_log(plugin_name() + " " + JC_VERSION_STR);
 
             if (skse->isEditor) {
                 JC_log("loaded in editor, marking as incompatible");
-                return false;
-            }
-            else if (skse->runtimeVersion != JC_SKYRIM_RUNTIME) {
-                JC_log("unsupported runtime version %08X", skse->runtimeVersion);
                 return false;
             }
 
@@ -254,9 +243,10 @@ namespace {
 
         __declspec(dllexport) bool SKSEPlugin_Load(const SKSEInterface * skse)
         {
-#ifndef JC_SKSE_VR
-            SKSEPlugin_Query (skse, nullptr);
-#endif
+            if (!REL::Module::IsVR())
+            {
+                SKSEPlugin_Query (skse, nullptr);
+            }
             g_serialization->SetUniqueID(g_pluginHandle, (UInt32)consts::storage_chunk);
 
             g_serialization->SetRevertCallback(g_pluginHandle, revert);
@@ -273,18 +263,18 @@ namespace {
                 g_messaging->RegisterListener(g_pluginHandle, "SKSE", [](SKSEMessagingInterface::Message* msg) {
                     if (msg && msg->type == SKSEMessagingInterface::kMessage_PostPostLoad) {
                         g_messaging->Dispatch(g_pluginHandle, jc::message_root_interface, (void *)&jc::root, sizeof(void*), nullptr);
-
-#ifdef JC_SKSE_VR
-                        SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(g_pluginHandle, g_messaging);
-                        if (g_SkyrimVRESLInterface)
+                        if (!REL::Module::IsVR())
                         {
-                            JC_log("SkyrimVRESL interface detected and initialized!");
+                            SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(g_pluginHandle, g_messaging);
+                            if (g_SkyrimVRESLInterface)
+                            {
+                                JC_log("SkyrimVRESL interface detected and initialized!");
+                            }
+                            else
+                            {
+                                JC_log("SkyrimVRESL interface is not present or has failed to be retrieved... ESL related functionality is disabled.");
+                            }
                         }
-                        else
-                        {
-                            JC_log("SkyrimVRESL interface is not present or has failed to be retrieved... ESL related functionality is disabled.");
-                        }
-#endif
                     }
                 });
             }

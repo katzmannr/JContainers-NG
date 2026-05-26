@@ -10,11 +10,7 @@
 
 #include "jc_interface.h"
 
-#include "skse64/PluginAPI.h"
-#include "skse64_common/skse_version.h"
-#include "skse64/GameForms.h"
-#include "skse64/PapyrusNativeFunctions.h"
-#include "skse64/PapyrusForm.h"
+#include <SKSE/SKSE.h>
 
 class VMClassRegistry;
 
@@ -23,7 +19,7 @@ static PluginHandle					g_pluginHandle = kPluginHandle_Invalid;
 static SKSEPapyrusInterface			* g_papyrus = NULL;
 static SKSEMessagingInterface       *g_messaging = nullptr;
 
-#define PLUGIN_NAME "JC_API_Example"
+constexpr std::string_view PLUGIN_NAME "JC_API_Example"
 
 
 namespace {
@@ -86,7 +82,7 @@ namespace {
         auto className = PLUGIN_NAME;
 
         registry->RegisterFunction(
-            new NativeFunction1 <StaticFunctionTag, void, SInt32>(funcName, className, sortByName, registry));
+            new NativeFunction1 <StaticFunctionTag, void, SInt32>(funcName, className.data(), sortByName, registry));
 
         registry->SetFunctionFlags(className, funcName, VMClassRegistry::kFunctionFlag_NoWait);
 
@@ -100,7 +96,7 @@ extern "C" {
 
     __declspec(dllexport) bool SKSEPlugin_Query(const SKSEInterface * skse, PluginInfo * info)
     {
-        gLog.OpenRelative (CSIDL_MYDOCUMENTS, JC_SKSE_LOGS PLUGIN_NAME ".log");
+        gLog.OpenRelative (CSIDL_MYDOCUMENTS, skse_logs() + PLUGIN_NAME + ".log");
         gLog.SetPrintLevel (IDebugLog::kLevel_Error);
         gLog.SetLogLevel (IDebugLog::kLevel_DebugMessage);
 
@@ -146,7 +142,7 @@ extern "C" {
 
             if (msg && msg->type == SKSEMessagingInterface::kMessage_PostLoad) {
 
-                auto loaded = g_messaging->RegisterListener(g_pluginHandle, JC_PLUGIN_NAME, [](SKSEMessagingInterface::Message* msg) {
+                auto loaded = g_messaging->RegisterListener(g_pluginHandle, plugin_name(), [](SKSEMessagingInterface::Message* msg) {
 
                     // JC publishes its API:
                     if (msg && msg->type == jc::message_root_interface) {

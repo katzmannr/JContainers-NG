@@ -1,6 +1,11 @@
 set(PROJECT_NAME json_validator)
 
 ################################################################################
+# Boost Package provided by us, but include folders require find_package
+################################################################################
+find_package(Boost CONFIG REQUIRED)
+
+################################################################################
 # Source groups
 ################################################################################
 file(GLOB ALL_FILES
@@ -39,10 +44,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 ################################################################################
 # Include directories
 ################################################################################
+#target_include_directories(${PROJECT_NAME} PRIVATE
+#    ${boost_SOURCE_DIR}
+#    ${boost_SOURCE_DIR}/libs/filesystem/include
+#)
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/dep/jansson/jansson/src;"
     "${CMAKE_SOURCE_DIR}/dep/jansson;"
-    "${CMAKE_SOURCE_DIR}/dep/boost"
 )
 
 ################################################################################
@@ -91,5 +99,6 @@ if(MSVC)
 endif()
 
 target_link_directories(${PROJECT_NAME} PRIVATE
-    "${CMAKE_SOURCE_DIR}//dep/boost/boost_lib/lib"
+    Boost::filesystem
+    Boost::headers
 )
