@@ -1,3 +1,4 @@
+#include <utility>
 #include "skse/skse.h"
 
 void JC_log(const char* fmt, va_list& args) {

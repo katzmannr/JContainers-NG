@@ -81,8 +81,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 # Include directories
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/JContainers/src;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/boost;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/JContainers/src;"
     "${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest/googletest/googletest/include;"
     "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src;"
     "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson;"
@@ -170,7 +169,13 @@ target_link_libraries(${PROJECT_NAME}
         CommonLibSSE::CommonLibSSE
 )
 
+target_link_directories(${PROJECT_NAME} PRIVATE
+    Boost::filesystem
+    Boost::headers
+    Boost::serialization
+    Boost::date_time
+)
+
 target_link_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/dep/boost/boost_lib/lib;"
     "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>"
 )

@@ -97,5 +97,4 @@ endif()
 target_link_directories(${PROJECT_NAME} PRIVATE
     Boost::filesystem
     Boost::headers
-    "${CMAKE_SOURCE_DIR}//dep/boost/boost_lib/lib"
 )
