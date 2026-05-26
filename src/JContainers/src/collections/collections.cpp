@@ -33,10 +33,10 @@
 
 #include "forms/form_handling.h"
 
-#include "collections/collections.h"
-#include "collections/context.h"
+#include "collections.h"
+#include "context.h"
 
-#include "collections/context.hpp"
+#include "context.hpp"
 #include "forms/form_observer.hpp"
 
 BOOST_CLASS_EXPORT_GUID(collections::array, "kJArray");

@@ -5,8 +5,8 @@
 #include <boost/optional.hpp>
 #include <boost/variant/variant.hpp>
 
-#include "collections/collections.h"
-#include "collections/default_value.h"
+#include "collections.h"
+#include "default_value.h"
 
 namespace collections
 {

@@ -10,8 +10,8 @@
 #include "boost_extras.h"
 
 #include "forms/form_handling.h"
-#include "collections/collections.h"
-#include "collections/access.h"
+#include "collections.h"
+#include "access.h"
 
 namespace collections {
 

@@ -1,3 +1,4 @@
+#include <utility>
 #include "SkyrimVRESLAPI.h"
 // Interface code based on https://github.com/adamhynek/higgs
 

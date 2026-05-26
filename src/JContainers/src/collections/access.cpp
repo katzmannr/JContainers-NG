@@ -1,4 +1,4 @@
-#include "collections/access.h"
+#include "access.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -8,9 +8,9 @@
 #include <functional>
 
 #include "forms/form_handling.h"
-#include "collections/collections.h"
-#include "collections/context.h"
-#include "collections/operators.h"
+#include "collections.h"
+#include "context.h"
+#include "operators.h"
 #include "util/cstring.h"
 
 namespace collections

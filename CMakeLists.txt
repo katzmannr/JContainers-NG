@@ -92,7 +92,7 @@ cmake_policy(SET CMP0167 OLD)
 #    serialization
 #    date_time
 #)
-#find_package(googletest REQUIRED)
+find_package(googletest CONFIG REQUIRED)
 
 ################################################################################
 # Use solution folders feature
@@ -169,7 +169,6 @@ add_subdirectory(src/DebugJC)
 ###############################################################################
 # C++ Linker Dependencies
 ###############################################################################
-#target_link_libraries(JContainersTests PRIVATE gtest)
 target_link_libraries(JContainers
     PRIVATE
         jc::common
