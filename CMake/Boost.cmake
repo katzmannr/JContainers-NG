@@ -4,6 +4,7 @@ include(FetchContent)
 FetchContent_Declare(
   Boost
   URL https://github.com/boostorg/boost/releases/download/boost-1.83.0/boost-1.83.0.tar.gz
+  OVERRIDE_FIND_PACKAGE
 )
 
 FetchContent_MakeAvailable(Boost)

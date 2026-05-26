@@ -32,7 +32,9 @@ message("64bit architecture in use")
 if(NOT MSVC)
     message(WARNING "Compiler mismatch. Continue at your own risk.")
 else()
-    add_compile_options(/EHsc)
+    add_compile_options(
+        "$<$<COMPILE_LANGUAGE:CXX>:/EHsc>"
+    )
 endif()
 
 ################################################################################
@@ -138,6 +140,11 @@ set(RAPIDCSV_INCLUDE_DIRS
 )
 
 ################################################################################
+# Boost Package provided by us, but include folders require find_package
+################################################################################
+find_package(Boost CONFIG REQUIRED)
+
+################################################################################
 # Sub-projects
 ################################################################################
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -169,4 +176,5 @@ target_link_libraries(JContainers
         Boost::filesystem
         Boost::thread
         Boost::serialization
+        Boost::date_time
 )

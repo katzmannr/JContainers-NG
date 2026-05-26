@@ -1,6 +1,11 @@
 set(PROJECT_NAME json_validator)
 
 ################################################################################
+# Boost Package provided by us, but include folders require find_package
+################################################################################
+find_package(Boost CONFIG REQUIRED)
+
+################################################################################
 # Source groups
 ################################################################################
 file(GLOB ALL_FILES
@@ -46,7 +51,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/dep/jansson/jansson/src;"
     "${CMAKE_SOURCE_DIR}/dep/jansson;"
-    "${CMAKE_SOURCE_DIR}/dep/boost"
 )
 
 ################################################################################
