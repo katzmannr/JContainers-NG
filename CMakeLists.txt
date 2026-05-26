@@ -93,6 +93,7 @@ cmake_policy(SET CMP0167 OLD)
 #    date_time
 #)
 find_package(googletest CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 ################################################################################
 # Use solution folders feature
