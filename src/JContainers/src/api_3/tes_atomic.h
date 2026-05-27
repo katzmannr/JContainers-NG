@@ -193,7 +193,7 @@ If @createMissingKeys is True, the function attemps to create missing @path elem
 
             boost::optional<item> newValue = ca::get(obj, path);
             EXPECT_NE(newValue, boost::none);
-            EXPECT_NOT_NIL(newValue->get<internal_item_type>());
+            EXPECT_NE((newValue->get<internal_item_type>()), nullptr);
             EXPECT_EQ(value.expect_new_value, *newValue->get<internal_item_type>());
 
             if (previousValue && previousValue->get<internal_item_type>()

@@ -459,7 +459,7 @@ namespace forms {
 
             auto entry = watcher.watch_form(fid);
             EXPECT_TRUE(watcher.u_forms_count() == 1);
-            EXPECT_NOT_NIL(entry.get());
+            EXPECT_NE((entry.get()), nullptr);
 
             watcher.on_form_deleted(fh::form_id_to_handle(fid));
             watcher.u_remove_expired_forms();

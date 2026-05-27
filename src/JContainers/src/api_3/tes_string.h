@@ -101,10 +101,10 @@ Accepts ASCII and UTF-8 encoded strings only");
 		auto testWrap = [&](const char *string, int linesCount, int charsPerLine) {
             auto obj = tes_string::wrap(ctx, string, charsPerLine);
             if (linesCount == -1) {
-                EXPECT_NIL(obj);
+                EXPECT_EQ((obj), nullptr);
             }
             else {
-                EXPECT_NOT_NIL(obj);
+                EXPECT_NE((obj), nullptr);
                 EXPECT_TRUE(obj->s_count() >= linesCount);
             }
 		};

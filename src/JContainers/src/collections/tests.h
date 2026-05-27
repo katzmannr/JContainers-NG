@@ -264,12 +264,12 @@ namespace collections { namespace {
         EXPECT_TRUE(tests->s_count() > 0);
 
         auto testNewResolving = [&](object_base& tree, const char* path, const item* expectedVal) {
-            EXPECT_NOT_NIL(path);
+            EXPECT_NE((path), nullptr);
             auto value = ca::get(tree, path);
             EXPECT_TRUE((!expectedVal && !value) || (value && *expectedVal == *value));
         };
         auto testOldResolving = [&](object_base& tree, const char* path, const item* expectedVal) {
-            EXPECT_NOT_NIL(path);
+            EXPECT_NE((path), nullptr);
             path_resolving::resolve(context, &tree, path, [&](item *optional) {
                 EXPECT_TRUE((!expectedVal && !optional) || (optional && *expectedVal == *optional));
             });
@@ -299,11 +299,11 @@ namespace collections { namespace {
 
     JC_TEST(json_deserializer, test)
     {
-        EXPECT_NIL(json_deserializer::object_from_file(context, ""));
-        EXPECT_NIL(json_deserializer::object_from_file(context, nullptr));
+        EXPECT_EQ((json_deserializer::object_from_file(context, "")), nullptr);
+        EXPECT_EQ((json_deserializer::object_from_file(context, nullptr)), nullptr);
 
-        EXPECT_NIL(json_deserializer::object_from_json_data(context, ""));
-        EXPECT_NIL(json_deserializer::object_from_json_data(context, nullptr));
+        EXPECT_EQ((json_deserializer::object_from_json_data(context, "")), nullptr);
+        EXPECT_EQ((json_deserializer::object_from_json_data(context, nullptr)), nullptr);
     }
 
     // load json file into tes_context -> serialize into json again -> compare with original json
@@ -339,7 +339,7 @@ namespace collections { namespace {
             Handle rootId = Handle::Null;
             {
                 auto root = json_deserializer::object_from_file (ctx, filepath.generic_string ().c_str ());
-                EXPECT_NOT_NIL (root);
+                EXPECT_NE( (root), nullptr);
                 rootId = root->uid ();
             }
             auto state = ctx.write_to_string ();
@@ -347,18 +347,18 @@ namespace collections { namespace {
         }
 
         static void do_comparison(const char *file_path) {
-            EXPECT_NOT_NIL(file_path);
+            EXPECT_NE((file_path), nullptr);
 
             auto jsonOut = make_unique_ptr((json_t*)nullptr, &json_decref);
             {
                 tes_context_standalone ctx;
                 auto root = json_deserializer::object_from_file(ctx, file_path);
-                EXPECT_NOT_NIL(root);
+                EXPECT_NE((root), nullptr);
                 jsonOut = json_serializer::create_json_value(*root);
             }
 
             auto originJson = json_deserializer::json_from_file(file_path);
-            EXPECT_NOT_NIL(originJson);
+            EXPECT_NE((originJson), nullptr);
 
             auto originJson_text = json_dumps (originJson.get (), JSON_INDENT (4));
             auto jsonOut_text = json_dumps (jsonOut.get (), JSON_INDENT (4));
@@ -367,7 +367,7 @@ namespace collections { namespace {
         }
 
         static void do_comparison2(const char *file_path) {
-            EXPECT_NOT_NIL(file_path);
+            EXPECT_NE((file_path), nullptr);
             auto jsonOut = make_unique_ptr((json_t*)nullptr, &json_decref);
             {
                 tes_context_standalone ctx;
@@ -375,7 +375,7 @@ namespace collections { namespace {
                 Handle rootId = Handle::Null;
                 {
                     auto root = json_deserializer::object_from_file(ctx, file_path);
-                    EXPECT_NOT_NIL(root);
+                    EXPECT_NE((root), nullptr);
                     rootId = root->uid();
                 }
 
@@ -386,7 +386,7 @@ namespace collections { namespace {
             }
 
             auto originJson = json_deserializer::json_from_file(file_path);
-            EXPECT_NOT_NIL(originJson);
+            EXPECT_NE((originJson), nullptr);
 
             EXPECT_TRUE(json_equal(originJson.get(), jsonOut.get()) == 1);
         }
@@ -424,8 +424,8 @@ namespace collections { namespace {
             }
         ));
 
-        EXPECT_NOT_NIL(root);
-        EXPECT_NOT_NIL(root->as<form_map>());
+        EXPECT_NE((root), nullptr);
+        EXPECT_NE((root->as<form_map>()), nullptr);
     }
 
     JC_TEST(json_handling, object_references)
@@ -458,7 +458,7 @@ namespace collections { namespace {
 
         auto validateGraph = [&](object_base *root) {
 
-            EXPECT_NOT_NIL(root);
+            EXPECT_NE((root), nullptr);
 
             const char *equalPaths[][2] = {
                 ".parentArray[0]", ".parentArray[1].referenceToChildJMap1",
@@ -515,7 +515,7 @@ namespace collections { namespace {
             ))->as_link<array>();
 
             EXPECT_TRUE(root[0] == root.base());
-            //EXPECT_NOT_NIL(root);
+            //EXPECT_NE((root), nullptr);
 
             array& copy = copying::deep_copy(context, root).as_link<array>();
             EXPECT_TRUE(&copy != &root);
