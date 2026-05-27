@@ -76,6 +76,7 @@ if(MSVC)
             /Od;
             /RTC1
         >
+        /FIcommon/IPrefix.h
         /W3;
         /Zi;
         /GR;
