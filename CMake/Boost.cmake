@@ -1,4 +1,8 @@
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
+set(BOOST_INCLUDE_LIBRARIES filesystem thread serialization date_time)
+set(BOOST_EXCLUDE_LIBRARIES "")  # optional
+
 include(FetchContent)
 
 FetchContent_Declare(

@@ -45,14 +45,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 # Include directories
 ################################################################################
 #target_include_directories(${PROJECT_NAME} PRIVATE
-#    ${boost_SOURCE_DIR}
 #    ${boost_SOURCE_DIR}/libs/filesystem/include
 #)
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/dep/jansson/jansson/src;"
     "${CMAKE_SOURCE_DIR}/dep/jansson;"
+    "${Boost_SOURCE_DIR};"
 )
-
 ################################################################################
 # Compile definitions
 ################################################################################
