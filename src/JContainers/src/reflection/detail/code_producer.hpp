@@ -5,7 +5,7 @@
 #include <vector>
 #include <fstream>
 
-#include "gtest.h"
+#include <gtest/gtest.h>
 #include "reflection/reflection.h"
 
 #include "reflection/tes_binding.h"

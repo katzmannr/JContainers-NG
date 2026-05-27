@@ -1,7 +1,7 @@
 #include "reflection/reflection.h"
 
 #include <map>
-#include "gtest.h"
+#include <gtest/gtest.h>
 #include "util/spinlock.h"
 #include "util/singleton.h"
 #include "skse64/PapyrusVM.h"

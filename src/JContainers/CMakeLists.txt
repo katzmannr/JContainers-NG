@@ -167,6 +167,7 @@ add_custom_command(
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         CommonLibSSE::CommonLibSSE
+        GTest::gtest_main
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE
