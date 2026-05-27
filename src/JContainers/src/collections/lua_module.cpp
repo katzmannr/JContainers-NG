@@ -22,7 +22,7 @@ extern "C" {
 
 #include "meta.h"
 #include "util/util.h"
-#include "gtest.h"
+#include <gtest/gtest.h>
 #include "util/spinlock.h"
 #include "reflection/reflection.h"
 #include "jcontainers_constants.h"

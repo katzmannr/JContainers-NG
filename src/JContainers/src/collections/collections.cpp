@@ -21,7 +21,7 @@
 #include <sstream>
 #include <set>
 
-#include "gtest.h"
+#include <gtest/gtest.h>
 #include "util/stl_ext.h"
 
 #include "intrusive_ptr.hpp"

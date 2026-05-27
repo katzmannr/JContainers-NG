@@ -9,7 +9,7 @@
 #include "boost/archive/binary_oarchive.hpp"
 
 #include "jansson.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "common/IDebugLog.h"
 
 #include "jcontainers_constants.h"

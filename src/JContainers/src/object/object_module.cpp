@@ -31,7 +31,7 @@
 #include "util/istring_serialization.h"
 
 #include "rw_mutex.h"
-#include "gtest.h"
+#include <gtest/gtest.h>
 
 #include "iarchive_with_blob.h"
 #include "jcontainers_constants.h"

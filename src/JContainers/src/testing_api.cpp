@@ -1,6 +1,6 @@
 #include "jcontainers_constants.h"
 #include "reflection/reflection.h"
-#include "gtest.h"
+#include <gtest/gtest.h>
 
 // C API for python scripts as a part of bundling and testing functionality
 extern "C" {

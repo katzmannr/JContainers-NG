@@ -144,6 +144,7 @@ set(RAPIDCSV_INCLUDE_DIRS
 # Boost Package provided by us, but include folders require find_package
 ################################################################################
 find_package(Boost CONFIG REQUIRED)
+find_package(rapidcsv CONFIG REQUIRED)
 
 ################################################################################
 # Sub-projects
