@@ -151,6 +151,7 @@ set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_API_EXAMPLE OFF)
 set(COMMONLIBSSE_BUILD_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(dep/common)
 add_subdirectory(dep/CommonLibSSE-NG)
 add_subdirectory(src/JContainers)
 add_subdirectory(src/json_validator)
@@ -171,6 +172,7 @@ add_subdirectory(src/DebugJC)
 #target_link_libraries(JContainersTests PRIVATE gtest)
 target_link_libraries(JContainers
     PRIVATE
+        jc::common
         jansson
         LuaJIT
         Boost::filesystem
