@@ -182,4 +182,6 @@ target_link_libraries(JContainers
         Boost::thread
         Boost::serialization
         Boost::date_time
+        Boost::lockfree
+        Boost::iostreams
 )

@@ -77,14 +77,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 # Include directories
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/JContainers/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest/googletest/googletest/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/luajit/luajit-2.0/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/CommonLibSSE-NG/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/CommonLibSSE-NG/CommonLibSSE/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/include"
+    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/CommonLibSSE/include"
+    "${CMAKE_SOURCE_DIR}/src"
     "${Boost_INCLUDE_DIRS}"
     "${rapidcsv_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/."
@@ -95,7 +90,7 @@ target_sources(${PROJECT_NAME}
         src/jc_interface.cpp
     PUBLIC
         FILE_SET HEADERS
-        BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/JContainers/src"
+        BASE_DIRS "${CMAKE_SOURCE_DIR}/src/JContainers/src"
         FILES ${JC_HEADERS}
 )
 
@@ -167,19 +162,24 @@ add_custom_command(
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        jansson
         CommonLibSSE::CommonLibSSE
         GTest::gtest_main
         Boost::filesystem
         Boost::headers
         Boost::serialization
         Boost::date_time
-)
+        Boost::lockfree
+        Boost::iostreams)
 
 target_link_directories(${PROJECT_NAME} PRIVATE
+    jansson
     Boost::filesystem
     Boost::headers
     Boost::serialization
     Boost::date_time
+    Boost::lockfree
+    Boost::iostreams
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC

@@ -48,10 +48,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 #    ${boost_SOURCE_DIR}/libs/filesystem/include
 #)
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/dep/jansson/jansson/src"
-    "${CMAKE_SOURCE_DIR}/dep/jansson"
-    "${Boost_SOURCE_DIR}"
+    "${CMAKE_SOURCE_DIR}/src/JContainers/src"
 )
+
 ################################################################################
 # Compile definitions
 ################################################################################
@@ -98,7 +97,16 @@ if(MSVC)
 endif()
 
 target_link_directories(${PROJECT_NAME} PRIVATE
+    jansson
     Boost::filesystem
     Boost::headers
     rapidcsv
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        jansson
+        Boost::filesystem
+        Boost::headers
+        rapidcsv
 )
