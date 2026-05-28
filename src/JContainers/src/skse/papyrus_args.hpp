@@ -1,7 +1,6 @@
 #pragma once
 
-#include "skse64/PapyrusArgs.h"
-#include "skse64/PapyrusStringUtil.h"
+#include <SKSE/SKSE.h>
 
 template <> inline UInt64 GetTypeID <skse::string_ref>(VMClassRegistry * registry)                        { return VMValue::kType_String; }
 template <> inline UInt64 GetTypeID <VMArray<skse::string_ref>>(VMClassRegistry * registry)       { return VMValue::kType_StringArray; }

@@ -171,14 +171,6 @@ target_link_libraries(${PROJECT_NAME}
         Boost::date_time
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE
-    jansson
-    Boost::filesystem
-    Boost::headers
-    Boost::serialization
-    Boost::date_time
-)
-
 target_link_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>"
 )

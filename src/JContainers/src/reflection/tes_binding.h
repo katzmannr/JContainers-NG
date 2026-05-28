@@ -1,7 +1,6 @@
 #pragma once
 
-#include "skse64/PapyrusNativeFunctions.h"
-#include "skse/string.h"
+#include <SKSE/SKSE.h>
 #include "reflection/reflection.h"
 
 class BGSListForm;

@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include "util/spinlock.h"
 #include "util/singleton.h"
-#include "skse64/PapyrusVM.h"
+#include <SKSE/SKSE.h>
 
 #include "reflection/detail/code_producer.hpp"
 #include "reflection/detail/type_traits.hpp"

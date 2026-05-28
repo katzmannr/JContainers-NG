@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <stdint.h>
 
-#include "skse64/PapyrusVM.h"
+#include <SKSE/SKSE.h>
 #include "meta.h"
 #include "util/istring.h"
 

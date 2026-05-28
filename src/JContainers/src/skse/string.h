@@ -1,11 +1,11 @@
 #pragma once
 
 #include <string>
-#include "skse64_common/Utilities.h"
+#include <SKSE/SKSE.h>
 
 namespace skse {
 
-    /// See `dep\skse64\src\skse64\GameTypes.h` and `StringCache`.
+    /// See `RE/B/BSFixedString.h` and `StringCache`.
     class string_ref {
         const char* data = nullptr;
 

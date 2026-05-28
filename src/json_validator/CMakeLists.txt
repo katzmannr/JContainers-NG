@@ -51,6 +51,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${boost_SOURCE_DIR}/libs/lockfree/include"
     "${boost_SOURCE_DIR}/libs/iostreams/include"
     "${CMAKE_SOURCE_DIR}/src/JContainers/src"
+    "${jansson_SOURCE_DIR}/src"
 )
 
 ################################################################################
@@ -97,13 +98,6 @@ if(MSVC)
         /INCREMENTAL:NO
     )
 endif()
-
-target_link_directories(${PROJECT_NAME} PRIVATE
-    jansson
-    Boost::filesystem
-    Boost::headers
-    rapidcsv
-)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE

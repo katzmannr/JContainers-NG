@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "resource.h"
 
-#include <jansson/src/jansson.h>
+#include <jansson.h>
 #include <stdio.h>
 #include <conio.h>
 #include <boost/filesystem.hpp>
