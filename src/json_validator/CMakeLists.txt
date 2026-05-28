@@ -48,6 +48,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 #    ${boost_SOURCE_DIR}/libs/filesystem/include
 #)
 target_include_directories(${PROJECT_NAME} PUBLIC
+    "${boost_SOURCE_DIR}/libs/lockfree/include"
+    "${boost_SOURCE_DIR}/libs/iostreams/include"
     "${CMAKE_SOURCE_DIR}/src/JContainers/src"
 )
 

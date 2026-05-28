@@ -169,8 +169,7 @@ target_link_libraries(${PROJECT_NAME}
         Boost::headers
         Boost::serialization
         Boost::date_time
-        Boost::lockfree
-        Boost::iostreams)
+)
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     jansson
@@ -178,8 +177,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     Boost::headers
     Boost::serialization
     Boost::date_time
-    Boost::lockfree
-    Boost::iostreams
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC
