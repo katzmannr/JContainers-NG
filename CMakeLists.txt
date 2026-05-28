@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
 project(JContainers LANGUAGES C CXX)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ################################################################################
 # A current compiler is needed, set it via C++ Standard (stricter code handling)

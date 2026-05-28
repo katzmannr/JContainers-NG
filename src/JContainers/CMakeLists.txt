@@ -82,6 +82,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/src"
     "${Boost_INCLUDE_DIRS}"
     "${rapidcsv_SOURCE_DIR}/src"
+    "${boost_SOURCE_DIR}/libs/lockfree/include"
+    "${boost_SOURCE_DIR}/libs/iostreams/include"
+    "${jansson_SOURCE_DIR}/src"
+    "${jansson_BINARY_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/."
 )
 
