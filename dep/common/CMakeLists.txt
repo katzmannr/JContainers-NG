@@ -73,14 +73,14 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /Od;
+            /Od
             /RTC1
         >
         /FIcommon/IPrefix.h
-        /W3;
-        /Zi;
-        /GR;
-        ${DEFAULT_CXX_EXCEPTION_HANDLING};
+        /W3
+        /Zi
+        /GR
+        ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
     )
 endif()

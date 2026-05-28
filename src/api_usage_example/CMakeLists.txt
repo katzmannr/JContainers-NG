@@ -76,17 +76,17 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /Od;
+            /Od
             /Zi
         >
         $<$<CONFIG:Release>:
-            /O2;
-            /Oi;
+            /O2
+            /Oi
             ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
         >
-        /sdl;
-        /Gy;
-        /W3;
+        /sdl
+        /Gy
+        /W3
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
     )
     target_link_options(${PROJECT_NAME} PRIVATE
@@ -101,6 +101,6 @@ endif()
 # target_link_libraries(${PROJECT_NAME})
 
 target_link_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}//dep/boost/boost_lib/lib;"
+    "${CMAKE_SOURCE_DIR}//dep/boost/boost_lib/lib"
     "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>"
 )

@@ -48,9 +48,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 #    ${boost_SOURCE_DIR}/libs/filesystem/include
 #)
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/dep/jansson/jansson/src;"
-    "${CMAKE_SOURCE_DIR}/dep/jansson;"
-    "${Boost_SOURCE_DIR};"
+    "${CMAKE_SOURCE_DIR}/dep/jansson/jansson/src"
+    "${CMAKE_SOURCE_DIR}/dep/jansson"
+    "${Boost_SOURCE_DIR}"
 )
 ################################################################################
 # Compile definitions
@@ -59,8 +59,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Release>:"
         "NDEBUG"
     ">"
-    "UNICODE;"
-    "_UNICODE"
+    UNICODE
+    _UNICODE
 )
 
 ################################################################################
@@ -69,30 +69,30 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /GL-;
-            /Od;
-            /Oi-;
-            /sdl;
+            /GL-
+            /Od
+            /Oi-
+            /sdl
             /RTC1
         >
         $<$<CONFIG:Release>:
-            /O2;
-            /Oi;
+            /O2
+            /Oi
             /Gy
         >
-        /W3;
-        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-        ${DEFAULT_CXX_EXCEPTION_HANDLING};
-        /Za;
+        /W3
+        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
+        ${DEFAULT_CXX_EXCEPTION_HANDLING}
+        /Za
         /Y-
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Release>:
-            /OPT:REF;
+            /OPT:REF
             /OPT:ICF
         >
-        /DEBUG;
-        /SUBSYSTEM:CONSOLE;
+        /DEBUG
+        /SUBSYSTEM:CONSOLE
         /INCREMENTAL:NO
     )
 endif()
@@ -100,4 +100,5 @@ endif()
 target_link_directories(${PROJECT_NAME} PRIVATE
     Boost::filesystem
     Boost::headers
+    rapidcsv
 )

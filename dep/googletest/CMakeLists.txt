@@ -41,12 +41,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 ################################################################################
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     target_include_directories(${PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest/include;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest"
     )
 elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
     target_include_directories(${PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest/include;"
+        "${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/googletest/googletest"
     )
 endif()
@@ -56,13 +56,13 @@ endif()
 ################################################################################
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     target_compile_definitions(${PROJECT_NAME} PRIVATE
-        "GTEST_LANG_CXX11;"
-        "GTEST_HAS_TR1_TUPLE=0;"
-        "_MBCS"
+        GTEST_LANG_CXX11
+        GTEST_HAS_TR1_TUPLE=0
+        _MBCS
     )
 elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
     target_compile_definitions(${PROJECT_NAME} PRIVATE
-        "_MBCS"
+        _MBCS
     )
 endif()
 
@@ -75,19 +75,19 @@ if(MSVC)
             $<$<CONFIG:Debug>:
                 /Od
             >
-            /W3;
-            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-            ${DEFAULT_CXX_EXCEPTION_HANDLING};
+            /W3
+            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
+            ${DEFAULT_CXX_EXCEPTION_HANDLING}
             /Y-
         )
     elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
         target_compile_options(${PROJECT_NAME} PRIVATE
             $<$<CONFIG:Debug>:
-                /Gm;
+                /Gm
                 /Od
             >
-            /W3;
-            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
+            /W3
+            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
             ${DEFAULT_CXX_EXCEPTION_HANDLING}
         )
     endif()

@@ -67,12 +67,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ################################################################################
 get_property(MSVC_RUNTIME_LIBRARY_DEFAULT TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY)
 string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
-    $<$<CONFIG:Debug>:
-        MultiThreadedDebug
-    >
-    $<$<CONFIG:Release>:
-        MultiThreaded
-    >
+    $<$<CONFIG:Debug>:MultiThreadedDebug>
+    $<$<CONFIG:Release>:MultiThreaded>
     $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:Release>>>:${MSVC_RUNTIME_LIBRARY_DEFAULT}>
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY_STR})
@@ -81,11 +77,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 # Include directories
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/JContainers/src;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest/googletest/googletest/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/luajit/luajit-2.0/src;"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/JContainers/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest/googletest/googletest/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/luajit/luajit-2.0/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/."
 )
 
@@ -105,17 +101,17 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Release>:"
         "NO_JC_DEBUG"
     ">"
-    "NOMINMAX;"
-    "_SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING;"
-    "_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;"
-    "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING;"
-    "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;"
-    "GTEST_LANG_CXX11;"
-    "GTEST_HAS_TR1_TUPLE=0;"
-    "_CRT_SECURE_NO_WARNINGS;"
-    "WIN32_LEAN_AND_MEAN;"
-    "BOOST_HAS_HASH;"
-    "_MBCS"
+    NOMINMAX
+    _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING
+    _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
+    _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
+    _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+    GTEST_LANG_CXX11
+    GTEST_HAS_TR1_TUPLE=0
+    _CRT_SECURE_NO_WARNINGS
+    WIN32_LEAN_AND_MEAN
+    BOOST_HAS_HASH
+    _MBCS
 )
 
 ################################################################################
@@ -124,32 +120,32 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /GL-;
-            /Od;
-            /Ob0;
-            /sdl;
+            /GL-
+            /Od
+            /Ob0
+            /sdl
             -D_SCL_SECURE_NO_WARNINGS
         >
         $<$<CONFIG:Release>:
-            /O1;
-            /Oi;
-            /sdl-;
+            /O1
+            /Oi
+            /sdl-
             /Os
         >
-        /std:c++20;
-        /GF;
-        /W3;
-        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
+        /std:c++20
+        /GF
+        /W3
+        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /NODEFAULTLIB:LIBCMT.lib;
+            /NODEFAULTLIB:LIBCMT.lib
             /DEBUG
         >
-        /SUBSYSTEM:CONSOLE;
-        /OPT:REF;
-        /OPT:ICF;
+        /SUBSYSTEM:CONSOLE
+        /OPT:REF
+        /OPT:ICF
         /INCREMENTAL:NO
     )
 endif()

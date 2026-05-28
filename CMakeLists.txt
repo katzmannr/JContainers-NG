@@ -139,6 +139,9 @@ FetchContent_MakeAvailable(rapidcsv)
 set(RAPIDCSV_INCLUDE_DIRS
     ${rapidcsv_SOURCE_DIR}/src
 )
+list(APPEND CMAKE_INCLUDE_PATH
+    ${rapidcsv_SOURCE_DIR}/src
+)
 
 ################################################################################
 # Boost Package provided by us, but include folders require find_package
