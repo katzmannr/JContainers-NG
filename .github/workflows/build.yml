@@ -25,3 +25,4 @@ jobs:
           cmake --build build
           --config Release
           --parallel
+          --verbose

@@ -82,6 +82,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson"
     "${CMAKE_CURRENT_SOURCE_DIR}/dep/luajit/luajit-2.0/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/CommonLibSSE-NG/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dep/CommonLibSSE-NG/CommonLibSSE/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    "${Boost_INCLUDE_DIRS}"
+    "${rapidcsv_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/."
 )
 
@@ -164,6 +169,10 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         CommonLibSSE::CommonLibSSE
         GTest::gtest_main
+        Boost::filesystem
+        Boost::headers
+        Boost::serialization
+        Boost::date_time
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE

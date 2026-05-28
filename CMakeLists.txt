@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
 project(JContainers LANGUAGES C CXX)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ################################################################################
 # A current compiler is needed, set it via C++ Standard (stricter code handling)
@@ -139,9 +140,6 @@ FetchContent_MakeAvailable(rapidcsv)
 set(RAPIDCSV_INCLUDE_DIRS
     ${rapidcsv_SOURCE_DIR}/src
 )
-list(APPEND CMAKE_INCLUDE_PATH
-    ${rapidcsv_SOURCE_DIR}/src
-)
 
 ################################################################################
 # Boost Package provided by us, but include folders require find_package
@@ -179,6 +177,7 @@ target_link_libraries(JContainers
         jc::common
         jansson
         LuaJIT
+        CommonLibSSE::CommonLibSSE
         Boost::filesystem
         Boost::thread
         Boost::serialization
