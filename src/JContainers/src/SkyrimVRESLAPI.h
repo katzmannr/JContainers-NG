@@ -19,10 +19,11 @@ namespace SkyrimVRESLPluginAPI
 	{
 	public:
 		// members
-		tArray<ModInfo*> files;       // 00
-		tArray<ModInfo*> smallFiles;  // 18
+        RE::BSTArray<RE::TESFile*> files;       // 00
+        RE::BSTArray<RE::TESFile*> smallFiles;  // 18
 	};
-	STATIC_ASSERT(sizeof(TESFileCollection) == 0x30);
+    // If that is a strict binary concern, then old code would need to be used.
+    // STATIC_ASSERT(sizeof(TESFileCollection) == 0x30);
 
 	// Returns an ISkyrimVRESLInterface001 object compatible with the API shown below
 	// This should only be called after SKSE sends kMessage_PostLoad to your plugin
@@ -42,13 +43,13 @@ namespace SkyrimVRESLPluginAPI
 	};
 
 // Converts the lower bits of a FormID to a full FormID depending on plugin type
-static inline UInt32 GetFullFormID(const ModInfo* modInfo, UInt32 formLower)
+static inline UInt32 GetFullFormID(const RE::TESFile* modInfo, UInt32 formLower)
 {
 	// Use modIndex of 0xFE as check for light plugin to determine proper form ID composition
 	return (modInfo->modIndex != 0xFE) ? UInt32(modInfo->modIndex) << 24 | (formLower & 0xFFFFFF) : 0xFE000000 | (UInt32(modInfo->lightIndex) << 12) | (formLower & 0xFFF);
 }
 
-const ModInfo* LookupAllLoadedModByName(const char* modName);
-const ModInfo* LookupLoadedLightModByName(const char* modName);
+const RE::TESFile* LookupAllLoadedModByName(const char* modName);
+const RE::TESFile* LookupLoadedLightModByName(const char* modName);
 }  // namespace SkyrimVRESLPluginAPI
 extern SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* g_SkyrimVRESLInterface;

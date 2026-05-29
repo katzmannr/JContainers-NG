@@ -122,7 +122,7 @@ struct real_api : public skse_api
         {
             if (g_SkyrimVRESLInterface)
             {
-                if (ModInfo const* mi = SkyrimVRESLPluginAPI::LookupAllLoadedModByName (string (name).c_str ()))
+                if (RE::TESFile const* mi = SkyrimVRESLPluginAPI::LookupAllLoadedModByName (string (name).c_str ()))
                 {
                     auto retval = make_optional (SkyrimVRESLPluginAPI::GetFullFormID(mi, form));
                     return retval;
@@ -130,8 +130,8 @@ struct real_api : public skse_api
             }
             else
             {
-                DataHandler* p = DataHandler::GetSingleton ();
-                if (ModInfo const* mi = p->LookupModByName (string (name).c_str ()))
+                RE::TESDataHandler* p = DataHandler::GetSingleton ();
+                if (RE::TESFile const* mi = p->LookupModByName (string (name).c_str ()))
                 {
                     auto retval = make_optional (mi->GetFormID (form));
                     return retval;
@@ -139,8 +139,8 @@ struct real_api : public skse_api
             }
         }
         else {
-            DataHandler* p = DataHandler::GetSingleton ();
-            if (ModInfo const* mi = p->LookupModByName (string (name).c_str ()))
+            RE::TESDataHandler* p = DataHandler::GetSingleton ();
+            if (RE::TESFile const* mi = p->LookupModByName (string (name).c_str ()))
             {
                 return make_optional (mi->GetFormID (form));
             }
@@ -151,7 +151,7 @@ struct real_api : public skse_api
     /// Question: order in *Mods list is considered as modIndex or modLighIndex?
     std::optional<std::string_view> loaded_mod_name (std::uint8_t i) override
     {
-        DataHandler* p = DataHandler::GetSingleton ();
+        RE::TESDataHandler* p = DataHandler::GetSingleton ();
         if (!REL::Module::IsVR())
         {
             if (i < p->modList.loadedModCount)
@@ -175,7 +175,7 @@ struct real_api : public skse_api
                 const SkyrimVRESLPluginAPI::TESFileCollection* fileCollection = g_SkyrimVRESLInterface->GetCompiledFileCollection();
                 if (i < fileCollection->smallFiles.count)
                 {
-                    ModInfo* smallFile = nullptr;
+                    RE::TESFile* smallFile = nullptr;
                     fileCollection->smallFiles.GetNthItem(i, smallFile);
                     return smallFile->name;
                 }
@@ -185,7 +185,7 @@ struct real_api : public skse_api
                 JC_log("WARNING: Attempted to fetch a light plugin name in VR, but VR ESL support is not  present!");
             }
         } else {
-            DataHandler* p = DataHandler::GetSingleton ();
+            RE::TESDataHandler* p = DataHandler::GetSingleton ();
             if (i < p->modList.loadedCCMods.count)
                 return p->modList.loadedCCMods[i]->name;
         }

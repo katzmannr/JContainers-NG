@@ -1,5 +1,6 @@
 #include <utility>
 #include "SkyrimVRESLAPI.h"
+#include "RE/T/TESDataHandler.h"
 // Interface code based on https://github.com/adamhynek/higgs
 
 // Stores the API after it has already been fetched
@@ -25,9 +26,9 @@ SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimV
 	return g_SkyrimVRESLInterface;
 }
 
-const ModInfo* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modName)
+const RE::TESFile* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modName)
 {
-	DataHandler* dataHandler = DataHandler::GetSingleton();
+    RE::TESDataHandler* dataHandler = RE::TESDataHandler::GetSingleton();
 	if (dataHandler)
 	{
 		if (!g_SkyrimVRESLInterface)
@@ -36,7 +37,7 @@ const ModInfo* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modNam
 		}
 		else
 		{
-			const ModInfo* modInfo = dataHandler->LookupLoadedModByName(modName);
+            const RE::TESFile* modInfo = dataHandler->LookupLoadedModByName(modName);
 			if (modInfo == nullptr)
 			{
 				modInfo = SkyrimVRESLPluginAPI::LookupLoadedLightModByName(modName);
@@ -47,12 +48,12 @@ const ModInfo* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modNam
 	return nullptr;
 }
 
-const ModInfo* SkyrimVRESLPluginAPI::LookupLoadedLightModByName(const char* modName)
+const RE::TESFile* SkyrimVRESLPluginAPI::LookupLoadedLightModByName(const char* modName)
 {
 	if (!g_SkyrimVRESLInterface)
 	{
-		DataHandler* dataHandler = DataHandler::GetSingleton();
-		if (dataHandler)
+        RE::TESDataHandler* dataHandler = RE::TESDataHandler::GetSingleton();
+        if (dataHandler)
 		{
 			return dataHandler->LookupLoadedModByName(modName);
 		}
@@ -68,12 +69,12 @@ const ModInfo* SkyrimVRESLPluginAPI::LookupLoadedLightModByName(const char* modN
 		{
 			for (int i = 0; i < fileCollection->smallFiles.count; i++)
 			{
-				ModInfo* smallFile = nullptr;
+                RE::TESFile* smallFile = nullptr;
 				fileCollection->smallFiles.GetNthItem(i, smallFile);
 				if (smallFile != nullptr)
 				{
 					int modNameLength = strlen(modName);
-					if (modNameLength == strlen(smallFile->name) && _strnicmp(smallFile->name, modName, modNameLength) == 0)
+                    if (modNameLength == smallFile->GetFilename().length() && _strnicmp(smallFile->GetFilename().data(), modName, modNameLength) == 0)
 					{
 						return smallFile;
 					}
