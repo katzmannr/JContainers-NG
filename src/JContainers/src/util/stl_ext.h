@@ -54,7 +54,7 @@ namespace util {
 
     template<typename Enum, typename Integer>
     inline auto to_enum(Integer && value) -> Enum {
-        static_assert(sizeof Enum >= sizeof Integer, "Enum should have enough room");
+        static_assert(sizeof(Enum) >= sizeof(Integer), "Enum should have enough room");
         return static_cast<Enum>(value);
     }
 

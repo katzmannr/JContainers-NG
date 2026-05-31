@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <SKSE/SKSE.h>
+#include "skse/skse.h"
 #include "meta.h"
 #include "util/istring.h"
 

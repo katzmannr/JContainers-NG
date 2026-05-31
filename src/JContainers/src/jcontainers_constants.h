@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SKSE/SKSE.h>
 #include <cstdint>
 
 namespace collections {
@@ -26,8 +27,12 @@ inline std::string_view plugin_name()
         return "JContainersVR";
     }
 
-    if (REL::Module::GetRuntime() == REL::Module::Runtime::GOG) {
-        return "JContainersGOG";
+    if (REL::Module::GetRuntime() == REL::Module::Runtime::AE) {
+        auto runtimeversion = REL::Module::get().version();
+        // Since API does only differentiate between version, 1170 GOG release is unsupported
+        // Which means it can be used, but is treated as a Steam release, not a GOG release.
+        if (runtimeversion.patch() == 659 || runtimeversion.patch() == 1179)
+            return "JContainersGOG";
     }
 
     return "JContainers64";
@@ -39,7 +44,7 @@ inline std::string_view skse_logs()
         return "\\My Games\\Skyrim VR\\SKSE\\";
     }
 
-    if (REL::Module::GetRuntime() == REL::Module::Runtime::GOG) {
+    if (plugin_name() == "JContainersGOG") {
         return "\\My Games\\Skyrim Special Edition GOG\\SKSE\\";
     }
 
@@ -52,7 +57,7 @@ inline std::string_view user_files()
         return "My Games/Skyrim VR/JCUser/";
     }
 
-    if (REL::Module::GetRuntime() == REL::Module::Runtime::GOG) {
+    if (plugin_name() == "JContainersGOG") {
         return "My Games/Skyrim Special Edition GOG/JCUser/";
     }
 

@@ -1,5 +1,6 @@
 #include <utility>
 #include "skse/skse.h"
+#include "common/IDebugLog.h"
 
 void JC_log(const char* fmt, va_list& args) {
     va_list	args_copy;
