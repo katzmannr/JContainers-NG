@@ -5,6 +5,8 @@
 #include <assert.h>
 #include <algorithm>
 #include <stdint.h>
+#include <utility>
+#include <cstdarg>
 
 #include <SKSE/SKSE.h>
 #include "skse/skse.h"

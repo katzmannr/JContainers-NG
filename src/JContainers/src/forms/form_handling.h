@@ -75,7 +75,7 @@ inline std::optional<std::string> form_to_string (FormId n)
         }
 
         if (!mod)
-            return nullopt;
+            return std::nullopt;
 
         s += mod->data ();
     }
@@ -122,7 +122,7 @@ inline std::optional<FormId> form_from_file (std::string_view const& file, std::
         return FormId (*ndx);
     }
 
-    return nullopt;
+    return std::optional<FormId>{};
 }
 
 //--------------------------------------------------------------------------------------------------
