@@ -1,5 +1,6 @@
 #pragma once
 #include <SKSE/SKSE.h>
+#include <common/ITypes.h>
 // Interface code based on https://github.com/adamhynek/higgs
 
 namespace SkyrimVRESLPluginAPI

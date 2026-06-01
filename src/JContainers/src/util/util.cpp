@@ -1,5 +1,6 @@
 #include <boost/filesystem/path.hpp>
-#include <windef.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 namespace util {
 

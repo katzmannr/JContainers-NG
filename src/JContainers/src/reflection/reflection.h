@@ -80,6 +80,12 @@ namespace reflection {
             _comment_str = comment;
         }
 
+        // Old SKSE64 VMClassRegistry::kFunctionFlag_NoWait
+        // Indicates the function is thread-safe and callable without VM wait.
+        // CommonLibSSE-NG no longer exposes this flag publicly.
+        // Preserved for compatibility until a proper mapping is identified.
+        constexpr std::uint32_t kFunctionFlag_NoWait = 0x01;
+
         void bind(VMClassRegistry& registry, const istring& className) const {
             registrator(bind_args{ registry, className.c_str(), name.c_str() });
             registry.SetFunctionFlags(className.c_str(), name.c_str(), VMClassRegistry::kFunctionFlag_NoWait);

@@ -52,6 +52,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${boost_SOURCE_DIR}/libs/iostreams/include"
     "${CMAKE_SOURCE_DIR}/src/JContainers/src"
     "${jansson_SOURCE_DIR}/src"
+    "${jansson_BINARY_DIR}/include"
 )
 
 ################################################################################
