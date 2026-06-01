@@ -3,6 +3,7 @@
 #include <chrono>
 #include <assert.h>
 #include "typedefs.h"
+#include <common/IDebugLog.h>
 
 namespace boost { namespace filesystem {
 

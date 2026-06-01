@@ -47,7 +47,18 @@ namespace SkyrimVRESLPluginAPI
 static inline UInt32 GetFullFormID(const RE::TESFile* modInfo, UInt32 formLower)
 {
 	// Use modIndex of 0xFE as check for light plugin to determine proper form ID composition
-	return (modInfo->modIndex != 0xFE) ? UInt32(modInfo->modIndex) << 24 | (formLower & 0xFFFFFF) : 0xFE000000 | (UInt32(modInfo->lightIndex) << 12) | (formLower & 0xFFF);
+    // return (modInfo->modIndex != 0xFE) ? UInt32(modInfo->modIndex) << 24 | (formLower & 0xFFFFFF) : 0xFE000000 | (UInt32(modInfo->lightIndex) << 12) | (formLower & 0xFFF);
+    if (!modInfo) { // Explicitely checked to avoid crash
+        return 0;
+    }
+
+    if (modInfo->IsLight()) {
+        return (modInfo->GetPartialIndex() << 12) |
+               (formLower & 0xFFF);
+    }
+
+    return (modInfo->GetPartialIndex() << 24) |
+           (formLower & 0xFFFFFF);
 }
 
 const RE::TESFile* LookupAllLoadedModByName(const char* modName);

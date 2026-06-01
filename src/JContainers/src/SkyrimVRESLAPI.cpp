@@ -7,7 +7,7 @@
 SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* g_SkyrimVRESLInterface = nullptr;
 
 // Fetches the interface to use from SkyrimVRESL
-SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(const PluginHandle& pluginHandle, SKSEMessagingInterface* messagingInterface)
+SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(const SKSE::PluginHandle& pluginHandle, SKSE::detail::SKSEMessagingInterface* messagingInterface)
 {
 	// If the interface has already been fetched, rturn the same object
 	if (g_SkyrimVRESLInterface) {
@@ -67,10 +67,8 @@ const RE::TESFile* SkyrimVRESLPluginAPI::LookupLoadedLightModByName(const char* 
 		const SkyrimVRESLPluginAPI::TESFileCollection* fileCollection = g_SkyrimVRESLInterface->GetCompiledFileCollection();
 		if (fileCollection != nullptr)
 		{
-			for (int i = 0; i < fileCollection->smallFiles.count; i++)
+			for (auto* smallFile : fileCollection->smallFiles)
 			{
-                RE::TESFile* smallFile = nullptr;
-				fileCollection->smallFiles.GetNthItem(i, smallFile);
 				if (smallFile != nullptr)
 				{
 					int modNameLength = strlen(modName);
