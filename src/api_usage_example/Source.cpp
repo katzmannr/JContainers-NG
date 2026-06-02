@@ -84,7 +84,7 @@ namespace {
         registry->RegisterFunction(
             new NativeFunction1 <StaticFunctionTag, void, SInt32>(funcName, className.data(), sortByName, registry));
 
-        registry->SetFunctionFlags(className, funcName, VMClassRegistry::kFunctionFlag_NoWait);
+        registry->SetFunctionFlags(className, funcName, reflection::kFunctionFlag_NoWait);
 
         _MESSAGE("registering functions");
 

@@ -6,6 +6,8 @@
 #include "util/util.h"
 #include "util/stl_ext.h"
 
+#include "common/ITypes.h"
+
 namespace collections {
 
 /// Redefine in each logging module

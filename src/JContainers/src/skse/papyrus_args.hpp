@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SKSE/SKSE.h>
+#include <common/ITypes.h>
+#include "skse/string.h"
 
 template <> inline UInt64 GetTypeID <skse::string_ref>(VMClassRegistry * registry)                        { return VMValue::kType_String; }
 template <> inline UInt64 GetTypeID <VMArray<skse::string_ref>>(VMClassRegistry * registry)       { return VMValue::kType_StringArray; }

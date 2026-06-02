@@ -3,87 +3,47 @@
 #include <string>
 #include <SKSE/SKSE.h>
 
-namespace skse {
-
-    /// See `RE/B/BSFixedString.h` and `StringCache`.
-    class string_ref {
-        const char* data = nullptr;
-
-        void assign(const char *buf) {
-            if (buf) {
-                CALL_MEMBER_FN(this, Set)(buf);
-            }
-            else {
-                release();
-            }
-        }
-
-        void release() {
-            if (data) {
-                CALL_MEMBER_FN(this, Release)();
-                data = nullptr;
-            }
-        }
-
-        MEMBER_FN_PREFIX(string_ref);
-
-#ifdef JC_SKSE_VR
-        DEFINE_MEMBER_FN(ctor, string_ref *, 0x00C6DB20, const char * buf);
-        DEFINE_MEMBER_FN(Set, string_ref *, 0x00C6DC90, const char * buf);
-        DEFINE_MEMBER_FN(Release, void, 0x00C6DC70);
-#elif JC_SKSE_GOG
-        DEFINE_MEMBER_FN(ctor, string_ref *, 0x00CEDFF0, const char * buf);
-        DEFINE_MEMBER_FN(Set, string_ref *, 0x00CEE180, const char * buf);
-        DEFINE_MEMBER_FN(Release, void, 0x00CEF3C0);
-#else
-        DEFINE_MEMBER_FN(ctor, string_ref *, 0x00CEC5D0, const char * buf);
-        DEFINE_MEMBER_FN(Set, string_ref *, 0x00CEC760, const char * buf);
-        DEFINE_MEMBER_FN(Release, void, 0x00CED9A0);
-#endif
-
+namespace skse
+{
+    class string_ref
+    {
     public:
+        string_ref() = default;
 
-        string_ref() { }
+        explicit string_ref(const char* val) :
+            _str(val)
+        {}
 
-        string_ref(const char * buf) {
-            CALL_MEMBER_FN(this, ctor)(buf);
-        }
+        string_ref(const string_ref&) = default;
+        string_ref(string_ref&&) = default;
 
-        template<class Tr, class Alloc>
-        string_ref(const std::basic_string<char, Tr, Alloc>& string) {
-            CALL_MEMBER_FN(this, ctor)(string.c_str());
-        }
+        string_ref& operator=(const string_ref&) = default;
+        string_ref& operator=(string_ref&&) = default;
 
-        ~string_ref() {
-            release();
-        }
-
-        string_ref(const string_ref& ref) { CALL_MEMBER_FN(this, ctor)(ref.data); }
-
-        string_ref& operator = (const string_ref& ref) { assign(ref.data); return *this; }
-
-        string_ref& operator = (const char* ref) { assign(ref); return *this; }
-
-        template<class Tr, class Alloc>
-        string_ref& operator = (const std::basic_string<char, Tr, Alloc>& string) {
-            assign(string.c_str());
+        string_ref& operator=(const char* val)
+        {
+            _str = val;
             return *this;
         }
 
-        string_ref(string_ref&& ref) {
-            std::swap(data, ref.data);
-        }
-
-        string_ref& operator = (string_ref&& ref) {
-            release();
-            std::swap(data, ref.data);
+        template <class Tr, class Alloc>
+        string_ref& operator=(const std::basic_string<char, Tr, Alloc>& str)
+        {
+            _str = str.c_str();
             return *this;
         }
 
-        bool operator==(const string_ref& lhs) const { return data == lhs.data; }
-
-        const char* c_str() const {
-            return data;
+        const char* c_str() const
+        {
+            return _str.c_str();
         }
+
+        bool operator==(const string_ref& rhs) const
+        {
+            return _str == rhs._str;
+        }
+
+    private:
+        RE::BSFixedString _str;
     };
 }

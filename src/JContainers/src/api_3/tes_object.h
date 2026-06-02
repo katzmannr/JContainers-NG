@@ -1,5 +1,6 @@
 
 #include "collections/lua_module.h"
+#include "reflection/tes_binding.h"
 
 namespace tes_api_3 {
 

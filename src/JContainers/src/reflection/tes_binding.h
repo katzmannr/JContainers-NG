@@ -94,7 +94,7 @@ namespace reflection { namespace binding {
 
 #define MAKE_ME_HAPPY(N)\
     template<> struct native_function_selector<N> {\
-        template<class... Params> using function = ::NativeFunction ## N <::StaticFunctionTag, Params...>;\
+        template<class... Params> using function = RE::BSScript::NativeFunction ## N <::StaticFunctionTag, Params...>;\
     };
 
     MAKE_ME_HAPPY(0);
@@ -166,7 +166,7 @@ namespace reflection { namespace binding {
 
             struct non_void_ret {
                 static convert_to_tes_type<R> tes_func(
-                    StaticFunctionTag* tag,
+                    RE::StaticFunctionTag* tag,
                     convert_to_tes_type<Params> ... params)
                 {
                     return GetConv<R>::convert2Tes(
@@ -179,7 +179,7 @@ namespace reflection { namespace binding {
 
             struct void_ret {
                 static void tes_func(
-                    StaticFunctionTag* tag,
+                    RE::StaticFunctionTag* tag,
                     convert_to_tes_type<Params> ... params)
                 {
                     func(get_converter<Params>::convert2J(params, tag) ...);

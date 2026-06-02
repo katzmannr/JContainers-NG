@@ -223,7 +223,7 @@ namespace {
                         };
                         func.registrator(args);
                         registry->SetFunctionFlags(args.className.c_str(),
-                            args.functionName.c_str(), VMClassRegistry::kFunctionFlag_NoWait);
+                            args.functionName.c_str(), reflection::kFunctionFlag_NoWait);
                     });
                 };
 
