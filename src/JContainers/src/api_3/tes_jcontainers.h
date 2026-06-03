@@ -1,3 +1,5 @@
+#pragma once
+
 namespace tes_api_3 {
 
 /// Redefine in each logging module
