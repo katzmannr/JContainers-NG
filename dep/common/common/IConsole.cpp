@@ -113,3 +113,4 @@ UInt32 IConsole::ReadBuf(char * buf, UInt32 len)
 	buf[charsRead] = 0;
 	
     return static_cast<UInt32>(charsRead);
+}

@@ -28,5 +28,5 @@ class IThread
 		UInt32			threadID;
 
 	private:
-		static UInt32 WINAPI _ThreadProc(void * param);
+        static DWORD WINAPI _ThreadProc(void * param);
 };
