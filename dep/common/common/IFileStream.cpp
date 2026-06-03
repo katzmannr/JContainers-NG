@@ -156,7 +156,7 @@ void IFileStream::Close(void)
 
 void IFileStream::ReadBuf(void * buf, UInt32 inLength)
 {
-	UInt32	bytesRead;
+    DWORD	bytesRead;
 
 	ReadFile(theFile, buf, inLength, &bytesRead, NULL);
 
@@ -165,7 +165,7 @@ void IFileStream::ReadBuf(void * buf, UInt32 inLength)
 
 void IFileStream::WriteBuf(const void * buf, UInt32 inLength)
 {
-	UInt32	bytesWritten;
+    DWORD	bytesWritten;
 
 	// check for file expansion
 	if(streamOffset > streamLength)

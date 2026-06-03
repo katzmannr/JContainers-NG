@@ -86,7 +86,7 @@ if(MSVC)
         /W3
         ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
-        /Za
+#       /Za # breaks boost build
         /Y-
     )
     target_link_options(${PROJECT_NAME} PRIVATE
