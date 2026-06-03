@@ -25,7 +25,7 @@ class IThread
 		volatile bool	stopRequested;
 		bool			isRunning;
 		HANDLE			theThread;
-		UInt32			threadID;
+        DWORD			threadID;
 
 	private:
         static DWORD WINAPI _ThreadProc(void * param);
