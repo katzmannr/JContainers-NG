@@ -4,8 +4,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 
-#include <shlobj.h>
-
 #include <gtest/gtest.h>
 
 #include "tes_object.h"

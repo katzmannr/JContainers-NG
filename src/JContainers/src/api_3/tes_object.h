@@ -6,6 +6,7 @@
 #include "master.h"
 #include "collections/copying.h"
 #include "collections/json_serialization.h"
+#include <shlobj.h>
 
 namespace tes_api_3 {
 
