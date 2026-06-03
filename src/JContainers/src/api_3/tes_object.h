@@ -1,6 +1,11 @@
+#pragma once
 
 #include "collections/lua_module.h"
+#include <reflection/reflection.h>
 #include "reflection/tes_binding.h"
+#include "master.h"
+#include "collections/copying.h"
+#include "collections/json_serialization.h"
 
 namespace tes_api_3 {
 

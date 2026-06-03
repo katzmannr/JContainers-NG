@@ -1,11 +1,10 @@
 #pragma once
 
 #include "forms/form_id.h"
+#include <SKSE/SKSE.h>
 #include <cstdint>
 #include <string_view>
 #include <optional>
-
-class TESForm;
 
 /// Wraps calls to SKSE - fakes the calls when SKSE/Skyrim inactive (during synthetic tests)
 namespace skse
@@ -50,7 +49,7 @@ forms::FormId resolve_handle (forms::FormId handle);
  * @returns the looked up handle, nullptr if silent API, random blob if test API
  */
 
-TESForm* lookup_form (forms::FormId handle);
+RE::TESForm* lookup_form (forms::FormId handle);
 
 /**
  * Uses SKSE `IObjectHandlePolicy::Resolve` and `AddRef`

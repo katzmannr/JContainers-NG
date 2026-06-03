@@ -1,8 +1,9 @@
 #pragma once
 
+#include <cstdint>
+
 #include <boost/variant.hpp>
 #include <string>
-#include <xutility>
 #include <boost/serialization/access.hpp>
 
 #include "common/ITypes.h"
@@ -142,7 +143,7 @@ namespace collections {
         explicit item(Real val) : _var(val) {}
         explicit item(double val) : _var((Real)val) {}
         explicit item(SInt32 val) : _var(val) {}
-        explicit item(int val) : _var((SInt32)val) {}
+        explicit item(long val) : _var((SInt32)val) {}
         explicit item(bool val) : _var((SInt32)val) {}
         explicit item(const form_ref& id) : _var(id) {}
         explicit item(form_ref&& id) : _var(std::move(id)) {}
@@ -167,7 +168,7 @@ namespace collections {
         }
 
         item& operator = (unsigned int val) { _var = (SInt32)val; return *this; }
-        item& operator = (int val) { _var = (SInt32)val; return *this; }
+        item& operator = (long val) { _var = (SInt32)val; return *this; }
         item& operator = (bool val) { _var = (SInt32)val; return *this; }
         item& operator = (SInt32 val) { _var = val; return *this; }
         item& operator = (Real val) { _var = val; return *this; }
@@ -241,7 +242,7 @@ namespace collections {
             return nullptr;
         }
 
-        TESForm * form() const {
+        RE::TESForm * form() const {
             return skse::lookup_form(formId());
         }
 
@@ -354,7 +355,7 @@ namespace collections {
         return obj ? obj->uid() : Handle::Null;
     }
 
-    template<> inline TESForm * item::readAs<TESForm*>() const {
+    template<> inline RE::TESForm * item::readAs<RE::TESForm*>() const {
         return form();
     }
 

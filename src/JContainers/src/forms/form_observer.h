@@ -17,8 +17,7 @@
 
 #include "rw_mutex.h"
 #include "form_id.h"
-
-class TESForm;
+#include <SKSE/SKSE.h>
 
 namespace forms {
 
@@ -80,7 +79,7 @@ namespace forms {
         form_ref& operator = (const form_ref &) = default;
 
         form_ref(FormId id, form_observer& watcher);
-        form_ref(const TESForm& form, form_observer& watcher);
+        form_ref(const RE::TESForm& form, form_observer& watcher);
 
         static form_ref make_expired(FormId formId);
 
@@ -216,7 +215,7 @@ namespace collections {
     }
 
     template<class Context>
-    inline form_ref make_weak_form_id(const TESForm* form, Context& context) {
+    inline form_ref make_weak_form_id(const RE::TESForm* form, Context& context) {
         return form ? form_ref(*form, context._form_watcher) : form_ref();
     }
 
@@ -226,8 +225,8 @@ namespace collections {
     }
 
     template<class Context>
-    inline form_ref_lightweight make_lightweight_form_ref(const TESForm* form, Context& context) {
-        return form_ref_lightweight{ form ? util::to_enum<FormId>(form->formID) : FormId::Zero, context._form_watcher };
+    inline form_ref_lightweight make_lightweight_form_ref(const RE::TESForm* form, Context& context) {
+        return form_ref_lightweight{ form ? util::to_enum<FormId>(form->GetFormID()) : FormId::Zero, context._form_watcher };
     }
 
 }

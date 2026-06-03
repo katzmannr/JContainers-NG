@@ -1,3 +1,10 @@
+#pragma once
+
+#include <collections/collections.h>
+#include <reflection/reflection.h>
+#include <collections/access.h>
+#include <collections/context.h>
+#include <gtest/gtest.h>
 
 namespace tes_api_3 {
 
@@ -58,7 +65,7 @@ namespace tes_api_3 {
             T& newValue;
 
             T& operator()(T& oldValue, T& comparer) const {
-                if (d != comparer)
+                if (oldValue != comparer)
                     return newValue;
                 return oldValue;
             }

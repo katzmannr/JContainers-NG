@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-extern SKSESerializationInterface* g_serialization;
+extern SKSE::detail::SKSESerializationInterface* g_serialization;
 
 namespace skse
 {
@@ -31,7 +31,7 @@ struct skse_api
     virtual std::optional<std::string_view> loaded_light_mod_name (std::uint16_t ndx) = 0;
 
     virtual FormId resolve_handle (FormId handle) = 0;
-    virtual TESForm* lookup_form (FormId handle) = 0;
+    virtual RE::TESForm* lookup_form (FormId handle) = 0;
 
     virtual bool try_retain_handle (FormId handle) = 0;
     virtual void release_handle (FormId handle) = 0;
@@ -68,10 +68,10 @@ struct fake_api : public skse_api
 
     FormId resolve_handle (FormId handle) override { return handle; }
 
-    TESForm* lookup_form (FormId) override
+    RE::TESForm* lookup_form (FormId) override
     {
-        static char blob[sizeof TESForm] = { '\0' };
-        return reinterpret_cast<TESForm*> (&blob);
+        static char blob[sizeof(RE::TESForm)] = { '\0' };
+        return reinterpret_cast<RE::TESForm*> (&blob);
     }
 
     bool try_retain_handle (FormId) override { return true; }
@@ -268,7 +268,7 @@ FormId resolve_handle (FormId handle)
     return g_current_api->resolve_handle (handle);
 }
 
-TESForm* lookup_form (FormId handle)
+RE::TESForm* lookup_form (FormId handle)
 {
     return handle != FormId::Zero ? g_current_api->lookup_form (handle) : nullptr;
 }

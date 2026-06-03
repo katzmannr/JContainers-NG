@@ -77,7 +77,7 @@ namespace reflection {
             _comment_func = func;
         }
 
-        void setComment(nullptr_t) {
+        void setComment(std::nullptr_t) {
             _comment_func = nullptr;
             _comment_str = nullptr;
         }
@@ -88,7 +88,7 @@ namespace reflection {
 
         void bind(VMClassRegistry& registry, const istring& className) const {
             registrator(bind_args{ registry, className.c_str(), name.c_str() });
-            registry.SetFunctionFlags(className.c_str(), name.c_str(), kFunctionFlag_NoWait);
+            //registry.SetFunctionFlags(className.c_str(), name.c_str(), kFunctionFlag_NoWait); // ToDo
         }
     };
 

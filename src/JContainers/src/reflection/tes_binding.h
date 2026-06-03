@@ -2,6 +2,8 @@
 
 #include <SKSE/SKSE.h>
 #include "reflection/reflection.h"
+#include "skse/string.h"
+#include "common/ITypes.h"
 
 class BGSListForm;
 
@@ -305,7 +307,7 @@ namespace reflection { namespace binding {
         {
             using namespace ::reflection;
 
-            static_assert( false == std::is_same<Binder::base::return_type, const char *>::value,
+            static_assert( false == std::is_same<typename Binder::base::return_type, const char *>::value,
                 "a trap for 'const char *' return types" );
 
             function_info metaF;

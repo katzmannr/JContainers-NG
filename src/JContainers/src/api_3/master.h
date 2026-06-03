@@ -1,5 +1,7 @@
 #pragma once
 
+#include <reflection/reflection.h>
+
 namespace tes_api_3 {
 
     template<class T>

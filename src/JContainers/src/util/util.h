@@ -4,11 +4,12 @@
 #include <assert.h>
 #include "typedefs.h"
 #include <common/IDebugLog.h>
+#include <boost/filesystem.hpp>
 
-namespace boost { namespace filesystem {
+// namespace boost { namespace filesystem {
 
-    class path;
-}}
+//     class path;
+// }}
 
 namespace util {
 

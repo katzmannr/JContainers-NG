@@ -1,3 +1,4 @@
+#include "api_3/master.h"
 namespace tes_api_3 {
 
 /// Redefine in each logging module

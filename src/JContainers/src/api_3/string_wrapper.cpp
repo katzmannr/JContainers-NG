@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <vector>
 #include <numeric>
+#include <math.h>
 #include <algorithm>
 #include <cctype>
 #include <locale>
