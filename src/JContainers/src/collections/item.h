@@ -34,7 +34,7 @@ namespace collections {
     public:
         typedef boost::blank blank;
         typedef Float32 Real;
-        typedef boost::variant<boost::blank, SInt32, Real, form_ref, internal_object_ref, std::string> variant;
+        typedef boost::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string> variant;
 
     private:
         variant _var;
@@ -140,18 +140,18 @@ namespace collections {
         //////////////////////////////////////////////////////////////////////////
 
 
-        explicit item(Real val) : _var(val) {}
-        explicit item(double val) : _var((Real)val) {}
-        explicit item(SInt32 val) : _var(val) {}
-        explicit item(long val) : _var((SInt32)val) {}
-        explicit item(bool val) : _var((SInt32)val) {}
-        explicit item(const form_ref& id) : _var(id) {}
-        explicit item(form_ref&& id) : _var(std::move(id)) {}
+        explicit item(Real val) : _var(variant(val)) {}
+        explicit item(double val) : _var(static_cast<item::Real>(val)) {}
+        explicit item(std::int32_t val) : _var(variant(val)) {}
+        explicit item(long val) : _var(static_cast<std::int32_t>(val)) {}
+        explicit item(bool val) : _var(static_cast<std::int32_t>(val)) {}
+        explicit item(const form_ref& id) : _var(variant(id)) {}
+        explicit item(form_ref&& id) : _var(std::move(variant(id))) {}
 
-        explicit item(object_base& o) : _var(o) {}
+        explicit item(object_base& o) : _var(variant(o)) {}
 
-        explicit item(const std::string& val) : _var(val) {}
-        explicit item(std::string&& val) : _var(std::move(val)) {}
+        explicit item(const std::string& val) : _var(variant(val)) {}
+        explicit item(std::string&& val) : _var(std::move(variant(val))) {}
 
         // the Item is none if the pointers below are zero:
         explicit item(const char * val) {
