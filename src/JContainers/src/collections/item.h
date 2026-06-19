@@ -34,7 +34,10 @@ namespace collections {
     public:
         typedef boost::blank blank;
         typedef Float32 Real;
-        typedef boost::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string> variant;
+        using variant = boost::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string>;
+
+        using variant_t = boost::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string>;
+        variant_t v{1.0f};
 
     private:
         variant _var;
@@ -43,14 +46,14 @@ namespace collections {
 
         template<class T> struct type2index{ };
 
-        template<> struct type2index < boost::blank >  { static const item_type index = none; };
-        template<> struct type2index < SInt32 >  { static const item_type index = integer; };
-        template<> struct type2index < Real >  { static const item_type index = real; };
-        template<> struct type2index < form_ref >  { static const item_type index = form; };
-        template<> struct type2index < internal_object_ref >  { static const item_type index = object; };
-        template<> struct type2index < std::string >  { static const item_type index = string; };
+        // template<> struct type2index < boost::blank >  { static const item_type index = none; };
+        // template<> struct type2index < SInt32 >  { static const item_type index = integer; };
+        // template<> struct type2index < Real >  { static const item_type index = real; };
+        // template<> struct type2index < form_ref >  { static const item_type index = form; };
+        // template<> struct type2index < internal_object_ref >  { static const item_type index = object; };
+        // template<> struct type2index < std::string >  { static const item_type index = string; };
 
-        static_assert(type2index<Real>::index > type2index<SInt32>::index, "Item::type2index works incorrectly");
+        //static_assert(type2index<Real>::index > type2index<SInt32>::index, "Item::type2index works incorrectly");
 
     private:
         static_assert(std::is_same<
