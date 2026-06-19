@@ -142,7 +142,7 @@ namespace collections {
         //////////////////////////////////////////////////////////////////////////
 
 
-        explicit item(Real val) : _var((val)) {}
+        explicit item(Real val) : _var(variant(val)) {}
         explicit item(double val) : _var(static_cast<item::Real>(val)) {}
         explicit item(std::int32_t val) : _var(variant(val)) {}
         explicit item(long val) : _var(static_cast<std::int32_t>(val)) {}
@@ -218,7 +218,7 @@ namespace collections {
                 return *val;
             }
             else if (auto val = std::get_if<SInt32>(&_var)) {
-                return *val;
+                return static_cast<Real>(*val);
             }
             return 0.f;
         }
@@ -228,7 +228,7 @@ namespace collections {
                 return *val;
             }
             else if (auto val = std::get_if<item::Real>(&_var)) {
-                return *val;
+                return static_cast<SInt32>(*val);
             }
             // ability to read forms as integer values. likely not needed anymore
             /*else if (auto val = std::get_if<form_ref>(&_var)) {

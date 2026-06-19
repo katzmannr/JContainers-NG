@@ -1,6 +1,8 @@
 #pragma once
 
 #include "forms/form_id.h"
+ // Added to solve namespace resolution build errors
+#include "skse/string.h"
 #include <SKSE/SKSE.h>
 #include <cstdint>
 #include <string_view>
