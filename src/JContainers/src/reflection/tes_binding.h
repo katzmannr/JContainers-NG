@@ -1,8 +1,8 @@
 #pragma once
 
-#include <SKSE/SKSE.h>
+//#include <SKSE/SKSE.h>
 #include "reflection/reflection.h"
-#include "skse/string.h"
+#include "skse/skse.h"
 #include "common/ITypes.h"
 
 class BGSListForm;

@@ -9,7 +9,6 @@
 #include "common/ITypes.h"
 #include "object/object_base.h"
 #include "skse/skse.h"
-#include "skse/string.h"
 
 #include "forms/form_id.h"
 #include "forms/form_observer.h"
