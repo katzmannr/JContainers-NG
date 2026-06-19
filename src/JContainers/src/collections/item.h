@@ -36,8 +36,12 @@ namespace collections {
         typedef Float32 Real;
         using variant = boost::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string>;
 
-        using variant_t = boost::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string>;
+        using variant_t = std::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string>;
         variant_t v{1.0f};
+        variant_t v2;
+        static_assert(std::is_same_v<Real, float>);
+        variant w{2.0f};
+        variant w2;
 
     private:
         variant _var;
