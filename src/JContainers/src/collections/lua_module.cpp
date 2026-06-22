@@ -4,7 +4,7 @@
 #include <boost/noncopyable.hpp>
 //#include <boost/thread/tss.hpp>
 #include <boost/optional.hpp>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <utility>

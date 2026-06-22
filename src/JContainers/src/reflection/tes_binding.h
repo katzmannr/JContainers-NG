@@ -2,11 +2,10 @@
 
 #include <vector>
 
-//#include <SKSE/SKSE.h>
+#include <SKSE/SKSE.h>
 #include "RE/N/NativeFunction.h"
 #include "RE/P/PackUnpack.h"
 #include "reflection/reflection.h"
-#include "skse/skse.h"
 #include "common/ITypes.h"
 
 class BGSListForm;

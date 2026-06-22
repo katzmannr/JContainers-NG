@@ -1,4 +1,3 @@
-#include <utility>
 #include <cstdarg>
 #include "skse/skse.h"
 #include "common/IDebugLog.h"

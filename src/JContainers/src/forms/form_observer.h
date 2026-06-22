@@ -2,20 +2,15 @@
 
 #include <concurrent_unordered_map.h> //See _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
 
-#include <atomic>
 #include <tuple>
 #include <assert.h>
-#include "boost/shared_ptr.hpp"
 #include "boost/smart_ptr/weak_ptr.hpp"
 #include "boost/serialization/split_member.hpp"
 #include "boost/serialization/version.hpp"
-#include "boost/noncopyable.hpp"
 #include "boost/core/explicit_operator_bool.hpp"
 
-#include "util/spinlock.h"
 #include "util/stl_ext.h"
 
-#include "rw_mutex.h"
 #include "form_id.h"
 #include <SKSE/SKSE.h>
 
@@ -81,11 +76,11 @@ namespace forms {
         form_ref(RE::FormID id, form_observer& watcher);
         form_ref(const RE::TESForm& form, form_observer& watcher);
 
-        static form_ref make_expired(FormId formId);
+        static form_ref make_expired(RE::FormID formId);
 
         // Special constructor - to load pre v3.3 data
         enum load_old_id_t { load_old_id };
-        explicit form_ref(FormId oldId, form_observer& watcher, load_old_id_t);
+        explicit form_ref(RE::FormID oldId, form_observer& watcher, load_old_id_t);
 
         bool is_not_expired() const;
         bool is_expired() const { return !is_not_expired(); }
@@ -207,7 +202,7 @@ namespace collections {
 
     using forms::form_ref;
     using forms::form_ref_lightweight;
-    using forms::FormId;
+    using RE::FormID;
 
     template<class Context>
     inline form_ref make_weak_form_id(RE::FormID id, Context& context) {

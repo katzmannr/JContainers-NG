@@ -86,8 +86,8 @@ namespace reflection {
             _comment_str = comment;
         }
 
-        void bind(VMClassRegistry& registry, const istring& className) const {
-            registrator(bind_args{ registry, className.c_str(), name.c_str() });
+        void bind(RE::BSScript::IVirtualMachine& vm, const istring& className) const {
+            registrator(bind_args{ vm, className.c_str(), name.c_str() });
             //registry.SetFunctionFlags(className.c_str(), name.c_str(), kFunctionFlag_NoWait); // ToDo
         }
     };

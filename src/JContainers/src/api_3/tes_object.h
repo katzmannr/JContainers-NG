@@ -5,6 +5,7 @@
 #include "reflection/tes_binding.h"
 #include "master.h"
 #include "collections/copying.h"
+#include <boost/filesystem.hpp>
 #include "collections/json_serialization.h"
 
 namespace tes_api_3 {

@@ -2,13 +2,13 @@
 
 #include <assert.h>
 #include <inttypes.h>
-#include <map>
-#include <tuple>
 #include <mutex>
 
 #include <boost/smart_ptr/make_shared_object.hpp>
 #include <boost/range.hpp>
 
+#include "boost/archive/binary_iarchive.hpp"
+#include "boost/archive/binary_oarchive.hpp"
 #include "boost/serialization/version.hpp"
 #include "boost/serialization/split_member.hpp"
 #include <boost/serialization/shared_ptr.hpp>
@@ -17,7 +17,7 @@
 
 #include "skse/skse.h"
 #include "util/stl_ext.h"
-#include "util/util.h"
+#include "iarchive_with_blob.h"
 
 #include "forms/form_handling.h"
 #include "forms/form_observer.h"
@@ -92,13 +92,13 @@ namespace forms {
         BOOST_SERIALIZATION_SPLIT_MEMBER();
 
         template<class Archive> void save(Archive & ar, const unsigned int version) const {
-            ar << util::to_integral_ref(_handle);
+            ar << _handle;
             ar << long (_deleted);
         }
 
         template<class Archive> void load(Archive & ar, const unsigned int version) {
             long tmp_deleted;
-            ar >> util::to_integral_ref(_handle);
+            ar >> _handle;
             ar >> tmp_deleted;
             _deleted = tmp_deleted;
 
@@ -116,14 +116,11 @@ namespace forms {
     };
 
     void form_observer::u_remove_expired_forms() {
-        auto hashmap_eraser = [](watched_forms_t& cnt, const watched_forms_t::const_iterator& itr) {
-            return cnt.unsafe_erase(itr);
-        };
-
-        util::tree_erase_if(_watched_forms, [](const watched_forms_t::value_type& pair) {
-            return pair.second.expired();
-        },
-            hashmap_eraser);
+        std::erase_if(_watched_forms,
+              [](const auto& pair)
+              {
+                  return pair.second.expired();
+              });
     }
 
     void form_observer::u_print_status() const
@@ -218,7 +215,7 @@ namespace forms {
 
         switch (version) {
         case 3:
-            load_collection(ar, _watched_forms, [&ar](boost::archive::binary_iarchive& ar, decltype(_watched_forms)& collection) {
+            load_collection(ar, _watched_forms, [](auto& ar, auto& collection) {
                 form_entry_ref entry;
                 ar >> entry;
 
@@ -248,7 +245,8 @@ namespace forms {
     template<>
     void form_observer::save(boost::archive::binary_oarchive & ar, const unsigned int version) const {
 
-        save_collection(ar, _watched_forms, [&ar](boost::archive::binary_oarchive& ar, const decltype(_watched_forms)::value_type& pair) {
+        save_collection(ar, _watched_forms, [](auto& ar,
+                                               const decltype(_watched_forms)::value_type& pair) {
             auto entry = pair.second.lock();
             ar << entry;
         });

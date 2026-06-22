@@ -6,12 +6,9 @@
 #include <jansson.h>
 #include <memory>
 
-#include "boost_extras.h"
-
 #include "collections/context.h"
 #include "forms/form_handling.h"
 #include "collections.h"
-#include "object/object_context.h"
 #include "access.h"
 
 namespace collections {
@@ -309,7 +306,7 @@ namespace collections {
                             a. lost info and convert it to FormZero
                             b. save info and convert it to string
                         */
-                        item = make_weak_form_id (forms::string_to_form (string).value_or (FormId::Zero), _context);
+                        item = make_weak_form_id (forms::string_to_form (string).value_or (0), _context);
                     }
                     else if (schedule_ref_resolving(string, container, item_key)) { // otherwise it's reference string?
                         ;
@@ -516,7 +513,7 @@ namespace collections {
 
             } item_visitor = { *this };
 
-            json_ref val = item.var().apply_visitor(item_visitor);
+            json_ref val = std::visit(item_visitor, item.var());
             return val;
         }
 

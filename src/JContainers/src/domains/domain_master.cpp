@@ -4,8 +4,7 @@
 #include <exception>
 #include <type_traits>
 
-#include "boost/filesystem/path.hpp"
-#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem.hpp"
 #include "boost/archive/binary_oarchive.hpp"
 
 #include "jansson.h"

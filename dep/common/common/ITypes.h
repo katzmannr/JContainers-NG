@@ -45,7 +45,7 @@ inline UInt64 Swap64(UInt64 in)
 {
 	UInt64	temp;
 
-	temp = Swap32(in);
+    temp = Swap32(static_cast<UInt32>(in));
     temp <<= static_cast<std::uint32_t>(32);
 	temp |= Swap32(in >> 32);
 
