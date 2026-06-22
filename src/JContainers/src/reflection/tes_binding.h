@@ -1,6 +1,10 @@
 #pragma once
 
+#include <vector>
+
 //#include <SKSE/SKSE.h>
+#include "RE/N/NativeFunction.h"
+#include "RE/P/PackUnpack.h"
 #include "reflection/reflection.h"
 #include "skse/skse.h"
 #include "common/ITypes.h"
@@ -8,6 +12,19 @@
 class BGSListForm;
 
 namespace reflection { namespace binding {
+
+    template <typename T>
+    class rbArray
+    {
+    public:
+        RE::BSScript::Array      *arr = nullptr;
+        UInt32 Length() const                           { return arr != nullptr ? arr->size() : 0; }
+        void Get(T * dst, const UInt32 idx)     { *dst = RE::BSScript::UnpackValue<T>(&(*arr)[idx]); }
+        void Set(T * src, const UInt32 idx)
+        {
+            RE::BSScript::PackValue(&(*arr)[idx], *src);
+        }
+    };
 
     // traits placeholders
     template<class JType>
@@ -56,15 +73,37 @@ namespace reflection { namespace binding {
         //typedef ValueConverter<TesType> Conv;
     };
 
-    template<> struct GetConv<void> {
-        using tes_type = void;
+    template <class T>
+    struct tes_type;
+
+    template <>
+    struct tes_type<int> {
+        using type = std::int32_t;
     };
 
-    template<> struct GetConv<const char*> : StringConverter{};
-    template<> struct GetConv<std::string> : StringConverter{};
+    template <>
+    struct tes_type<float> {
+        using type = float;
+    };
 
-    template<> struct GetConv<int32_t> : StaticCastValueConverter<int32_t, SInt32>{};
-    template<> struct GetConv<uint32_t> : StaticCastValueConverter<uint32_t, UInt32>{};
+    template <>
+    struct tes_type<bool> {
+        using type = std::int32_t;
+    };
+
+    template <>
+    struct tes_type<std::string> {
+        using type = RE::BSFixedString;
+    };
+
+    template <class T>
+    using tes_type_t = typename tes_type<T>::type;
+
+    template <class R>
+    tes_type_t<R> to_tes(R&& r)
+    {
+        return GetConv<R>::convert2Tes(std::forward<R>(r));
+    }
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -77,7 +116,7 @@ namespace reflection { namespace binding {
         }
     };
 
-    template<class T> struct j2Str < VMArray<T> > {
+    template<class T> struct j2Str < rbArray<T> > {
         static function_parameter typeInfo() {
             std::string str(j2Str<T>::typeInfo().tes_type_name);
             str += "[]";
@@ -86,45 +125,9 @@ namespace reflection { namespace binding {
         }
     };
 
-    template<class T> struct j2Str < VMResultArray<T> > : j2Str < VMArray<T> > {};
+    template<class T> struct j2Str < std::vector<T> > : j2Str < rbArray<T> > {};
 
     //////////////////////////////////////////////////////////////////////////
-
-
-    template<size_t ParamCnt>
-    struct native_function_selector;
-
-#define MAKE_ME_HAPPY(N)\
-    template<> struct native_function_selector<N> {\
-        template<class... Params> using function = RE::BSScript::NativeFunction ## N <::StaticFunctionTag, Params...>;\
-    };
-
-    MAKE_ME_HAPPY(0);
-    MAKE_ME_HAPPY(1);
-    MAKE_ME_HAPPY(2);
-    MAKE_ME_HAPPY(3);
-    MAKE_ME_HAPPY(4);
-    MAKE_ME_HAPPY(5);
-    MAKE_ME_HAPPY(6);
-
-    template<size_t ParamCnt>
-    struct state_native_function_selector;
-
-#undef MAKE_ME_HAPPY
-#define MAKE_ME_HAPPY(N)\
-    template<> struct state_native_function_selector<N> {\
-        template<class State, class... Params> using function = ::NativeFunctionWithState ## N <State, Params...>; \
-    };
-
-    MAKE_ME_HAPPY(0);
-    MAKE_ME_HAPPY(1);
-    MAKE_ME_HAPPY(2);
-    MAKE_ME_HAPPY(3);
-    MAKE_ME_HAPPY(4);
-    MAKE_ME_HAPPY(5);
-    MAKE_ME_HAPPY(6);
-
-#undef  MAKE_ME_HAPPY
 
     template<class T>
     using remove_cref = typename std::remove_const<typename std::remove_reference<T>::type>::type;
@@ -141,6 +144,30 @@ namespace reflection { namespace binding {
     // - holds function meta-info, like @parameter_info
     template <typename T> struct proxy;
     template <typename T> struct state_proxy;
+
+    template <class Func, class S, class... Args>
+    struct tes_wrapper
+    {
+        static tes_type_t<S> call(
+            RE::StaticFunctionTag* tag,
+            tes_type_t<Args>... args)
+        {
+            if constexpr (std::is_void_v<S>)
+            {
+                Func{}(
+                    get_converter<Args>::convert2J(args, tag)...
+                    );
+            }
+            else
+            {
+                return GetConv<S>::convert2Tes(
+                    Func{}(
+                        get_converter<Args>::convert2J(args, tag)...
+                        )
+                    );
+            }
+        }
+    };
 
     template <class R, class... Params>
     struct proxy<R(*)(Params ...)>
@@ -179,6 +206,7 @@ namespace reflection { namespace binding {
                 }
             };
 
+
             struct void_ret {
                 static void tes_func(
                     RE::StaticFunctionTag* tag,
@@ -193,22 +221,20 @@ namespace reflection { namespace binding {
                 void_ret,
                 non_void_ret>::type;
 
-            static void bind(const bind_args& args) {
-                args.registry.RegisterFunction
-                (
-                    new typename native_function_selector<sizeof...(Params)>::template function<
-                        convert_to_tes_type<R>, convert_to_tes_type<Params> ...>
-                        (
-                            args.functionName.c_str(),
-                            args.className.c_str(),
-                            &tes_func_holder::tes_func,
-                            &args.registry
+            template <class Func, class S, class... Parameters>
+            static void bind(const bind_args& args)
+            {
+                using wrapper = tes_wrapper<Func, S, Parameters...>;
+
+                args.vm.RegisterFunction(
+                    new RE::BSScript::NativeFunction(
+                        args.functionName.c_str(),
+                        args.className.c_str(),
+                        &wrapper::call
                         )
-                );
+                    );
             }
         };
-
-
     };
 
     template <class R, class State, class... Params>
@@ -263,20 +289,21 @@ namespace reflection { namespace binding {
                 void_ret,
                 non_void_ret>::type;
 
-            static void bind(const bind_args& args) {
-                args.registry.RegisterFunction
-                (
-                    new typename state_native_function_selector<sizeof...(Params)>::template function<
-                        State, convert_to_tes_type<R>, convert_to_tes_type<Params> ...>
-                        (
-                            args.functionName.c_str(),
-                            args.className.c_str(),
-                            &tes_func_holder::tes_func,
-                            &args.registry,
-                            *reinterpret_cast<State*>(args.shared_state)
+            template <class Func, class S, class... Parameters>
+            static void bind(const bind_args& args)
+            {
+                using wrapper = tes_wrapper<Func, S, Parameters...>;
+
+                args.vm.RegisterFunction(
+                    new RE::BSScript::NativeFunction(
+                        args.functionName.c_str(),
+                        args.className.c_str(),
+                        &wrapper::call,
+                        *reinterpret_cast<State*>(args.shared_state)
                         )
-                );
+                    );
             }
+
         };
 
 

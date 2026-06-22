@@ -1,13 +1,11 @@
 #include <SKSE/SKSE.h>
 
+#include "RE/B/BSCoreTypes.h"
+#include "RE/C/ConsoleLog.h"
+#include "RE/T/TESDataHandler.h"
 #include "SkyrimVRESLAPI.h"
 
-#include "util/stl_ext.h"
-#include "forms/form_handling.h"
-
 #include <gtest/gtest.h>
-
-#include <algorithm>
 
 extern SKSE::detail::SKSESerializationInterface* g_serialization;
 
@@ -16,9 +14,6 @@ namespace skse
 
 namespace
 {
-
-using forms::FormId;
-using forms::FormIdUnredlying;
 
 //--------------------------------------------------------------------------------------------------
 
@@ -30,11 +25,11 @@ struct skse_api
     virtual std::optional<std::string_view> loaded_mod_name (std::uint8_t ndx) = 0;
     virtual std::optional<std::string_view> loaded_light_mod_name (std::uint16_t ndx) = 0;
 
-    virtual FormId resolve_handle (FormId handle) = 0;
-    virtual RE::TESForm* lookup_form (FormId handle) = 0;
+    virtual RE::FormID resolve_handle (RE::FormID handle) = 0;
+    virtual RE::TESForm* lookup_form (RE::FormID handle) = 0;
 
-    virtual bool try_retain_handle (FormId handle) = 0;
-    virtual void release_handle (FormId handle) = 0;
+    virtual bool try_retain_handle (RE::FormID handle) = 0;
+    virtual void release_handle (RE::FormID handle) = 0;
 
     virtual void console_print (const char * fmt, const va_list& args) = 0;
 };
@@ -66,17 +61,17 @@ struct fake_api : public skse_api
         return std::make_optional ((uint32_t (name.front ()) << 24) | (0x00ffffffu & form));
     }
 
-    FormId resolve_handle (FormId handle) override { return handle; }
+    RE::FormID resolve_handle (RE::FormID handle) override { return handle; }
 
-    RE::TESForm* lookup_form (FormId) override
+    RE::TESForm* lookup_form (RE::FormID) override
     {
         static char blob[sizeof(RE::TESForm)] = { '\0' };
         return reinterpret_cast<RE::TESForm*> (&blob);
     }
 
-    bool try_retain_handle (FormId) override { return true; }
+    bool try_retain_handle (RE::FormID) override { return true; }
 
-    void release_handle (FormId) override {}
+    void release_handle (RE::FormID) override {}
 
     void console_print (const char*, const va_list&) override {}
 
@@ -103,10 +98,10 @@ struct silent_api : public skse_api
     std::optional<std::uint32_t> form_from_file (std::string_view const&, std::uint32_t) override { return 0; }
     std::optional<std::string_view> loaded_mod_name (std::uint8_t) override { return ""; }
     std::optional<std::string_view> loaded_light_mod_name (std::uint16_t) override { return ""; }
-    FormId resolve_handle (FormId) override { return FormId::Zero; }
-    TESForm* lookup_form (FormId) override { return nullptr; }
-    bool try_retain_handle (FormId) override { return true; }
-    void release_handle (FormId) override {}
+    RE::FormID resolve_handle (RE::FormID) override { return 0; }
+    RE::TESForm* lookup_form (RE::FormID) override { return nullptr; }
+    bool try_retain_handle (RE::FormID) override { return true; }
+    void release_handle (RE::FormID) override {}
     void console_print (const char*, const va_list&) override {}
 };
 
@@ -118,6 +113,7 @@ struct real_api : public skse_api
     std::optional<std::uint32_t> form_from_file (std::string_view const& name, std::uint32_t form) override
     {
         using namespace std;
+        RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
         if (!REL::Module::IsVR())
         {
             if (g_SkyrimVRESLInterface)
@@ -130,19 +126,20 @@ struct real_api : public skse_api
             }
             else
             {
-                RE::TESDataHandler* p = DataHandler::GetSingleton ();
+                RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
                 if (RE::TESFile const* mi = p->LookupModByName (string (name).c_str ()))
                 {
-                    auto retval = make_optional (mi->GetFormID (form));
+                    auto retval = p->LookupFormID(form, name);  //auto retval = make_optional (mi->GetFormID (form));
                     return retval;
                 }
             }
         }
         else {
-            RE::TESDataHandler* p = DataHandler::GetSingleton ();
+            RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
             if (RE::TESFile const* mi = p->LookupModByName (string (name).c_str ()))
             {
-                return make_optional (mi->GetFormID (form));
+                auto retval = p->LookupFormID(form, name); // make_optional (mi->GetFormID (form));
+                return retval;
             }
         }
         return nullopt;
@@ -151,17 +148,17 @@ struct real_api : public skse_api
     /// Question: order in *Mods list is considered as modIndex or modLighIndex?
     std::optional<std::string_view> loaded_mod_name (std::uint8_t i) override
     {
-        RE::TESDataHandler* p = DataHandler::GetSingleton ();
+        RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
         if (!REL::Module::IsVR())
         {
-            if (i < p->modList.loadedModCount)
+            if (i < p->GetLoadedModCount())
             {
-                return p->modList.loadedMods[i]->name;
+                return p->GetLoadedMods()[i]->GetFilename();
             }
         }
-        else if (i < p->modList.loadedMods.count)
+        else if (i < p->GetLoadedModCount())
         {
-            return p->modList.loadedMods[i]->name;
+            return p->GetLoadedMods()[i]->GetFilename();
         }
         return std::nullopt;
     }
@@ -173,11 +170,11 @@ struct real_api : public skse_api
             if (g_SkyrimVRESLInterface)
             {
                 const SkyrimVRESLPluginAPI::TESFileCollection* fileCollection = g_SkyrimVRESLInterface->GetCompiledFileCollection();
-                if (i < fileCollection->smallFiles.count)
+                if (i < fileCollection->smallFiles.size())
                 {
                     RE::TESFile* smallFile = nullptr;
-                    fileCollection->smallFiles.GetNthItem(i, smallFile);
-                    return smallFile->name;
+                    smallFile = fileCollection->smallFiles[i];
+                    return (smallFile != nullptr ? smallFile->GetFilename() : "");
                 }
             }
             else
@@ -185,55 +182,60 @@ struct real_api : public skse_api
                 JC_log("WARNING: Attempted to fetch a light plugin name in VR, but VR ESL support is not  present!");
             }
         } else {
-            RE::TESDataHandler* p = DataHandler::GetSingleton ();
-            if (i < p->modList.loadedCCMods.count)
-                return p->modList.loadedCCMods[i]->name;
+            RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
+            if (i < p->GetLoadedModCount())
+                return p->GetLoadedMods()[i]->GetFilename();
         }
         return std::nullopt;
     }
 
-    FormId resolve_handle (FormId id) override
+    RE::FormID resolve_handle (RE::FormID id) override
     {
-        UInt32 new_id, old_id = static_cast<UInt32> (id);
-        return g_serialization->ResolveFormId (old_id, &new_id) ? static_cast<FormId> (new_id) : FormId::Zero;
+        // Already resolved ? Just return the id
+        // return g_serialization->ResolveFormId (old_id, &new_id) ? static_cast<FormId> (new_id) : FormId::Zero;
+        // not resolved
+        // return RE::TESForm::LookbyID(id) -> does return the Form, you could get the form with RE::TESDataHandler again
+        return id;
     }
 
-    TESForm* lookup_form (FormId id) override
-    {
-        return LookupFormByID (static_cast<std::uint32_t> (id));
+    RE::TESForm* lookup_form (RE::FormID id) override
+    {   
+        return RE::TESForm::LookupByID(id);
     }
 
-    bool try_retain_handle (FormId id) override
+    bool try_retain_handle (RE::FormID id) override
     {
         auto form = lookup_form (id);
         if (!form)
             return false;
 
-        auto policy = *g_objectHandlePolicy;
-        auto handle = policy->Create (form->formType, form);
-        if (handle == policy->GetInvalidHandle ())
-            return false;
+        // Now done internally in CommonLibNG-SE
+        // auto policy = *g_objectHandlePolicy;
+        // auto handle = policy->Create (form->formType, form);
+        // if (handle == policy->GetInvalidHandle ())
+        //     return false;
 
-        policy->AddRef (handle);
+        // policy->AddRef (handle);
         return true;
     }
 
-    void release_handle (FormId id) override
+    void release_handle (RE::FormID id) override
     {
-        auto form = lookup_form (id);
-        if (!form)
-            return;
+        // Now done internally in CommonLibNG-SE
+        // auto form = lookup_form (id);
+        // if (!form)
+        //     return;
 
-        auto policy = *g_objectHandlePolicy;
-        auto handle = policy->Create (form->formType, form);
-        if (handle != policy->GetInvalidHandle ())
-            policy->Release (handle);
+        // auto policy = *g_objectHandlePolicy;
+        // auto handle = policy->Create (form->formType, form);
+        // if (handle != policy->GetInvalidHandle ())
+        //     policy->Release (handle);
     }
 
     void console_print (const char * fmt, const va_list& args) override
     {
-        if (ConsoleManager* mgr = *g_console)
-            CALL_MEMBER_FN (mgr, VPrint) (fmt, args);
+        RE::ConsoleLog console;
+        console.Print(fmt, args);
     }
 };
 
@@ -263,14 +265,14 @@ void set_silent_api ()
     g_current_api = &g_silent_api;
 }
 
-FormId resolve_handle (FormId handle)
+RE::FormID resolve_handle (RE::FormID handle)
 {
     return g_current_api->resolve_handle (handle);
 }
 
-RE::TESForm* lookup_form (FormId handle)
+RE::TESForm* lookup_form (RE::FormID handle)
 {
-    return handle != FormId::Zero ? g_current_api->lookup_form (handle) : nullptr;
+    return handle != 0 ? g_current_api->lookup_form (handle) : nullptr;
 }
 
 std::optional<std::uint32_t> form_from_file (std::string_view const& name, std::uint32_t form)
@@ -301,12 +303,12 @@ void console_print (const char* fmt, ...)
     va_end (args);
 }
 
-bool try_retain_handle (FormId handle)
+bool try_retain_handle (RE::FormID handle)
 {
     return g_current_api->try_retain_handle (handle);
 }
 
-void release_handle (FormId handle)
+void release_handle (RE::FormID handle)
 {
     g_current_api->release_handle (handle);
 }

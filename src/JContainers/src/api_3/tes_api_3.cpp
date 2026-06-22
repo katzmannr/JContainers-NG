@@ -1,11 +1,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
-
 #include <gtest/gtest.h>
 
+#include <shlobj.h>
 #include "tes_object.h"
 
 namespace collections {

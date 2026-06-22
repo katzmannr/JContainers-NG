@@ -6,7 +6,6 @@
 #include "master.h"
 #include "collections/copying.h"
 #include "collections/json_serialization.h"
-#include <shlobj.h>
 
 namespace tes_api_3 {
 
@@ -433,17 +432,17 @@ Int function atomicFetchDiv(int object, string path, int value, bool createMissi
 
             T previousVal = default_value<T>();
 
-            bool succeed = ca::visit_value(*obj, path, ca::access_way::creative, [&previousVal](item& value) {
+            bool succeed = ca::visit_value(*obj, path, ca::access_way::creative, [&previousVal, &initialValue](item& value) {
                 if (value.isNull()) {
                     value = initialValue;
                 }
                 else if (auto *asInt = value.get<SInt32>()) {
                     previousVal = *asInt;
-                    *asInt += value;
+                    *asInt += value.intValue();
                 }
                 else if (auto *asInt = value.get<Float32>()) {
                     previousVal = *asInt;
-                    *asInt += value;
+                    *asInt += value.fltValue();
                 }
             });
 

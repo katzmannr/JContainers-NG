@@ -4,6 +4,7 @@
 #include <functional>
 #include <deque>
 #include <boost/serialization/split_member.hpp>
+#include <memory>
 
 #include "object_base.h"
 

@@ -29,7 +29,7 @@ namespace forms {
     class form_observer {
     private:
         using weak_entry = boost::weak_ptr<form_entry>;
-        using watched_forms_t = concurrency::concurrent_unordered_map < FormId, weak_entry >;
+        using watched_forms_t = concurrency::concurrent_unordered_map < RE::FormID, weak_entry >;
 
         watched_forms_t _watched_forms;
 
@@ -38,7 +38,7 @@ namespace forms {
         form_observer() = default;
 
         void on_form_deleted(FormHandle fId);
-        form_entry_ref watch_form(FormId fId);
+        form_entry_ref watch_form(RE::FormID fId);
 
         // Not threadsafe part of API:
 
@@ -78,7 +78,7 @@ namespace forms {
         form_ref(const form_ref &) = default;
         form_ref& operator = (const form_ref &) = default;
 
-        form_ref(FormId id, form_observer& watcher);
+        form_ref(RE::FormID id, form_observer& watcher);
         form_ref(const RE::TESForm& form, form_observer& watcher);
 
         static form_ref make_expired(FormId formId);
@@ -90,8 +90,8 @@ namespace forms {
         bool is_not_expired() const;
         bool is_expired() const { return !is_not_expired(); }
 
-        FormId get() const;
-        FormId get_raw() const;
+        RE::FormID get() const;
+        RE::FormID get_raw() const;
 
         bool operator!() const BOOST_NOEXCEPT { return is_expired(); }
         BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT();
@@ -127,12 +127,12 @@ namespace forms {
     // It's lightweight alternative to form_ref to temporarily hold forms
     // why lightweight? form_ref constructor accesses form_observer, which is costly
     class form_ref_lightweight {
-        FormId _formId = FormId::Zero;
+        RE::FormID _formId = 0;
         form_observer* _observer = nullptr;
 
     public:
 
-        form_ref_lightweight(FormId id, form_observer& watcher)
+        form_ref_lightweight(RE::FormID id, form_observer& watcher)
             : _formId(id), _observer(&watcher) {}
 
         // allow implicit conversion
@@ -146,13 +146,13 @@ namespace forms {
         }
 
         // mimic form_ref interface
-        FormId get() const { return _formId; }
-        FormId get_raw() const { return _formId; }
+        RE::FormID get() const { return _formId; }
+        RE::FormID get_raw() const { return _formId; }
 
         bool operator!() const BOOST_NOEXCEPT{ return is_expired(); }
         BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
 
-        bool is_expired() const { return _formId == FormId::Zero; }
+        bool is_expired() const { return _formId == 0; }
         bool is_not_expired() const { return !is_expired(); }
     };
 
@@ -210,7 +210,7 @@ namespace collections {
     using forms::FormId;
 
     template<class Context>
-    inline form_ref make_weak_form_id(FormId id, Context& context) {
+    inline form_ref make_weak_form_id(RE::FormID id, Context& context) {
         return form_ref{ id, context._form_watcher };
     }
 
@@ -220,13 +220,13 @@ namespace collections {
     }
 
     template<class Context>
-    inline form_ref_lightweight make_lightweight_form_ref(FormId id, Context& context) {
+    inline form_ref_lightweight make_lightweight_form_ref(RE::FormID id, Context& context) {
         return form_ref_lightweight{ id, context._form_watcher };
     }
 
     template<class Context>
     inline form_ref_lightweight make_lightweight_form_ref(const RE::TESForm* form, Context& context) {
-        return form_ref_lightweight{ form ? util::to_enum<FormId>(form->GetFormID()) : FormId::Zero, context._form_watcher };
+        return form_ref_lightweight{ form != nullptr ? util::to_enum<RE::FormID>(form->GetFormID()) : 0, context._form_watcher };
     }
 
 }

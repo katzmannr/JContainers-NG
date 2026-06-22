@@ -6,6 +6,10 @@
 #include <collections/context.h>
 #include <gtest/gtest.h>
 
+#include "api_3/master.h"
+#include "reflection/reflection.h"
+#include "reflection/tes_binding.h"
+
 namespace tes_api_3 {
 
     using namespace collections;

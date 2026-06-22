@@ -35,7 +35,7 @@ namespace reflection {
 
     struct bind_args {
         struct shared_state_t{};
-        VMClassRegistry& registry;
+        RE::BSScript::IVirtualMachine& vm;
         istring className;
         istring functionName;
         shared_state_t* shared_state;

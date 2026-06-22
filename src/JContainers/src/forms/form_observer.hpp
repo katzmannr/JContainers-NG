@@ -35,7 +35,7 @@ namespace forms {
 
     class form_entry : public boost::noncopyable {
 
-        FormId _handle = FormId::Zero;
+        RE::FormID _handle = 0;
         std::atomic<bool> _deleted = false;
         // remember whether a form handle was retained or not
         // to not release it if the handle wasn't be previously retained (for ex. handle's object was not loaded)
@@ -43,7 +43,7 @@ namespace forms {
 
     public:
 
-        form_entry(FormId handle, bool deleted, bool handle_was_retained)
+        form_entry(RE::FormID handle, bool deleted, bool handle_was_retained)
             : _handle(handle)
             , _deleted(deleted)
             , _is_handle_retained(handle_was_retained)
@@ -51,7 +51,7 @@ namespace forms {
 
         form_entry() = default;
 
-        static form_entry_ref make(FormId handle) {
+        static form_entry_ref make(RE::FormID handle) {
             //log("form_entry retains %X", handle);
 
             return boost::make_shared<form_entry>(
@@ -60,7 +60,7 @@ namespace forms {
                 skse::try_retain_handle(handle));
         }
 
-        static form_entry_ref make_expired(FormId handle) {
+        static form_entry_ref make_expired(RE::FormID handle) {
             return boost::make_shared<form_entry>(handle, true, false);
         }
 
@@ -71,7 +71,7 @@ namespace forms {
             }
         }
 
-        FormId id() const { return _handle; }
+        RE::FormID id() const { return _handle; }
 
         bool is_deleted() const {
             return _deleted.load(std::memory_order_acquire);
@@ -105,7 +105,7 @@ namespace forms {
             if (u_is_deleted() == false) {
                 _handle = skse::resolve_handle(_handle);
 
-                if (_handle != FormId::Zero) {
+                if (_handle != 0) {
                     _is_handle_retained = skse::try_retain_handle(_handle);
                 }
                 else {
@@ -151,7 +151,7 @@ namespace forms {
 
     namespace {
 
-        static boost::detail::spinlock & spinlock_for(FormId formId) {
+        static boost::detail::spinlock & spinlock_for(RE::FormID formId) {
             using spinlock_pool = boost::detail::spinlock_pool < 'DyFW' > ;
             return spinlock_pool::spinlock_for(reinterpret_cast<void*>(formId));
         }
@@ -160,7 +160,7 @@ namespace forms {
     void form_observer::on_form_deleted(FormHandle handle)
     {
         // already failed, there are plenty of any kind of objects that are deleted every moment, even during initial splash screen
-        //jc_assert_msg(form_handling::is_static((FormId)handle) == false,
+        //jc_assert_msg(form_handling::is_static((RE::FormID)handle) == false,
             //"If failed, then there is static form destruction event too? fId %" PRIX64, handle);
 
         if (!fh::is_form_handle(handle)) {
@@ -168,15 +168,15 @@ namespace forms {
         }
 
         // to test whether static form gets ever destroyed or not
-        //jc_assert(form_handling::is_static((FormId)handle) == false);
+        //jc_assert(form_handling::is_static((RE::FormID)handle) == false);
 
         ///log("on_form_deleted: %" PRIX64, handle);
 
-        auto formId = fh::form_handle_to_id(handle);
+        auto formID = fh::form_handle_to_id(handle);
         {
             // Since it's impossible that two threads will delete the same form simultaneosly
             // we can skip some thread safe stuff
-            auto itr = _watched_forms.find(formId);
+            auto itr = _watched_forms.find(formID);
             if (itr != _watched_forms.end()) {
 
                 auto watched = itr->second.lock();
@@ -185,10 +185,10 @@ namespace forms {
                     watched->set_deleted();
                     {
                         // the only unsafe piece of code here
-                        std::lock_guard<boost::detail::spinlock> guard{ spinlock_for(formId) };
+                        std::lock_guard<boost::detail::spinlock> guard{ spinlock_for(formID) };
                         itr->second.reset();
                     }
-                    log("flagged form-entry %" PRIX32 " as deleted", formId);
+                    log("flagged form-entry %" PRIX32 " as deleted", formID);
                 }
             }
         }
@@ -228,7 +228,7 @@ namespace forms {
             });
             break;
         case 2:{
-            std::unordered_map<FormId, boost::weak_ptr<form_entry> > oldCnt;
+            std::unordered_map<RE::FormID, boost::weak_ptr<form_entry> > oldCnt;
             ar >> oldCnt;
 
             for (auto& pair : oldCnt) {
@@ -254,9 +254,9 @@ namespace forms {
         });
     }
 
-    form_entry_ref form_observer::watch_form(FormId fId)
+    form_entry_ref form_observer::watch_form(RE::FormID fId)
     {
-        if (fId == FormId::Zero) {
+        if (fId == 0) {
             return nullptr;
         }
 
@@ -307,22 +307,22 @@ namespace forms {
 
     ////////////////////////////////////////
 
-    form_ref::form_ref(FormId id, form_observer& watcher)
+    form_ref::form_ref(RE::FormID id, form_observer& watcher)
         : _watched_form(watcher.watch_form(id))
     {
     }
 
-    form_ref::form_ref(const TESForm& form, form_observer& watcher)
-        : _watched_form(watcher.watch_form(util::to_enum<FormId>(form.formID)))
+    form_ref::form_ref(const RE::TESForm& form, form_observer& watcher)
+        : _watched_form(watcher.watch_form(util::to_enum<RE::FormID>(form.GetLocalFormID())))
     {
     }
 
-    form_ref::form_ref(FormId oldId, form_observer& watcher, load_old_id_t)
+    form_ref::form_ref(RE::FormID oldId, form_observer& watcher, load_old_id_t)
         : _watched_form(watcher.watch_form(skse::resolve_handle(oldId)))
     {
     }
 
-    form_ref form_ref::make_expired(FormId formId) {
+    form_ref form_ref::make_expired(RE::FormID formId) {
         auto entry = form_entry::make_expired(formId);
         return form_ref{ entry };
     }
@@ -333,12 +333,12 @@ namespace forms {
         return _watched_form && !_watched_form->is_deleted();
     }
 
-    FormId form_ref::get() const {
-        return is_not_expired() ? _watched_form->id() : FormId::Zero;
+    RE::FormID form_ref::get() const {
+        return is_not_expired() ? _watched_form->id() : 0;
     }
 
-    FormId form_ref::get_raw() const {
-        return _watched_form ? _watched_form->id() : FormId::Zero;
+    RE::FormID form_ref::get_raw() const {
+        return _watched_form ? _watched_form->id() : 0;
     }
 
     template<class Archive>
@@ -361,9 +361,9 @@ namespace forms {
         switch (version)
         {
         case 0: {// v3.3 alpha-1 format
-            FormId oldId = FormId::Zero;
+            RE::FormID oldId = 0;
             ar >> oldId;
-            FormId id = skse::resolve_handle(oldId);
+            RE::FormID id = skse::resolve_handle(oldId);
             bool expired = false;
             ar >> expired;
 
@@ -375,9 +375,9 @@ namespace forms {
         }
         case 1: {
             // Remove this case !!! This format wasn't ever published
-            FormId oldId = FormId::Zero;
+            RE::FormID oldId = 0;
             ar >> oldId;
-            FormId id = skse::resolve_handle(oldId);
+            RE::FormID id = skse::resolve_handle(oldId);
             bool expired = false;
             ar >> expired;
 
@@ -418,7 +418,7 @@ namespace forms {
 
 
                 for (int i = 0; i < 1000000; ++i) {
-                    watcher.watch_form(util::to_enum<FormId>(i % 1000));
+                    watcher.watch_form(util::to_enum<RE::FormID>(i % 1000));
                 }
 
             });
@@ -430,12 +430,12 @@ namespace forms {
 
             EXPECT_TRUE(!id);
             EXPECT_FALSE(id);
-            EXPECT_TRUE(id.get() == FormId::Zero);
-            EXPECT_TRUE(id.get_raw() == FormId::Zero);
+            EXPECT_TRUE(id.get() == 0);
+            EXPECT_TRUE(id.get_raw() == 0);
         }
 
         TEST(forms, simple_2){
-            const auto fid = util::to_enum<FormId>(0xff000014);
+            const auto fid = util::to_enum<RE::FormID>(0xff000014);
             form_observer watcher;
             form_ref id{ fid, watcher };
 
@@ -455,7 +455,7 @@ namespace forms {
         TEST(form_observer, u_remove_expired_forms){
             form_observer watcher;
 
-            const auto fid = util::to_enum<FormId>(0xff000014);
+            const auto fid = util::to_enum<RE::FormID>(0xff000014);
 
             auto entry = watcher.watch_form(fid);
             EXPECT_TRUE(watcher.u_forms_count() == 1);
@@ -471,7 +471,7 @@ namespace forms {
         // lookup with a non-expired form-ref ID 0x14 to a list containing expired form-ref (0x14) should fail
         TEST(forms, bug_1)
         {
-            const auto fid = util::to_enum<FormId>(0x14);
+            const auto fid = util::to_enum<RE::FormID>(0x14);
             form_observer watcher;
             form_ref non_expired{ fid, watcher };
 
@@ -488,7 +488,7 @@ namespace forms {
         // lookup with a non-expired form-ref ID 0x14 (key) to a map containing expired form-ref key (0x14) should fail
         TEST(forms, bug_2)
         {
-            const auto fid = util::to_enum<FormId>(0x14);
+            const auto fid = util::to_enum<RE::FormID>(0x14);
             form_observer watcher;
             form_ref non_expired{ fid, watcher };
 
@@ -500,7 +500,7 @@ namespace forms {
         // lookup with an expired form-ref ID 0x14 (key) to a map containing non-expired form-ref key (0x14) should fail
         TEST(forms, bug_3)
         {
-            const auto fid = util::to_enum<FormId>(0x14);
+            const auto fid = util::to_enum<RE::FormID>(0x14);
             form_observer watcher;
             form_ref non_expired{ fid, watcher };
             auto expired = form_ref::make_expired(fid);
@@ -512,7 +512,7 @@ namespace forms {
 
         TEST(forms, bug_4)
         {
-            const auto fid = util::to_enum<FormId>(0xff000014);
+            const auto fid = util::to_enum<RE::FormID>(0xff000014);
             const auto fhid = fh::form_id_to_handle(fid);
 
             form_observer watcher;
@@ -531,7 +531,7 @@ namespace forms {
 
         TEST(forms, bug_5)
         {
-            const auto fid = util::to_enum<FormId>(0xff000014);
+            const auto fid = util::to_enum<RE::FormID>(0xff000014);
             const auto fhid = fh::form_id_to_handle(fid);
 
             form_observer watcher;
@@ -557,7 +557,7 @@ namespace forms {
 
         // both form refs (ID 0xff000014) should expire in the same moment of time, should point to the same form-entry
         TEST(forms, dynamic_form_id){
-            const auto fid = util::to_enum<FormId>(0xff000014);
+            const auto fid = util::to_enum<RE::FormID>(0xff000014);
             const auto fhid = fh::form_id_to_handle(fid);
             // EXPECT_TRUE(fh::is_static(fid) == false);
 
@@ -572,7 +572,7 @@ namespace forms {
 
             auto expectExpired = [&](const form_ref& id) {
                 EXPECT_FALSE(id.is_not_expired());
-                EXPECT_TRUE(id.get() == FormId::Zero);
+                EXPECT_TRUE(id.get() == 0);
                 EXPECT_TRUE(id.get_raw() == fid);
             };
 

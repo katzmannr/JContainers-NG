@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <vector>
+
 #include <common/ITypes.h>
 #include "object/object_base.h"
 #include "item.h"

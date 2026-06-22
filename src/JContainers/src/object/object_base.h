@@ -6,6 +6,7 @@
 #include <boost/optional/optional.hpp>
 #include "boost/noncopyable.hpp"
 
+#include "common/ITypes.h"
 #include "intrusive_ptr.hpp"
 #include "util/spinlock.h"
 #include "util/istring.h"

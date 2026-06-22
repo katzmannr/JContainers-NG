@@ -12,7 +12,6 @@
 
 #include "forms/form_id.h"
 #include "forms/form_observer.h"
-#include "collections.h"
 
 
 namespace collections {
