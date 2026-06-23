@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api_3/tes_object.h"
 #include "collections/functions.h"
 #include "reflection/tes_binding.h"
 #include "master.h"

@@ -3,12 +3,12 @@
 #include <vector>
 
 #include <SKSE/SKSE.h>
-#include "RE/N/NativeFunction.h"
-#include "RE/P/PackUnpack.h"
+// Using only SKSE.h is NOT sufficient for NativeFunction and PackUnpack
+#include <RE/N/NativeFunction.h>
+#include <RE/P/PackUnpack.h>
 #include "reflection/reflection.h"
 #include "common/ITypes.h"
-
-class BGSListForm;
+#include "skse/string.h"
 
 namespace reflection { namespace binding {
 

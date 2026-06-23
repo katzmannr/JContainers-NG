@@ -6,11 +6,8 @@
 #include <algorithm>
 #include <stdint.h>
 #include <utility>
-#include <cstdarg>
 
 #include <SKSE/SKSE.h>
-#include "skse/skse.h"
-#include "meta.h"
 #include "util/istring.h"
 
 class VMClassRegistry;
@@ -141,12 +138,12 @@ namespace reflection {
             methods.push_back(info);
         }
 
-        void bind(VMClassRegistry& registry) const {
+        void bind(RE::BSScript::IVirtualMachine& vm) const {
             assert(initialized());
 
             auto clsName = className();
             for (const auto& itm : methods) {
-                itm.bind(registry, clsName);
+                itm.bind(vm, clsName);
             }
         }
 
