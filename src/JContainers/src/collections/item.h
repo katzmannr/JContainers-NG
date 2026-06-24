@@ -12,6 +12,7 @@
 
 #include "forms/form_id.h"
 #include "forms/form_observer.h"
+#include "skse/string.h"
 
 
 namespace collections {

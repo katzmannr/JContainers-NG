@@ -10,8 +10,6 @@
 #include <SKSE/SKSE.h>
 #include "util/istring.h"
 
-class VMClassRegistry;
-
 namespace reflection {
 
     using istring = util::istring;

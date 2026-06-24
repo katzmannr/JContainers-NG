@@ -1,10 +1,17 @@
 #include <boost/iostreams/stream.hpp>
-#include <ShlObj.h>
+#include "RE/B/BSCoreTypes.h"
+#include "RE/I/IVirtualMachine.h"
+#include "SKSE/API.h"
+#include "SKSE/Interfaces.h"
+#include "api_3/tes_types.h"
+#include <shlobj.h>
+
 
 #include <SKSE/SKSE.h>
 
 #include "SkyrimVRESLAPI.h"
 
+#include "common/ITypes.h"
 #include "util/util.h"
 #include "jc_interface.h"
 #include "reflection/reflection.h"
@@ -15,24 +22,29 @@
 
 #include "domains/domain_master.h"
 
-class VMClassRegistry;
-
 namespace jc {
     extern root_interface root;
 }
 
-SKSESerializationInterface	* g_serialization = nullptr;
-static SKSEPapyrusInterface			* g_papyrus = nullptr;
-static SKSEMessagingInterface       * g_messaging = nullptr;
-
 namespace {
 
-    using namespace collections;
-    using namespace domain_master;
+using namespace collections;
+using namespace domain_master;
 
-    static PluginHandle					g_pluginHandle = kPluginHandle_Invalid;
+class skse_callbacks {
 
-    void revert(SKSESerializationInterface * intfc) {
+public:
+    skse_callbacks() {
+        m_serialization = SKSE::GetSerializationInterface();
+        m_papyrus = SKSE::GetPapyrusInterface();
+        if (!m_papyrus) {
+            JC_log("couldn't get papyrus interface");
+            return;
+        }
+        s_messaging = SKSE::GetMessagingInterface();
+    }
+
+    static void revert(SKSE::SerializationInterface *intfc) {
         util::do_with_timing("Revert", []() {
             skse::set_silent_api();
             domain_master::master::instance().clear_state();
@@ -40,7 +52,7 @@ namespace {
         });
     }
 
-    void save(SKSESerializationInterface * intfc) {
+    static void save(SKSE::SerializationInterface * intfc) {
 
         namespace io = boost::iostreams;
 
@@ -53,137 +65,99 @@ namespace {
                 return n;
             }
 
-            SKSESerializationInterface* _sink;
+            SKSE::SerializationInterface* _sink;
         };
 
 
         util::do_with_timing("Save", [intfc]() {
-            if (intfc->OpenRecord((UInt32)consts::storage_chunk, (UInt32)serialization_version::current)) {
-                io::stream<skse_data_sink> stream(skse_data_sink{ intfc });
-                domain_master::master::instance().write_to_stream(stream);
-                //_DMESSAGE("%lu bytes saved", stream.tellp());
-            }
-            else {
-                JC_log("Unable open JC record");
-            }
-        });
-    }
-
-    void load(SKSESerializationInterface * intfc) {
-
-        namespace io = boost::iostreams;
-
-        class skse_data_source {
-        public:
-            typedef char char_type;
-            typedef io::source_tag  category;
-
-            explicit skse_data_source(SKSESerializationInterface* src = nullptr) : _source(src){}
-
-            std::streamsize read(char* buffer, std::streamsize n) const {
-                return _source ? _source->ReadRecordData(buffer, n) : 0;
-            }
-
-        private:
-            SKSESerializationInterface* _source;
-        };
-
-        util::do_with_timing("Load", [intfc]() {
-
-            skse::set_silent_api();
-            domain_master::master::instance().clear_state();
-            skse::set_real_api();
-
-            UInt32 type = 0;
-            UInt32 version = 0;
-            UInt32 length = 0;
-
-            while (intfc->GetNextRecordInfo(&type, &version, &length)) {
-                if (static_cast<consts>(type) == consts::storage_chunk) {
-                    break;
+                if (intfc->OpenRecord((UInt32)consts::storage_chunk, (UInt32)serialization_version::current)) {
+                    io::stream<skse_data_sink> stream(skse_data_sink{ intfc });
+                    domain_master::master::instance().write_to_stream(stream);
+                    //_DMESSAGE("%lu bytes saved", stream.tellp());
                 }
-            }
-
-            io::stream<skse_data_source> stream(skse_data_source(static_cast<consts>(type) == consts::storage_chunk ? intfc : nullptr));
-            domain_master::master::instance().read_from_stream(stream);
-        });
-    }
-
-    extern "C" {
-
-        __declspec(dllexport)
-        if (REL::Module::IsVR())
-        {
-            SKSEPluginVersionData SKSEPlugin_Version =
-            {
-                SKSEPluginVersionData::kVersion,
-                JC_API_VERSION,
-                plugin_name(),
-                "silvericed, ryobg & others",
-                "",
-                0,	// not version independent
-                0,
-                { CURRENT_RELEASE_RUNTIME, 0 },
-                0,	// works with any version of the script extender. you probably do not need to put anything here
-            };
+                else {
+                    JC_log("Unable open JC record");
+                }
+            });
         }
 
-        /// Since SKSE 2.3.1 it is not actually called, kept for minimizing changes
-        bool SKSEPlugin_Query (const SKSEInterface * skse, PluginInfo * info)
-        {
-            gLog.OpenRelative(CSIDL_MYDOCUMENTS, skse_logs() + plugin_name() + ".log");
+        static void load(SKSE::SerializationInterface * intfc) {
+
+            namespace io = boost::iostreams;
+
+            class skse_data_source {
+            public:
+                typedef char char_type;
+                typedef io::source_tag  category;
+
+                explicit skse_data_source(SKSE::SerializationInterface* src = nullptr) : _source(src){}
+
+                std::streamsize read(char* buffer, std::streamsize n) const {
+                    return _source ? _source->ReadRecordData(buffer, n) : 0;
+                }
+
+            private:
+                SKSE::SerializationInterface* _source;
+            };
+
+            util::do_with_timing("Load", [intfc]() {
+
+                skse::set_silent_api();
+                domain_master::master::instance().clear_state();
+                skse::set_real_api();
+
+                UInt32 type = 0;
+                UInt32 version = 0;
+                UInt32 length = 0;
+
+                while (intfc->GetNextRecordInfo(type, version, length)) {
+                    if (static_cast<consts>(type) == consts::storage_chunk) {
+                        break;
+                    }
+                }
+
+                io::stream<skse_data_source> stream(skse_data_source(static_cast<consts>(type) == consts::storage_chunk ? intfc : nullptr));
+                domain_master::master::instance().read_from_stream(stream);
+            });
+        }
+
+        static void delet(RE::VMHandle handle) {
+            domain_master::master::instance().get_form_observer().on_form_deleted((forms::FormHandle)handle);
+        }
+
+        static void listene(SKSE::MessagingInterface::Message* msg) {
+            if (msg && msg->type == SKSE::MessagingInterface::kPostPostLoad) {
+                s_messaging->Dispatch(jc::message_root_interface, (void *)&jc::root, sizeof(void*), nullptr);
+                if (!REL::Module::IsVR())
+                {
+                    SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(s_pluginHandle, s_messaging);
+                    if (g_SkyrimVRESLInterface)
+                    {
+                        JC_log("SkyrimVRESL interface detected and initialized!");
+                    }
+                    else
+                    {
+                        JC_log("SkyrimVRESL interface is not present or has failed to be retrieved... ESL related functionality is disabled.");
+                    }
+                }
+            }
+        }
+
+        static bool registerAllFunctions(RE::BSScript::IVirtualMachine *vm) {
+
+            gLog.OpenRelative(CSIDL_MYDOCUMENTS, (std::string(skse_logs()) + std::string(plugin_name()) + ".log").c_str());
             gLog.SetPrintLevel(IDebugLog::kLevel_Error);
             gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
 
-            if (info)
-            {
-                info->infoVersion = PluginInfo::kInfoVersion;
-                info->name = plugin_name();
-                info->version = JC_API_VERSION;
-            }
-
             // store plugin handle so we can identify ourselves later
-            g_pluginHandle = skse->GetPluginHandle();
+            s_pluginHandle = SKSE::GetPluginHandle();
 
-            JC_log(plugin_name() + " " + JC_VERSION_STR);
+            // This old check could be useful in a rare case of multiple mixed version build
+            // messaging && messaging->interfaceVersion >= SKSE::MessagingInterface::kVersion)
 
-            if (skse->isEditor) {
-                JC_log("loaded in editor, marking as incompatible");
-                return false;
-            }
+            JC_log("%s %s", plugin_name(), JC_VERSION_STR);
 
-            // get the serialization interface and query its version
-            g_serialization = (SKSESerializationInterface *)skse->QueryInterface(kInterface_Serialization);
-            if (!g_serialization) {
-                JC_log("couldn't get serialization interface");
-                return false;
-            }
-
-            if (g_serialization->version < SKSESerializationInterface::kVersion) {
-                JC_log("serialization interface too old (%d expected %d)", g_serialization->version, SKSESerializationInterface::kVersion);
-                return false;
-            }
-
-            g_papyrus = (SKSEPapyrusInterface *)skse->QueryInterface(kInterface_Papyrus);
-
-            if (!g_papyrus) {
-                JC_log("couldn't get papyrus interface");
-                return false;
-            }
-
-            auto messaging = (SKSEMessagingInterface *)skse->QueryInterface(kInterface_Messaging);
-            if (messaging && messaging->interfaceVersion >= SKSEMessagingInterface::kInterfaceVersion) {
-                g_messaging = messaging;
-            }
-
-            skse::set_real_api();
-
-            return true;
-        }
-
-        bool registerAllFunctions(VMClassRegistry *registry) {
-
-            jc_assert(registry);
+            jc_assert(vm);
 
             // One of the ways: temp. clone class meta infos, register them
             // 2nd: pass each context into "info.bind(*registry, some-context);"
@@ -201,7 +175,7 @@ namespace {
             // Need to enhance control over resulting function and class name
             // E.g. turn JArray.addObj into PSM_JContainers.JArray_addObj
 
-            // Pitfall: since the functions registered only ONCE, we must 
+            // Pitfall: since the functions registered only ONCE, we must
             // preserve context pointers during ALL gaming session
 
             // ����� ��������, ��� ����� ���� ���� ����� �������� ���� �� ��������
@@ -216,14 +190,15 @@ namespace {
                             return;
                         }
                         reflection::bind_args args{
-                            *registry,
+                            *vm,
                             info.className(),
                             func.name,
                             reinterpret_cast<reflection::bind_args::shared_state_t*>(&dom)
                         };
                         func.registrator(args);
-                        registry->SetFunctionFlags(args.className.c_str(),
-                            args.functionName.c_str(), reflection::kFunctionFlag_NoWait);
+                        // Replaces setting NoWait flag using SetFunctionFlags
+                        vm->SetCallableFromTasklets(args.className.c_str(),
+                                                    args.functionName.c_str(), true);
                     });
                 };
 
@@ -241,49 +216,40 @@ namespace {
             return true;
         }
 
-        __declspec(dllexport) bool SKSEPlugin_Load(const SKSEInterface * skse)
+        bool SKSEPlugin_Load()
         {
-            if (!REL::Module::IsVR())
-            {
-                SKSEPlugin_Query (skse, nullptr);
-            }
-            g_serialization->SetUniqueID(g_pluginHandle, (UInt32)consts::storage_chunk);
+            m_serialization->SetUniqueID(s_pluginHandle);
 
-            g_serialization->SetRevertCallback(g_pluginHandle, revert);
-            g_serialization->SetSaveCallback(g_pluginHandle, save);
-            g_serialization->SetLoadCallback(g_pluginHandle, load);
+            m_serialization->SetRevertCallback(revert);
+            m_serialization->SetSaveCallback(save);
+            m_serialization->SetLoadCallback(load);
 
-            g_serialization->SetFormDeleteCallback(g_pluginHandle, [](UInt64 handle) {
-                domain_master::master::instance().get_form_observer().on_form_deleted((forms::FormHandle)handle);
-            });
+            m_serialization->SetFormDeleteCallback(delet);
 
-            g_papyrus->Register(registerAllFunctions);
+            m_papyrus->Register(registerAllFunctions);
 
-            if (g_messaging) {
-                g_messaging->RegisterListener(g_pluginHandle, "SKSE", [](SKSEMessagingInterface::Message* msg) {
-                    if (msg && msg->type == SKSEMessagingInterface::kMessage_PostPostLoad) {
-                        g_messaging->Dispatch(g_pluginHandle, jc::message_root_interface, (void *)&jc::root, sizeof(void*), nullptr);
-                        if (!REL::Module::IsVR())
-                        {
-                            SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(g_pluginHandle, g_messaging);
-                            if (g_SkyrimVRESLInterface)
-                            {
-                                JC_log("SkyrimVRESL interface detected and initialized!");
-                            }
-                            else
-                            {
-                                JC_log("SkyrimVRESL interface is not present or has failed to be retrieved... ESL related functionality is disabled.");
-                            }
-                        }
-                    }
-                });
+            if (s_messaging) {
+                s_messaging->RegisterListener(listene);
             }
 
             JC_log("plugin loaded");
 
             return true;
         }
-    };
+
+        /// Since SKSE 2.3.1 it is not actually called, now CommonLibSSE-NG takes care of this part.
+        // bool SKSEPlugin_Query (const SKSEInterface * skse, PluginInfo * info)
+
+        private:
+            const SKSE::SerializationInterface * m_serialization = nullptr;
+            const SKSE::PapyrusInterface	     * m_papyrus     = nullptr;
+            const static SKSE::MessagingInterface     * s_messaging;
+            static SKSE::PluginHandle s_pluginHandle;
+
+};
+
+const SKSE::MessagingInterface *skse_callbacks::s_messaging = nullptr;
+SKSE::PluginHandle s_pluginHandle = static_cast<SKSE::PluginHandle>(-1);
 
 }
 

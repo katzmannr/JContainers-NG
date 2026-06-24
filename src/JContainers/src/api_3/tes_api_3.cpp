@@ -3,9 +3,9 @@
 #include <gtest/gtest.h>
 
 #include <boost/optional.hpp>
-#include <shlobj.h>
 #include <boost/filesystem.hpp>
 #include "tes_object.h"
+#include <shlobj.h>
 
 namespace collections {
 
