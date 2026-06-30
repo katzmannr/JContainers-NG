@@ -1,4 +1,6 @@
 #include "api_3/master.h"
+#include "collections/context.h"
+#include "collections/functions.h"
 namespace tes_api_3 {
 
 /// Redefine in each logging module
@@ -291,7 +293,7 @@ Usage:
         struct KeyCompareForNextKey {
             template<class K1, class K2>
             bool operator()(const K1& nKey, const K2& endKey) const {
-                return skse::lookup_form(nKey.get()) == skse::lookup_form(endKey.get());
+                return jc_skse::lookup_form(nKey.get()) == jc_skse::lookup_form(endKey.get());
             }
         };
 

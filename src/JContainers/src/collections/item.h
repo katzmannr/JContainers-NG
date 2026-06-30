@@ -245,7 +245,7 @@ namespace collections {
         }
 
         RE::TESForm * form() const {
-            return skse::lookup_form(formId());
+            return jc_skse::lookup_form(formId());
         }
 
         RE::FormID formId() const {

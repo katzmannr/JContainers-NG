@@ -66,12 +66,12 @@ inline std::optional<std::string> form_to_string (RE::FormID n)
 
         if (is_light (n))
         {
-            mod = skse::loaded_light_mod_name (uint16_t ((u32 >> 12) & 0x0fffu));
+            mod = jc_skse::loaded_light_mod_name (uint16_t ((u32 >> 12) & 0x0fffu));
             u32 &= 0x0000'0fffu;
         }
         else
         {
-            mod = skse::loaded_mod_name (uint8_t (u32 >> 24));
+            mod = jc_skse::loaded_mod_name (uint8_t (u32 >> 24));
             u32 &= 0x00ff'ffffu;
         }
 
@@ -118,7 +118,7 @@ inline std::optional<RE::FormID> form_from_file (std::string_view const& file, s
     if (file.empty ())
         return RE::FormID (0xff000000u | form);
 
-    if (optional<uint32_t> ndx = skse::form_from_file (file, form))
+    if (optional<uint32_t> ndx = jc_skse::form_from_file (file, form))
     {
         return RE::FormID (*ndx);
     }

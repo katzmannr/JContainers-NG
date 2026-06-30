@@ -9,7 +9,7 @@
 
 extern SKSE::detail::SKSESerializationInterface* g_serialization;
 
-namespace skse
+namespace jc_skse
 {
 
 namespace

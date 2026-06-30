@@ -7,7 +7,7 @@ void JC_log(const char* fmt, va_list& args) {
 
     va_copy(args_copy, args);
 
-    skse::console_print(fmt, args);
+    jc_skse::console_print(fmt, args);
     gLog.Log(IDebugLog::kLevel_Message, fmt, args_copy);
 
     va_end(args_copy);

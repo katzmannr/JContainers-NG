@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <optional>
 
-namespace skse
+namespace jc_skse
 {
 
 /**

@@ -58,7 +58,7 @@ namespace reflection { namespace binding {
     template<> struct GetConv < forms::form_ref > {
         typedef RE::TESForm* tes_type;
         static RE::TESForm* convert2Tes(const forms::form_ref& id) {
-            return skse::lookup_form(id.get());
+            return jc_skse::lookup_form(id.get());
         }
         static forms::form_ref convert2J(const RE::TESForm* form, tes_context& ctx) {
             return make_weak_form_id(form, ctx);
@@ -68,7 +68,7 @@ namespace reflection { namespace binding {
     template<> struct GetConv < forms::form_ref_lightweight > {
         typedef RE::TESForm* tes_type;
         static RE::TESForm* convert2Tes(const forms::form_ref_lightweight& id) {
-            return skse::lookup_form(id.get());
+            return jc_skse::lookup_form(id.get());
         }
         static forms::form_ref_lightweight convert2J(const RE::TESForm* form ,tes_context& ctx) {
             return make_lightweight_form_ref(form, ctx);

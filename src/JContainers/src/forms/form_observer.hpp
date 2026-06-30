@@ -57,7 +57,7 @@ namespace forms {
             return boost::make_shared<form_entry>(
                 handle,
                 false,
-                skse::try_retain_handle(handle));
+                jc_skse::try_retain_handle(handle));
         }
 
         static form_entry_ref make_expired(RE::FormID handle) {
@@ -67,7 +67,7 @@ namespace forms {
         ~form_entry() {
             if (!u_is_deleted() && _is_handle_retained) {
                 //log("form_entry releases %X", _handle);
-                skse::release_handle(_handle);
+                jc_skse::release_handle(_handle);
             }
         }
 
@@ -103,10 +103,10 @@ namespace forms {
             _deleted = tmp_deleted;
 
             if (u_is_deleted() == false) {
-                _handle = skse::resolve_handle(_handle);
+                _handle = jc_skse::resolve_handle(_handle);
 
                 if (_handle != 0) {
-                    _is_handle_retained = skse::try_retain_handle(_handle);
+                    _is_handle_retained = jc_skse::try_retain_handle(_handle);
                 }
                 else {
                     u_set_deleted();
@@ -316,7 +316,7 @@ namespace forms {
     }
 
     form_ref::form_ref(RE::FormID oldId, form_observer& watcher, load_old_id_t)
-        : _watched_form(watcher.watch_form(skse::resolve_handle(oldId)))
+        : _watched_form(watcher.watch_form(jc_skse::resolve_handle(oldId)))
     {
     }
 
@@ -361,7 +361,7 @@ namespace forms {
         case 0: {// v3.3 alpha-1 format
             RE::FormID oldId = 0;
             ar >> oldId;
-            RE::FormID id = skse::resolve_handle(oldId);
+            RE::FormID id = jc_skse::resolve_handle(oldId);
             bool expired = false;
             ar >> expired;
 
@@ -375,7 +375,7 @@ namespace forms {
             // Remove this case !!! This format wasn't ever published
             RE::FormID oldId = 0;
             ar >> oldId;
-            RE::FormID id = skse::resolve_handle(oldId);
+            RE::FormID id = jc_skse::resolve_handle(oldId);
             bool expired = false;
             ar >> expired;
 

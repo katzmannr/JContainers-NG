@@ -1,4 +1,7 @@
 
+#include "common/ITypes.h"
+#include "reflection/reflection.h"
+#include "skse/string.h"
 namespace reflection {  namespace binding {
 
     template<>
@@ -22,6 +25,6 @@ namespace reflection {  namespace binding {
     template<>
         function_parameter type_info< TESForm * >() { return function_parameter_make("Form", nullptr); }
     template<>
-        function_parameter type_info< BGSListForm * >() { return function_parameter_make("FormList", nullptr); }
+        function_parameter type_info< RE::Offset::BGSListForm * >() { return function_parameter_make("FormList", nullptr); }
 }
 }

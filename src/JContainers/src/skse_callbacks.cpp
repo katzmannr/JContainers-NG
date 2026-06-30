@@ -46,9 +46,9 @@ public:
 
     static void revert(SKSE::SerializationInterface *intfc) {
         util::do_with_timing("Revert", []() {
-            skse::set_silent_api();
+            jc_skse::set_silent_api();
             domain_master::master::instance().clear_state();
-            skse::set_real_api();
+            jc_skse::set_real_api();
         });
     }
 
@@ -102,9 +102,9 @@ public:
 
             util::do_with_timing("Load", [intfc]() {
 
-                skse::set_silent_api();
+                jc_skse::set_silent_api();
                 domain_master::master::instance().clear_state();
-                skse::set_real_api();
+                jc_skse::set_real_api();
 
                 UInt32 type = 0;
                 UInt32 version = 0;
