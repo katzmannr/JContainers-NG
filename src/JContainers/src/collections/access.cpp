@@ -7,6 +7,7 @@
 
 #include <functional>
 
+#include "RE/B/BSCoreTypes.h"
 #include "forms/form_handling.h"
 #include "collections.h"
 #include "context.h"
@@ -254,7 +255,7 @@ namespace collections
                 }
 
                 int32_t indexOrFormId = 0;
-                FormId frmId = FormId::Zero;
+                RE::FormID frmId = 0;
 
                 if (!forms::is_form_string(indexRange.begin())) {
                     try {
@@ -352,6 +353,11 @@ namespace collections
         using cstring = util::cstring;
         //using keys = std::vector<key_variant>;
 
+        template<class R, class Arg>
+        boost::none_t parse_path_helper(Arg&&) {
+            return boost::none;
+        }
+
         template<class R, class Arg, class F1, class ... F>
         boost::optional<R> parse_path_helper(Arg&& a, F1&& f1, F&& ... funcs) {
             auto result = f1(std::forward<Arg>(a));
@@ -363,10 +369,6 @@ namespace collections
             }
         };
 
-        template<class R, class Arg>
-        boost::none_t parse_path_helper(Arg&&) {
-            return boost::none;
-        }
 
         struct key_and_rest {
             key_variant key;

@@ -111,7 +111,7 @@ namespace collections
         }
 
         SInt32 u_count() const override {
-            return _array.size();
+            return static_cast<SInt32>(_array.size());
         }
 
         void u_nullifyObjects() override;

@@ -6,6 +6,7 @@
 #include <string>
 #include <boost/serialization/access.hpp>
 
+#include "RE/B/BSCoreTypes.h"
 #include "common/ITypes.h"
 #include "object/object_base.h"
 #include "skse/skse.h"
@@ -247,11 +248,11 @@ namespace collections {
             return skse::lookup_form(formId());
         }
 
-        FormId formId() const {
+        RE::FormID formId() const {
             if (auto val = std::get_if<form_ref>(&_var)) {
                 return val->get();
             }
-            return FormId::Zero;
+            return 0;
         }
 
         class are_strict_equals : public boost::static_visitor<bool> {
@@ -364,7 +365,7 @@ namespace collections {
         return object();
     }
 
-    template<> inline FormId item::readAs<FormId>() const {
+    template<> inline RE::FormID item::readAs<RE::FormID>() const {
         return formId();
     }
 
