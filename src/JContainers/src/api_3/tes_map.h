@@ -1,3 +1,5 @@
+#pragma once
+
 #include <collections/collections.h>
 #include <reflection/reflection.h>
 #include <collections/access.h>

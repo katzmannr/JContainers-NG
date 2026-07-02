@@ -1,5 +1,14 @@
+#pragma once
+
+#include "api_3/master.h"
+#include "api_3/tes_map.h"
+#include "api_3/tes_db.h"
 #include "boost_extras.h"
 #include <boost/algorithm/string.hpp>
+
+#include "collections/context.h"
+#include "forms/form_observer.h"
+#include "reflection/tes_binding.h"
 
 namespace tes_api_3 {
 
@@ -267,7 +276,7 @@ namespace tes_api_3 {
         EXPECT_NE((formStorage), nullptr);
         EXPECT_EQ(formStorage, tes_form_db::makeFormStorage(ctx, storageName));
 
-        auto fakeForm = make_lightweight_form_ref((FormId)0x14, ctx);
+        auto fakeForm = make_lightweight_form_ref((RE::FormID)0x14, ctx);
 
         auto entry = tes_form_db::makeMapEntry(ctx, storageName, fakeForm);
         EXPECT_NE((entry), nullptr);
@@ -279,7 +288,7 @@ namespace tes_api_3 {
     {
         tes_context_standalone ctx;
 
-        auto fakeForm = make_lightweight_form_ref((FormId)0x14, ctx);
+        auto fakeForm = make_lightweight_form_ref((RE::FormID)0x14, ctx);
 
         {
             const char *path = ".forms.object";

@@ -1,6 +1,7 @@
 
 #include "common/ITypes.h"
 #include "reflection/reflection.h"
+#include "reflection/tes_binding.h"
 #include "skse/string.h"
 namespace reflection {  namespace binding {
 
@@ -23,8 +24,8 @@ namespace reflection {  namespace binding {
     template<>
         function_parameter type_info< UInt32 >() { return function_parameter_make("Int", "object"); }
     template<>
-        function_parameter type_info< TESForm * >() { return function_parameter_make("Form", nullptr); }
+        function_parameter type_info< RE::TESForm * >() { return function_parameter_make("Form", nullptr); }
     template<>
-        function_parameter type_info< RE::Offset::BGSListForm * >() { return function_parameter_make("FormList", nullptr); }
+        function_parameter type_info< RE::BGSListForm * >() { return function_parameter_make("FormList", nullptr); }
 }
 }

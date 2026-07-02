@@ -18,8 +18,8 @@ namespace tes_api_3 {
 #define JC_LOG_API(params, ...) \
         if (tes_api_3::log_api_calls) \
             JC_log("[Info] " JC_LOG_API_SOURCE ".%s (" params ")",     \
-                __func__                                            \
-                __VA_OPT__(,) __VA_ARGS__)
+                __func__,                                            \
+                __VA_ARGS__)
 
     /// Flags whether calls from Papyrus API should be logged
     extern bool log_api_calls;
