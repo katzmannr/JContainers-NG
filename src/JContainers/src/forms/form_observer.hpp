@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <mutex>
+#include <gtest/gtest.h>
 
 #include <boost/smart_ptr/make_shared_object.hpp>
 #include <boost/range.hpp>

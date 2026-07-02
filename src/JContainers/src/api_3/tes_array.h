@@ -1,9 +1,16 @@
 #pragma once
 
+#include <cstdint>
+
 #include "api_3/tes_object.h"
 #include "collections/functions.h"
+#include "collections/collections_types.h"
+#include "collections/bind_traits.h" // Required for convert2J variants
 #include "reflection/tes_binding.h"
 #include "master.h"
+#include <reflection/tes_binding.h>
+#include <SKSE/SKSE.h>
+#include "RE/B/BGSListForm.h"
 
 namespace tes_api_3 {
 
@@ -17,14 +24,18 @@ namespace tes_api_3 {
 
     class tes_array : public class_meta< tes_array >, public collections::array_functions {
     public:
-
-        typedef array* ref;
+        tes_array(const tes_array &) = default;
+        tes_array(tes_array &&) = default;
+        tes_array &operator=(const tes_array &) = default;
+        tes_array &operator=(tes_array &&) = default;
+        typedef array *ref;
 
         REGISTER_TES_NAME("JArray");
 
         void additionalSetup() {
-            metaInfo.comment = "Ordered collection of values (value is float, integer, string, form or another container).\n"
-                "Inherits JValue functionality";
+            metaInfo.comment = "Ordered collection of values (value is float, "
+                               "integer, string, form or another container).\n"
+                               "Inherits JValue functionality";
         }
 
         // TODO: are these to go to private, all used?
@@ -81,7 +92,7 @@ namespace tes_api_3 {
                 me.u_container().reserve(arr.Length());
                 for (UInt32 i = 0; i < arr.Length(); ++i) {
                     TesType val;
-                    arr.Get(&val, i);
+                    arr.Get(val, i);
                     me.u_container().emplace_back(reflection::binding::get_converter<JCType>::convert2J(val, ctx));
                 }
             },
@@ -95,7 +106,7 @@ objectWithBooleans converts booleans into integers");
         REGISTERF(fromArray<skse::string_ref>, "objectWithStrings",  "values", nullptr);
         REGISTERF(fromArray<Float32>, "objectWithFloats",  "values", nullptr);
         REGISTERF(fromArray<bool>, "objectWithBooleans",  "values", nullptr);
-        REGISTERF(ARGS(fromArray<TESForm*, form_ref>), "objectWithForms", "values", nullptr);
+        REGISTERF(ARGS(fromArray<RE::TESForm*, form_ref>), "objectWithForms", "values", nullptr);
 
         static object_base* subArray(tes_context& ctx, ref source, SInt32 startIndex, SInt32 endIndex)
         {
@@ -138,7 +149,7 @@ objectWithBooleans converts booleans into integers");
 "Inserts the values from the source array into this array. If insertAtIndex is -1 (default behaviour) it appends to the end.\n"
 NEGATIVE_IDX_COMMENT);
 
-        static void addFromFormList(tes_context& ctx, ref obj, BGSListForm *formList, SInt32 insertAtIndex = -1)
+        static void addFromFormList(tes_context& ctx, ref obj, RE::BGSListForm *formList, SInt32 insertAtIndex = -1)
         {
             JC_LOG_API ("%p, %p, %d", (void*) obj, (void*) formList, insertAtIndex);
 
@@ -146,23 +157,19 @@ NEGATIVE_IDX_COMMENT);
                 return;
             }
 
-            struct inserter : BGSListForm::Visitor {
+            // Formlist notification not needed anymore after container modification
+            doWriteOp(obj, insertAtIndex, [formList, obj, &ctx](uint32_t idx) {
+                auto& arr = obj->u_container();
 
-                virtual bool Accept(TESForm * form) override {
-                    arr->u_container().insert(arr->u_container().begin() + insertIdx, item{ make_weak_form_id(form, context) });
-                    return false;
+                for (auto* form : formList->forms())  // OR correct accessor
+                {
+                    arr.insert(
+                        arr.begin() + idx,
+                        item{ make_weak_form_id(form, ctx) }
+                    );
                 }
-
-                array *arr;
-                uint32_t insertIdx;
-                tes_context& context;
-
-                inserter(array *obj, uint32_t insertAt, tes_context& c) : arr(obj), insertIdx(insertAt), context(c) {}
-            };
-
-            doWriteOp(obj, insertAtIndex, [formList, &obj, &ctx](uint32_t idx) {
-                formList->Visit(inserter{ obj, idx, ctx });
             });
+
         }
         REGISTERF2(addFromFormList, "* source insertAtIndex=-1", nullptr);
 
@@ -203,13 +210,13 @@ NEGATIVE_IDX_COMMENT);
 
             return v;
         }
-        REGISTERF (all_items<VMResultArray<SInt32>>,           "asIntArray",    "*",
+        REGISTERF (all_items<std::vector<SInt32>>,           "asIntArray",    "*",
             "Copy all items to new native Papyrus array of dynamic size.\n"
             "Items not matching the requested type will have default\n"
             "values as the ones from the getInt/Flt/Str/Form functions.");
-        REGISTERF (all_items<VMResultArray<Float32>>,          "asFloatArray",  "*", "");
-        REGISTERF (all_items<VMResultArray<skse::string_ref>>, "asStringArray", "*", "");
-        REGISTERF (all_items<VMResultArray<TESForm*>>,         "asFormArray",   "*", "");
+        REGISTERF (all_items<std::vector<Float32>>,          "asFloatArray",  "*", "");
+        REGISTERF (all_items<std::vector<skse::string_ref>>, "asStringArray", "*", "");
+        REGISTERF (all_items<std::vector<RE::TESForm*>>,         "asFormArray",   "*", "");
 
         template<class T>
         static SInt32 findVal(tes_context& ctx, ref obj, T value, SInt32 pySearchStartIndex = 0)
@@ -312,7 +319,7 @@ If @addToIndex >= 0 it inserts value at given index. " NEGATIVE_IDX_COMMENT);
                 obj->_array.erase(obj->begin() + idx);
             });
         }
-        REGISTERF2(eraseIndex, "* index", "Erases the item at the index. "NEGATIVE_IDX_COMMENT);
+        REGISTERF2(eraseIndex, "* index", "Erases the item at the index. " NEGATIVE_IDX_COMMENT);
 
         static void eraseRange(tes_context& ctx, ref obj, SInt32 first, SInt32 last)
         {
@@ -329,7 +336,7 @@ If @addToIndex >= 0 it inserts value at given index. " NEGATIVE_IDX_COMMENT);
                 }
             });
         }
-        REGISTERF2(eraseRange, "* first last", "Erases [first, last] index range of the items. "NEGATIVE_IDX_COMMENT
+        REGISTERF2(eraseRange, "* first last", "Erases [first, last] index range of the items. " NEGATIVE_IDX_COMMENT
             "\nFor ex. with [1,-1] range it will erase everything except the first item");
 
         template<class T>
@@ -364,7 +371,7 @@ If @addToIndex >= 0 it inserts value at given index. " NEGATIVE_IDX_COMMENT);
 
             return type;
         }
-        REGISTERF2(valueType, "* index", "Returns type of the value at the @index. "NEGATIVE_IDX_COMMENT"\n"VALUE_TYPE_COMMENT);
+        REGISTERF2(valueType, "* index", "Returns type of the value at the @index. " NEGATIVE_IDX_COMMENT "\n" VALUE_TYPE_COMMENT);
 
         static void swapItems(tes_context& ctx, ref obj, SInt32 idx, SInt32 idx2)
         {
@@ -378,7 +385,7 @@ If @addToIndex >= 0 it inserts value at given index. " NEGATIVE_IDX_COMMENT);
                 }
             });
         }
-        REGISTERF2(swapItems, "* index1 index2", "Exchanges the items at @index1 and @index2. "NEGATIVE_IDX_COMMENT);
+        REGISTERF2(swapItems, "* index1 index2", "Exchanges the items at @index1 and @index2. " NEGATIVE_IDX_COMMENT);
 
         static ref sort(tes_context& ctx, ref obj)
         {
@@ -421,7 +428,7 @@ If @addToIndex >= 0 it inserts value at given index. " NEGATIVE_IDX_COMMENT);
         template<
             typename ValueType,
             typename TesValueType = reflection::binding::convert_to_tes_type<ValueType>,
-            typename PArrayType = VMArray<TesValueType>
+            typename PArrayType = reflection::binding::rbArray<TesValueType>
         >
         static bool writeToPapyrusArray(
                 tes_context& ctx

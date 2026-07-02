@@ -2,9 +2,7 @@
 #include <map>
 #include <functional>
 #include <exception>
-#include <type_traits>
 
-#include "boost/filesystem.hpp"
 #include "boost/archive/binary_oarchive.hpp"
 
 #include "jansson.h"
@@ -21,7 +19,6 @@
 #include "domains/domain_master.h"
 
 
-#include "domains/domain_master_serialization.h"
 
 namespace domain_master {
 

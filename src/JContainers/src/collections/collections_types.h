@@ -40,7 +40,7 @@ namespace collections
         }
 
         template<class Init>
-        static T& _makeWithInitializer(Init& init, object_context& context /*= tes_context::instance()*/) {
+        static T& _makeWithInitializer(Init&& init, object_context& context /*= tes_context::instance()*/) {
             auto& obj = *new T();
             obj.set_context(context);
             init(obj);
@@ -53,7 +53,7 @@ namespace collections
         }
 
         template<class Init>
-        static T& objectWithInitializer(Init& init, object_context& context /*= tes_context::instance()*/) {
+        static T& objectWithInitializer(Init&& init, object_context& context /*= tes_context::instance()*/) {
             return _makeWithInitializer(init, context);
         }
     };

@@ -363,7 +363,7 @@ namespace reflection { namespace binding {
 #define REGISTERF_STATE(func, _funcname, _args, _comment)\
     ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
         metaInfo, \
-        ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::magick<&func>(), \
+        ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
         _funcname, _args, _comment \
     };
 

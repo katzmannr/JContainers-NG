@@ -1,5 +1,14 @@
 #pragma once
 
+#include <gtest/gtest.h>
+#include "RE/B/BSCoreTypes.h"
+#include "collections/context.h"
+#include "collections/copying.h"
+#include "collections/json_serialization.h"
+#include "forms/form_handling.h"
+#include "util/util.h"
+#include "collections/collections_types.h"
+
 namespace collections {
 
     struct JCFixture : public ::testing::Test {
@@ -116,7 +125,7 @@ namespace collections { namespace {
         // test static form ids
         {
             const int pluginIdx = 'B';
-            const FormId form = FormId (pluginIdx << 24 | 0x14);
+            const RE::FormID form = RE::FormID (pluginIdx << 24 | 0x14);
             EXPECT_TRUE (is_static (form));
             std::string formString = *form_to_string (form);
             EXPECT_EQ (form, *string_to_form (formString.c_str ()));
@@ -124,7 +133,7 @@ namespace collections { namespace {
 
         // test global (0xFF*) form ids
         {
-            const FormId form = (FormId)(forms::FormGlobalPrefix << 24 | 0x14);
+            const RE::FormID form = (RE::FormID)(forms::FormGlobalPrefix << 24 | 0x14);
             EXPECT_TRUE (!is_static (form));
             std::string formString = *form_to_string (form);
             EXPECT_EQ (form, *string_to_form (formString.c_str ()));

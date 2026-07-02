@@ -53,7 +53,7 @@ namespace collections {
         }
 
         template<class Op>
-        static void doReadOp(array * obj, index pyIndex, Op& operation) {
+        static void doReadOp(array * obj, index pyIndex, Op&& operation) {
             if (!obj) {
                 return;
             }
@@ -66,7 +66,7 @@ namespace collections {
         }
 
         template<class Op, class Index, size_t N>
-        static void doReadOp(array * obj, const Index(&pyIndex)[N], Op& operation) {
+        static void doReadOp(array * obj, const Index(&pyIndex)[N], Op&& operation) {
             if (!obj) {
                 return;
             }
@@ -79,7 +79,7 @@ namespace collections {
         }
 
         template<class Op>
-        static void doWriteOp(array * obj, index pyIndex, Op& operation) {
+        static void doWriteOp(array * obj, index pyIndex, Op&& operation) {
             if (!obj) {
                 return;
             }

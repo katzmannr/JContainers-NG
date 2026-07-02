@@ -5,6 +5,7 @@
 #include <map>
 #include <jansson.h>
 #include <memory>
+#include <boost/filesystem.hpp>
 
 #include "collections/context.h"
 #include "forms/form_handling.h"
