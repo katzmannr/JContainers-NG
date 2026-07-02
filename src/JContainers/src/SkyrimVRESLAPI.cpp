@@ -7,7 +7,7 @@
 SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* g_SkyrimVRESLInterface = nullptr;
 
 // Fetches the interface to use from SkyrimVRESL
-SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(const SKSE::PluginHandle& pluginHandle, SKSE::detail::SKSEMessagingInterface* messagingInterface)
+SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(const SKSE::PluginHandle& pluginHandle, const SKSE::MessagingInterface* messagingInterface)
 {
 	// If the interface has already been fetched, rturn the same object
 	if (g_SkyrimVRESLInterface) {
@@ -16,7 +16,7 @@ SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimV
 
 	// Dispatch a message to get the plugin interface from SkyrimVRESL
 	SkyrimVRESLMessage message;
-	messagingInterface->Dispatch(pluginHandle, SkyrimVRESLMessage::kMessage_GetInterface, (void*)&message, sizeof(SkyrimVRESLMessage*), SkyrimVRESLPluginName);
+    messagingInterface->Dispatch(SkyrimVRESLMessage::kMessage_GetInterface, (void*)&message, sizeof(SkyrimVRESLMessage*), SkyrimVRESLPluginName);
 	if (!message.GetApiFunction) {
 		return nullptr;
 	}

@@ -1,7 +1,8 @@
 #include <boost/iostreams/stream.hpp>
 #include "RE/B/BSCoreTypes.h"
-#include "RE/I/IVirtualMachine.h"
+#include "RE/Skyrim.h"
 #include "SKSE/API.h"
+#include "RE/I/IVirtualMachine.h"
 #include "SKSE/Interfaces.h"
 #include "api_3/tes_types.h"
 #include <shlobj.h>

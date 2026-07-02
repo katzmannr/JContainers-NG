@@ -1,3 +1,5 @@
+#pragma once
+
 #include "api_3/master.h"
 #include "api_3/tes_object.h"
 #include "api_3/tes_map.h"

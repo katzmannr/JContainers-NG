@@ -1,5 +1,17 @@
 #pragma once
 
+#include <filesystem>
+#include <cstring>
+#include <gtest/gtest.h>
+
+#include "api_3/master.h"
+#include "api_3/tes_object.h"
+#include "collections/collections.h"
+#include "reflection/tes_binding.h"
+
+#include "api_3/tes_types.h"
+#include <shlobj.h>
+
 namespace tes_api_3 {
 
 /// Redefine in each logging module
@@ -51,9 +63,7 @@ namespace tes_api_3 {
                 return false;
             }
 
-            struct _stat buf;
-            int result = _stat(filename, &buf);
-            return result == 0;
+            return std::filesystem::exists(filename);
         }
         REGISTERF2_STATELESS(fileExistsAtPath, "path", "Returns true if the file at a specified @path exists");
 
@@ -93,7 +103,7 @@ namespace tes_api_3 {
             return result;
         }
         REGISTERF_STATELESS(
-            contentsOfDirectoryAtPath<VMResultArray<skse::string_ref>>, "contentsOfDirectoryAtPath",
+            contentsOfDirectoryAtPath<std::vector<skse::string_ref>>, "contentsOfDirectoryAtPath",
             "directoryPath extension=\"\"", nullptr);
 
         static void removeFileAtPath(const char *filename)
@@ -115,7 +125,7 @@ namespace tes_api_3 {
                 return std::string();
             }
 
-            strcat_s(path, sizeof(path), "/" + user_files());
+            strcat_s(path, sizeof(path), std::string{"/"} + std::string{user_files()}.c_str());
 
             // race condition possible. hope it's not critical
             if (!boost::filesystem::exists(path) && (boost::filesystem::create_directories(path), !boost::filesystem::exists(path))) {
@@ -126,7 +136,7 @@ namespace tes_api_3 {
         }
 
         static skse::string_ref _userDirectory() {
-            return userDirectory().c_str();
+            return skse::string_ref(userDirectory().c_str());
         }
         REGISTERF_STATELESS(_userDirectory, "userDirectory", "", "A path to user-specific directory - " + user_files());
 

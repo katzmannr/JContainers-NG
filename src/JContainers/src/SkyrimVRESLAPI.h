@@ -1,5 +1,6 @@
 #pragma once
 #include <SKSE/SKSE.h>
+#include "SKSE/Interfaces.h"
 #include <common/ITypes.h>
 // Interface code based on https://github.com/adamhynek/higgs
 
@@ -29,7 +30,7 @@ namespace SkyrimVRESLPluginAPI
 	// Returns an ISkyrimVRESLInterface001 object compatible with the API shown below
 	// This should only be called after SKSE sends kMessage_PostLoad to your plugin
 	struct ISkyrimVRESLInterface001;
-	ISkyrimVRESLInterface001* GetSkyrimVRESLInterface001(const SKSE::PluginHandle& pluginHandle, SKSE::detail::SKSEMessagingInterface* messagingInterface);
+    ISkyrimVRESLInterface001* GetSkyrimVRESLInterface001(const SKSE::PluginHandle& pluginHandle, const SKSE::MessagingInterface* messagingInterface);
 
 	// This object provides access to SkyrimVRESL's mod support API
 	struct ISkyrimVRESLInterface001
