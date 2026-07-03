@@ -9,7 +9,6 @@
 #include "common/IDebugLog.h"
 #include <skse/skse.h>
 
-#include "object/object_base.h"
 #include "collections/collections_types.h"
 
 namespace collections {

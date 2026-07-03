@@ -2,6 +2,7 @@
 
 #include <set>
 #include "collections.h"
+#include "context.h"
 
 namespace collections {
 

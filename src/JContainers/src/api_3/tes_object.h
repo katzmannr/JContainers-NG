@@ -1,10 +1,10 @@
 #pragma once
 
+#include "collections/copying.h"
 #include "collections/lua_module.h"
 #include <reflection/reflection.h>
 #include "reflection/tes_binding.h"
 #include "master.h"
-#include "collections/copying.h"
 #include <boost/filesystem.hpp>
 #include "collections/json_serialization.h"
 

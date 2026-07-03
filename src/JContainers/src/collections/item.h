@@ -8,8 +8,8 @@
 
 #include "RE/B/BSCoreTypes.h"
 #include "common/ITypes.h"
-#include "object/object_base.h"
 #include "skse/skse.h"
+#include "object/object_base.h"
 
 #include "forms/form_id.h"
 #include "forms/form_observer.h"
