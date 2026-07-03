@@ -138,7 +138,7 @@ namespace tes_api_3 {
         static skse::string_ref _userDirectory() {
             return skse::string_ref(userDirectory().c_str());
         }
-        REGISTERF_STATELESS(_userDirectory, "userDirectory", "", "A path to user-specific directory - " + user_files());
+        REGISTERF_STATELESS(_userDirectory, "userDirectory", "", std::string{"A path to user-specific directory - "} + std::string{user_files()});
 
         REGISTER_TEXT([]() {
             const char fmt[] = R"===(

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include "boost/archive/binary_oarchive.hpp"

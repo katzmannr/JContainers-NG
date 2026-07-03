@@ -1,3 +1,4 @@
+#pragma once
 
 #include "common/ITypes.h"
 #include "reflection/reflection.h"

@@ -4,7 +4,6 @@
 #include "SKSE/API.h"
 #include "RE/I/IVirtualMachine.h"
 #include "SKSE/Interfaces.h"
-#include "api_3/tes_types.h"
 #include <shlobj.h>
 
 
