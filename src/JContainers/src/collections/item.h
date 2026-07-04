@@ -8,6 +8,7 @@
 
 #include "RE/B/BSCoreTypes.h"
 #include "common/ITypes.h"
+#include <SKSE/SKSE.h>
 #include "skse/skse.h"
 #include "object/object_base.h"
 

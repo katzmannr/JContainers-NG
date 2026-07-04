@@ -1,7 +1,7 @@
 #pragma once
 
-//#include <SKSE/SKSE.h>
 #include <common/ITypes.h>
+#include <SKSE/SKSE.h>
 #include "skse/skse.h"
 #include "reflection/tes_binding.h"
 

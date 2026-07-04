@@ -16,12 +16,14 @@
 #include <boost/serialization/weak_ptr.hpp>
 #include <boost/serialization/unordered_map.hpp>
 
-#include "skse/skse.h"
 #include "util/stl_ext.h"
 #include "iarchive_with_blob.h"
 
 #include "forms/form_handling.h"
 #include "forms/form_observer.h"
+
+#include <SKSE/SKSE.h>
+#include "skse/skse.h"
 
 BOOST_CLASS_VERSION(forms::form_ref, 2);
 

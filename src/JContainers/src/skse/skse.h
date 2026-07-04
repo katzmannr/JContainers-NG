@@ -1,7 +1,5 @@
 #pragma once
 
-/// Wraps calls to SKSE - fakes the calls when SKSE/Skyrim inactive (during synthetic tests)
-#include "SKSE/SKSE.h"
 #include <cstdint>
 #include <optional>
 

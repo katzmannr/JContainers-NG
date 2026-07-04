@@ -1,10 +1,11 @@
 #pragma once
 
 #include "util/stl_ext.h"
-#include "skse/skse.h"
 #include "reflection/tes_binding.h"
 #include "collections.h"
 #include "context.h"
+#include <SKSE/SKSE.h>
+#include "skse/skse.h"
 
 namespace reflection { namespace binding {
 
