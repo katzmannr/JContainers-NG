@@ -1,4 +1,10 @@
-#pragma once
+// Do NOT use the statement below
+//#pragma once
+// The dumb MSVC compiler does not make a difference from SKSE.h and skse.h
+// Instead we are forced to use "old style" header guards.
+
+#ifndef JC_SKSE_H
+#define JC_SKSE_H
 
 #include <cstdint>
 #include <optional>
@@ -93,3 +99,4 @@ void set_silent_api ();
 
 }
 
+#endif // JC_SKSE_H
