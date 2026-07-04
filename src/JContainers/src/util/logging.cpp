@@ -1,6 +1,6 @@
 #include <cstdarg>
-#include <SKSE/SKSE.h>
-#include "skse/skse.h"
+#include <RE/Skyrim.h>
+#include "skse/jc_skse.h"
 #include "common/IDebugLog.h"
 
 using namespace jc_skse;

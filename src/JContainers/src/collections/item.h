@@ -9,7 +9,7 @@
 #include "RE/B/BSCoreTypes.h"
 #include "common/ITypes.h"
 #include <SKSE/SKSE.h>
-#include "skse/skse.h"
+#include "skse/jc_skse.h"
 #include "object/object_base.h"
 
 #include "forms/form_id.h"

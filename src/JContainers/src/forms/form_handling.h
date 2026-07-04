@@ -5,7 +5,7 @@
 #include <optional>
 #include "forms/form_id.h"
 #include <SKSE/SKSE.h>
-#include "skse/skse.h"
+#include "skse/jc_skse.h"
 
 namespace forms 
 {

@@ -17,7 +17,7 @@ namespace
 
 //--------------------------------------------------------------------------------------------------
 
-/// Internal interface to follow on, same meaning as in the skse.h
+/// Internal interface to follow on, same meaning as in the jc_skse.h
 struct skse_api
 {
     virtual std::optional<std::uint32_t> form_from_file (std::string_view const& name, std::uint32_t form) = 0;

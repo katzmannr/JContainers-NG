@@ -5,7 +5,7 @@
 #include "collections.h"
 #include "context.h"
 #include <SKSE/SKSE.h>
-#include "skse/skse.h"
+#include "skse/jc_skse.h"
 
 namespace reflection { namespace binding {
 

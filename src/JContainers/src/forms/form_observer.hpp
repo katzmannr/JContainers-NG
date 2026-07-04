@@ -23,7 +23,7 @@
 #include "forms/form_observer.h"
 
 #include <SKSE/SKSE.h>
-#include "skse/skse.h"
+#include "skse/jc_skse.h"
 
 BOOST_CLASS_VERSION(forms::form_ref, 2);
 

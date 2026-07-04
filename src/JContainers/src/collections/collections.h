@@ -8,7 +8,7 @@
 #include "common/ITypes.h"
 #include "common/IDebugLog.h"
 #include <SKSE/SKSE.h>
-#include <skse/skse.h>
+#include <skse/jc_skse.h>
 
 #include "collections/collections_types.h"
 
