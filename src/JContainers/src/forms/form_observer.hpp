@@ -119,6 +119,11 @@ namespace forms {
     };
 
     void form_observer::u_remove_expired_forms() {
+        static_assert(sizeof(watched_forms_t) != 0);
+        auto it = _watched_forms.begin();
+        auto end = _watched_forms.end();
+        _watched_forms.erase(it);
+        _watched_forms.unsafe_erase(it);
         std::erase_if(_watched_forms,
               [](const auto& pair)
               {
