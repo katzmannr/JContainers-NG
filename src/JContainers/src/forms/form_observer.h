@@ -4,6 +4,7 @@
 
 #include <tuple>
 #include <assert.h>
+#include <shared_mutex>
 #include "boost/smart_ptr/weak_ptr.hpp"
 #include "boost/serialization/split_member.hpp"
 #include "boost/serialization/version.hpp"
@@ -24,9 +25,12 @@ namespace forms {
     class form_observer {
     private:
         using weak_entry = boost::weak_ptr<form_entry>;
-        using watched_forms_t = concurrency::concurrent_unordered_map < RE::FormID, weak_entry >;
+        // Replaced with standard container since original type is unsupported by concurrency (no std::erase_if)
+        using watched_forms_t = std::unordered_map < RE::FormID, weak_entry >;
 
         watched_forms_t _watched_forms;
+        // We take care of synchronisation ourself
+        mutable std::shared_mutex _watched_forms_mutex;
 
     public:
 
@@ -41,7 +45,10 @@ namespace forms {
             _watched_forms.clear();
         }
 
-        size_t u_forms_count() const { return _watched_forms.size(); }
+        size_t u_forms_count() const {
+            std::shared_lock lock(_watched_forms_mutex);
+            return _watched_forms.size();
+        }
         void u_remove_expired_forms();
         void u_print_status() const;
 

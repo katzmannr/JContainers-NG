@@ -119,11 +119,8 @@ namespace forms {
     };
 
     void form_observer::u_remove_expired_forms() {
-        static_assert(sizeof(watched_forms_t) != 0);
-        auto it = _watched_forms.begin();
-        auto end = _watched_forms.end();
-        _watched_forms.erase(it);
-        _watched_forms.unsafe_erase(it);
+        std::unique_lock lock(_watched_forms_mutex);
+
         std::erase_if(_watched_forms,
               [](const auto& pair)
               {
@@ -135,6 +132,8 @@ namespace forms {
     {
         uint32_t count_of_one_user = 0;
         uint32_t dyn_form_count = 0;
+
+        std::shared_lock lock(_watched_forms_mutex);
 
         for (auto& pair : _watched_forms) {
             if (!pair.second.expired()) {
@@ -154,14 +153,6 @@ namespace forms {
 
     }
 
-    namespace {
-
-        static boost::detail::spinlock & spinlock_for(RE::FormID formId) {
-            using spinlock_pool = boost::detail::spinlock_pool < 'DyFW' > ;
-            return spinlock_pool::spinlock_for(reinterpret_cast<void*>(formId));
-        }
-    }
-
     void form_observer::on_form_deleted(FormHandle handle)
     {
         // already failed, there are plenty of any kind of objects that are deleted every moment, even during initial splash screen
@@ -179,8 +170,13 @@ namespace forms {
 
         auto formID = fh::form_handle_to_id(handle);
         {
+            // Original comment:
             // Since it's impossible that two threads will delete the same form simultaneosly
             // we can skip some thread safe stuff
+            // Additional hint:
+            // While above is true, both reading and modifying need to be protected too (f.e. watch_form)
+            std::unique_lock lock(_watched_forms_mutex);
+
             auto itr = _watched_forms.find(formID);
             if (itr != _watched_forms.end()) {
 
@@ -188,11 +184,6 @@ namespace forms {
 
                 if (watched) {
                     watched->set_deleted();
-                    {
-                        // the only unsafe piece of code here
-                        std::lock_guard<boost::detail::spinlock> guard{ spinlock_for(formID) };
-                        itr->second.reset();
-                    }
                     log("flagged form-entry %" PRIX32 " as deleted", formID);
                 }
             }
@@ -222,7 +213,9 @@ namespace forms {
     void form_observer::load(boost::archive::binary_iarchive & ar, const unsigned int version) {
 
         switch (version) {
-        case 3:
+        case 3:{
+            std::unique_lock lock(_watched_forms_mutex);
+
             load_collection(ar, _watched_forms, [](auto& ar, auto& collection) {
                 form_entry_ref entry;
                 ar >> entry;
@@ -231,11 +224,13 @@ namespace forms {
                     collection[entry->id()] = std::move(entry);
                 }
             });
+        }
             break;
         case 2:{
             std::unordered_map<RE::FormID, boost::weak_ptr<form_entry> > oldCnt;
             ar >> oldCnt;
 
+            std::unique_lock lock(_watched_forms_mutex);
             for (auto& pair : oldCnt) {
                 form_entry_ref entry = pair.second.lock();
                 if (entry && !entry->is_deleted()) {
@@ -252,6 +247,7 @@ namespace forms {
 
     template<>
     void form_observer::save(boost::archive::binary_oarchive & ar, const unsigned int version) const {
+        std::shared_lock lock(_watched_forms_mutex);
 
         save_collection(ar, _watched_forms, [](auto& ar,
                                                const decltype(_watched_forms)::value_type& pair) {
@@ -267,10 +263,9 @@ namespace forms {
         }
 
         {
+            std::unique_lock lock(_watched_forms_mutex);
 
             auto itr = _watched_forms.find(fId);
-
-            std::lock_guard<boost::detail::spinlock> guard{ spinlock_for(fId) };
 
             if (itr != _watched_forms.end()) {
                 auto watched = itr->second.lock();
