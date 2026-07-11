@@ -226,12 +226,10 @@ namespace reflection { namespace binding {
                 using wrapper = tes_wrapper<Func, S, Parameters...>;
 
                 args.vm.RegisterFunction(
-                    new RE::BSScript::NativeFunction(
-                        args.functionName.c_str(),
-                        args.className.c_str(),
-                        &wrapper::call
-                        )
-                    );
+                    args.functionName,
+                    args.className,
+                    &wrapper::call
+                );
             }
         };
     };
@@ -294,13 +292,11 @@ namespace reflection { namespace binding {
                 using wrapper = tes_wrapper<Func, S, Parameters...>;
 
                 args.vm.RegisterFunction(
-                    new RE::BSScript::NativeFunction(
-                        args.functionName.c_str(),
-                        args.className.c_str(),
-                        &wrapper::call,
-                        *reinterpret_cast<State*>(args.shared_state)
-                        )
-                    );
+                    args.functionName.c_str(),
+                    args.className.c_str(),
+                    &wrapper::call,
+                    *reinterpret_cast<State*>(args.shared_state)
+                );
             }
 
         };

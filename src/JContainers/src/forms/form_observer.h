@@ -1,7 +1,5 @@
 #pragma once
 
-#include <concurrent_unordered_map.h> //See _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
-
 #include <tuple>
 #include <assert.h>
 #include <shared_mutex>

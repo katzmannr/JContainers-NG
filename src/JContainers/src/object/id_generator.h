@@ -1,5 +1,15 @@
 #pragma once
 
+#include "object/object_base.h"
+#include <algorithm>
+#include <boost/core/noncopyable.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <gtest/gtest.h>
+#include <cstdint>
+#include <ctime>
+#include <deque>
+
 namespace collections {
 
     template<

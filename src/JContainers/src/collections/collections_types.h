@@ -281,7 +281,7 @@ namespace collections
             u_set(key, std::forward<T>(value));
         }
 
-        SInt32 u_count() const override {
+        size_t u_count() const override {
             return cnt.size();
         }
 

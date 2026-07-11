@@ -1,7 +1,11 @@
 #pragma once
 
+#include "object/id_generator.h"
+#include "object/object_base.h"
+#include "rw_mutex.h"
 #include <hash_set>
 #include <hash_map>
+#include <unordered_set>
 
 namespace collections
 {

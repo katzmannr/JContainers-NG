@@ -170,7 +170,7 @@ namespace collections {
         void _registerSelf();
 
         virtual void u_clear() = 0;
-        virtual SInt32 u_count() const = 0;
+        virtual size_t u_count() const = 0;
         virtual void u_onLoaded() {};
 
         // nillify object cross references to avoid high-level

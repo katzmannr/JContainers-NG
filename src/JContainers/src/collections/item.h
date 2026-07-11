@@ -256,7 +256,7 @@ namespace collections {
             return 0;
         }
 
-        class are_strict_equals : public boost::static_visitor<bool> {
+        class are_strict_equals {
         public:
 
             template <typename T, typename U>
@@ -275,7 +275,7 @@ namespace collections {
         };
 
         bool isEqual(const item& other) const {
-            return boost::apply_visitor(are_strict_equals(), _var, other._var);
+            return std::visit(are_strict_equals{}, _var, other._var);
         }
 
         bool isNull() const {
@@ -307,10 +307,10 @@ namespace collections {
 
         bool operator < (const item& other) const {
             const auto l = type(), r = other.type();
-            return l == r ? boost::apply_visitor(lesser_comparison(), _var, other._var) : (l < r);
+            return l == r ? std::visit(lesser_comparison{}, _var, other._var) : (l < r);
         }
     private:
-        class lesser_comparison : public boost::static_visitor < bool > {
+        class lesser_comparison {
         public:
 
             template <typename T, typename U>
