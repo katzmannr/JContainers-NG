@@ -6,6 +6,7 @@
 #include <hash_set>
 #include <hash_map>
 #include <unordered_set>
+#include <boost/serialization/version.hpp>
 
 namespace collections
 {

@@ -58,7 +58,6 @@ namespace collections
         }
     };
 
-    class array;
     class map;
     class object_base;
 
@@ -110,7 +109,7 @@ namespace collections
             _array.clear();
         }
 
-        SInt32 u_count() const override {
+        size_t u_count() const override {
             return static_cast<SInt32>(_array.size());
         }
 

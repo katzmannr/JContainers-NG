@@ -10,6 +10,7 @@
 #include "collections/context.h"
 #include "forms/form_handling.h"
 #include "collections.h"
+#include "object/object_base.h"
 #include "access.h"
 
 namespace collections {
@@ -188,7 +189,8 @@ namespace collections {
                     size_t index = 0;
                     json_t *value = nullptr;
                     json_array_foreach(val, index, value) {
-                        arr.u_push(self->make_item(value, arr, index));
+                        auto itm = self->make_item(value, arr, index);
+                        arr.u_push(std::move(itm));
                     }
                 }
                 void operator()(map& cnt) {
@@ -404,6 +406,7 @@ namespace collections {
             auto obj_cref = std::cref(object);
 
             if (_serializedObjects.find(obj_cref) == _serializedObjects.end()) {
+                const array* p = object.as<array>(); // Test
                 placeholder = object.as<array>() ? json_array() : json_object();
                 _toFill.push_back(objects_to_fill::value_type(obj_cref, placeholder));
                 _serializedObjects.insert(obj_cref);

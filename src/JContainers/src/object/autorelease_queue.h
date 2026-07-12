@@ -1,13 +1,17 @@
 #pragma once
 
+#include "rw_mutex.h"
+#include "util/singleton.h"
+#include "object_base.h"
+#include "common/IThread.h"
+
 #include <atomic>
 #include <deque>
-#include <boost\serialization\version.hpp>
-#include <boost\asio\io_service.hpp>
-#include <boost\asio\deadline_timer.hpp>
-#include "common\IThread.h"
-#include "util\util.h"
-#include "util\singleton.h"
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <gtest/gtest.h>
 
 namespace collections {
 
@@ -53,7 +57,7 @@ namespace collections {
     class object_registry;
 
     // The purpose of autorelease_queue (aqueue) is to temporarily own an object and increase an object's lifetime
-    class autorelease_queue : boost::noncopyable {
+    class autorelease_queue : boost::asio::noncopyable {
     public:
         typedef std::lock_guard<bshared_mutex> lock;
         typedef object_base::time_point time_point;
