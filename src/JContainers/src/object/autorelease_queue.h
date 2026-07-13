@@ -3,6 +3,7 @@
 #include "rw_mutex.h"
 #include "util/singleton.h"
 #include "object_base.h"
+#include "common/IPrefix.h"
 #include "common/IThread.h"
 
 #include <atomic>
