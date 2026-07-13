@@ -245,11 +245,10 @@ public:
             const SKSE::PapyrusInterface	     * m_papyrus     = nullptr;
             const static SKSE::MessagingInterface     * s_messaging;
             static SKSE::PluginHandle s_pluginHandle;
-
 };
 
 const SKSE::MessagingInterface *skse_callbacks::s_messaging = nullptr;
-SKSE::PluginHandle s_pluginHandle = static_cast<SKSE::PluginHandle>(-1);
+SKSE::PluginHandle skse_callbacks::s_pluginHandle = static_cast<SKSE::PluginHandle>(-1);
 
 }
 

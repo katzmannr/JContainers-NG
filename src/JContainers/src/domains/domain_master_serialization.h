@@ -1,12 +1,12 @@
 #pragma once
 
-#include "boost\serialization\split_free.hpp"
-#include "boost\serialization\version.hpp"
+#include "boost/serialization/split_free.hpp"
+#include "boost/serialization/version.hpp"
 //#include "boost\serialization\optional.hpp"
 
 #include "util/istring_serialization.h"
 
-#include "domains/domain_master.h"
+#include "domain_master.h"
 
 namespace boost {
     namespace serialization {

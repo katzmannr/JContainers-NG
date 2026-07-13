@@ -124,7 +124,7 @@ namespace collections {
             BOOST_ASSERT_MSG(false, "invalid form_map version");
             break;
         case 0: {   // v3.2.X -> v3.3.X
-            std::map<FormId, item> oldMap;
+            std::map<RE::FormID, item> oldMap;
             ar >> oldMap;
             auto& fwatcher = hack::iarchive_with_blob::from_base_get<tes_context>(ar)._form_watcher;
             for (auto& pair : oldMap) {
