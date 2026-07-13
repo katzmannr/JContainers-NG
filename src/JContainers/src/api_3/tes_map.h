@@ -338,8 +338,8 @@ Usage:
         using namespace collections;
 
         collections::form_map* fmap = tes_object::object<form_map>(context);
-        fmap->u_container()[make_weak_form_id(util::to_enum<FormId>(0x14), context)] = item{ 10 };
-        fmap->u_container()[make_weak_form_id(util::to_enum<FormId>(0x20), context)] = item{ 14 };
+        fmap->u_container()[make_weak_form_id(0x14, context)] = item{ 10 };
+        fmap->u_container()[make_weak_form_id(0x20, context)] = item{ 14 };
 
         auto countIterations = [&](collections::form_map* fmap) -> int {
             int cycle_counter = 0;
@@ -355,7 +355,7 @@ Usage:
         EXPECT_EQ(fmap->s_count(), 2);
         EXPECT_EQ(countIterations(fmap), 2);
 
-        fmap->u_container()[form_ref::make_expired(util::to_enum<FormId>(0x15))] = item{ "nill" };
+        fmap->u_container()[form_ref::make_expired(0x15)] = item{ "nill" };
         fmap->u_container()[form_ref{}] = item{ "nill" };
 
         EXPECT_EQ(fmap->s_count(), 4);

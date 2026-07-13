@@ -30,7 +30,9 @@ ExternalProject_Add(
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/lualib.h       <INSTALL_DIR>/include/ &&
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/lauxlib.h      <INSTALL_DIR>/include/ &&
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luajit.h       <INSTALL_DIR>/include/ &&
+        ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luaconf.h      <INSTALL_DIR>/include/ &&
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luajit.lib     <INSTALL_DIR>/lib/
+        ${CMAKE_COMMAND} -E chdir ${LUAJIT_INSTALL_DIR} cmd /c dir /s
 )
 
 ExternalProject_Get_Property(LuaJIT INSTALL_DIR)

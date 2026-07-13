@@ -25,3 +25,19 @@ jobs:
           cmake --build build
           --config Release
           --parallel
+
+      - name: Inspect LuaJIT install
+        shell: cmd
+        run: |
+          echo ==== INSTALL DIR ====
+          dir /s build\extern-luajit\install
+          echo.
+          echo ==== INCLUDE DIR ====
+          dir build\extern-luajit\install\include
+
+      - name: Upload LuaJIT install
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luajit-install
+          path: build/extern-luajit/install
