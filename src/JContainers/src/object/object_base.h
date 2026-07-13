@@ -177,7 +177,7 @@ namespace collections {
         // release calls and resulting deadlock
         virtual void u_nullifyObjects() = 0;
 
-        SInt32 s_count() const {
+        size_t s_count() const {
             lock g(_mutex);
             return u_count();
         }

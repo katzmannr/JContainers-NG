@@ -5,6 +5,7 @@
 #include <boost/core/noncopyable.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/split_member.hpp>
+#include <boost/serialization/version.hpp>
 #include <gtest/gtest.h>
 #include <cstdint>
 #include <ctime>

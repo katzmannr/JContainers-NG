@@ -1,3 +1,7 @@
+#include "object/object_registry.h"
+#include "object_base.h"
+#include "object_context.h"
+
 namespace collections
 {
     void object_base::_registerSelf() {

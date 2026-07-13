@@ -32,10 +32,17 @@ file(GLOB ALL_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.cpp
 )
 
+###############################################################################
+# CommonLibSSE-NG extension for cmake
+###############################################################################
+include(${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
+
 ################################################################################
 # Target
 ################################################################################
-add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
+add_commonlibsse_plugin(${PROJECT_NAME}
+    SOURCES ${ALL_FILES}
+    VERSION 1.0)
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/jcontainers_pch.h>"
@@ -86,6 +93,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${boost_SOURCE_DIR}/libs/lockfree/include"
     "${boost_SOURCE_DIR}/libs/iostreams/include"
     "${boost_SOURCE_DIR}/libs/serialization/include"
+    "${Boost_SOURCE_DIR}/libs/uuid/include"
+    "${Boost_SOURCE_DIR}/libs/align/include"
+    "${Boost_SOURCE_DIR}/libs/parameter/include"
     "${jansson_SOURCE_DIR}/src"
     "${jansson_BINARY_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/."

@@ -179,7 +179,7 @@ namespace tes_api_3 {
         }
         REGISTERF(removeKey, "removeKey", "* key", "Removes the pair from the container where the key equals to the @key");
 
-        static SInt32 count(tes_context& ctx, ref obj)
+        static size_t count(tes_context& ctx, ref obj)
         {
             JC_LOG_API ("%p", (void*) obj);
 

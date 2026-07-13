@@ -406,7 +406,6 @@ namespace collections {
             auto obj_cref = std::cref(object);
 
             if (_serializedObjects.find(obj_cref) == _serializedObjects.end()) {
-                const array* p = object.as<array>(); // Test
                 placeholder = object.as<array>() ? json_array() : json_object();
                 _toFill.push_back(objects_to_fill::value_type(obj_cref, placeholder));
                 _serializedObjects.insert(obj_cref);

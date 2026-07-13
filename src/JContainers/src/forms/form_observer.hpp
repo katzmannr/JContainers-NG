@@ -17,6 +17,7 @@
 #include <boost/serialization/unordered_map.hpp>
 
 #include "util/stl_ext.h"
+#include "util/util.h"
 #include "iarchive_with_blob.h"
 
 #include "forms/form_handling.h"
