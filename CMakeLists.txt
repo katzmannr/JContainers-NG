@@ -176,7 +176,7 @@ target_link_libraries(JContainers
     PRIVATE
         jc::common
         jansson
-        LuaJIT
+        LuaJIT::LuaJIT
         CommonLibSSE::CommonLibSSE
         Boost::filesystem
         Boost::thread

@@ -144,30 +144,6 @@ namespace reflection { namespace binding {
     template <typename T> struct proxy;
     template <typename T> struct state_proxy;
 
-    template <class Func, class S, class... Args>
-    struct tes_wrapper
-    {
-        static tes_type_t<S> call(
-            RE::StaticFunctionTag* tag,
-            tes_type_t<Args>... args)
-        {
-            if constexpr (std::is_void_v<S>)
-            {
-                Func{}(
-                    get_converter<Args>::convert2J(args, tag)...
-                    );
-            }
-            else
-            {
-                return GetConv<S>::convert2Tes(
-                    Func{}(
-                        get_converter<Args>::convert2J(args, tag)...
-                        )
-                    );
-            }
-        }
-    };
-
     template <class R, class... Params>
     struct proxy<R(*)(Params ...)>
     {
@@ -220,15 +196,12 @@ namespace reflection { namespace binding {
                 void_ret,
                 non_void_ret>::type;
 
-            template <class Func, class S, class... Parameters>
             static void bind(const bind_args& args)
             {
-                using wrapper = tes_wrapper<Func, S, Parameters...>;
-
                 args.vm.RegisterFunction(
                     args.functionName,
                     args.className,
-                    &wrapper::call
+                    &tes_func_holder::tes_func
                 );
             }
         };
@@ -286,15 +259,12 @@ namespace reflection { namespace binding {
                 void_ret,
                 non_void_ret>::type;
 
-            template <class Func, class S, class... Parameters>
             static void bind(const bind_args& args)
             {
-                using wrapper = tes_wrapper<Func, S, Parameters...>;
-
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),
-                    &wrapper::call,
+                    &tes_func_holder::tes_func,
                     *reinterpret_cast<State*>(args.shared_state)
                 );
             }

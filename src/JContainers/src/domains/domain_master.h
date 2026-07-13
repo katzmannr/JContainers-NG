@@ -9,8 +9,6 @@
 #include "collections/context.h"
 #include "util/istring.h"
 
-#include "domain_master_serialization.h"
-
 namespace domain_master {
 
     using context = ::collections::tes_context;

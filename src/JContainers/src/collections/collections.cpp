@@ -53,10 +53,10 @@ namespace collections {
 
     template<class Archive>
     struct converter_324_to_330 : public boost::static_visitor < > {
-        template<class T> void operator () ( T& v) {
+        template<class T> void operator () (const T& v) {
             var = std::move(v);
         }
-        void operator () ( FormId& v) {
+        void operator () (const RE::FormID& v) {
             auto& fwatcher = hack::iarchive_with_blob::from_base_get<tes_context>(archive)._form_watcher;
             var = form_ref{ v, fwatcher, form_ref::load_old_id };
         }
@@ -80,7 +80,8 @@ namespace collections {
             using variant_old = boost::variant<boost::blank, SInt32, Real, FormId, internal_object_ref, std::string>;
             variant_old var;
             ar >> var;
-            var.apply_visitor(converter_324_to_330<Archive>{ _var, ar });
+            converter_324_to_330<Archive> visitor{ _var, ar };
+            var.apply_visitor(visitor);
         }
             break;
 
