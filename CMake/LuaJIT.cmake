@@ -3,6 +3,8 @@ include(ExternalProject)
 set(LUAJIT_PREFIX "${CMAKE_BINARY_DIR}/extern-luajit")
 set(LUAJIT_INSTALL_DIR "${LUAJIT_PREFIX}/install")
 
+file(TO_NATIVE_PATH "${LUAJIT_PREFIX}" LUAJIT_PREFIX_NATIVE)
+
 # Ensure the install dir exists at configure time
 file(MAKE_DIRECTORY
     "${LUAJIT_INSTALL_DIR}/include"
@@ -32,7 +34,7 @@ ExternalProject_Add(
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luajit.h       <INSTALL_DIR>/include/ &&
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luaconf.h      <INSTALL_DIR>/include/ &&
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luajit.lib     <INSTALL_DIR>/lib/
-    COMMAND cmd /c dir /s "${LUAJIT_PREFIX}"
+    COMMAND cmd /c dir /s "${LUAJIT_PREFIX_NATIVE}"
 )
 
 ExternalProject_Get_Property(LuaJIT INSTALL_DIR)
