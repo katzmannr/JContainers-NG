@@ -361,7 +361,7 @@ namespace reflection { namespace binding {
 #define REGISTERF_STATE(func, _funcname, _args, _comment) \
     ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
          metaInfo, \
-         disabled_state_function<&func>{}, \
+         ::reflection::binding::disabled_state_function<&func>{}, \
          _funcname, _args, _comment \
     };
 //#define REGISTERF_STATE(func, _funcname, _args, _comment)\
