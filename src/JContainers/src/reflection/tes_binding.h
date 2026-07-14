@@ -283,6 +283,29 @@ namespace reflection { namespace binding {
 
     };
 
+    // Temporary replacement for old state proxy
+    template <auto Func>
+    struct disabled_state_function
+    {
+        using base = state_proxy<decltype(Func)>;
+
+        static auto func_ptr()
+        {
+            return Func;
+        }
+
+        static void bind(const bind_args&)
+        {
+            // intentionally do nothing
+        }
+
+        struct tes_func_holder
+        {
+            static void tes_func(...)
+            {
+            }
+        };
+    };
 
 #define CONCAT(x, y) CONCAT1 (x, y)
 #define CONCAT1(x, y) x##y
@@ -335,12 +358,18 @@ namespace reflection { namespace binding {
 #define REGISTERF2(func, args, comment)     REGISTERF(func, #func, args, comment)
 #define REGISTERF2_STATELESS(func, args, comment)     REGISTERF_STATELESS(func, #func, args, comment)
 
-#define REGISTERF_STATE(func, _funcname, _args, _comment)\
+#define REGISTERF_STATE(func, _funcname, _args, _comment) \
     ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
-        metaInfo, \
-        ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
-        _funcname, _args, _comment \
+         metaInfo, \
+         disabled_state_function<&func>{}, \
+         _funcname, _args, _comment \
     };
+//#define REGISTERF_STATE(func, _funcname, _args, _comment)\
+// ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
+//     metaInfo, \
+//     ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
+//     _funcname, _args, _comment \
+// };
 
     struct papyrus_textblock_setter {
         explicit papyrus_textblock_setter(class_info& info, const papyrus_text_block& text) {
