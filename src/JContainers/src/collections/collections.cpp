@@ -81,7 +81,7 @@ namespace collections {
             variant_old var;
             ar >> var;
             converter_324_to_330<Archive> visitor{ _var, ar };
-            std::visit(apply_visitor(visitor, var));
+            std::visit(visitor, var);
         }
             break;
 

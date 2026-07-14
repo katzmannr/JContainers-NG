@@ -110,7 +110,7 @@ namespace collections {
         ///typedef typename T::key_type key_type;
 
         template<class Op, class R,/* class RAlter, */class key_type>
-        static R doReadOpR(T * obj, const key_type& key, R rDefault, Op& operation) {
+        static R doReadOpR(T * obj, const key_type& key, R rDefault, Op&& operation) {
             if (obj && key_checker::check(key)) {
                 object_lock g(obj);
                 item *itm = obj->u_get(key);
@@ -122,7 +122,7 @@ namespace collections {
         }
 
         template<class Op, class key_type>
-        static void doReadOp(T * obj, const key_type& key, Op& operation) {
+        static void doReadOp(T * obj, const key_type& key, Op&& operation) {
             if (obj && key_checker::check(key)) {
                 object_lock g(obj);
                 item *itm = obj->u_get(key);
@@ -134,7 +134,7 @@ namespace collections {
 
         // force write into an item
         template<class Op, class key_type>
-        static void doWriteOp(T * obj, const key_type& key, Op& operation) {
+        static void doWriteOp(T * obj, const key_type& key, Op&& operation) {
             if (obj && key_checker::check(key)) {
                 object_lock g(obj);
                 item &itm = obj->u_get_or_create(key);
