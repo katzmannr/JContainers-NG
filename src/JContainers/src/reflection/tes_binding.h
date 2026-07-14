@@ -264,8 +264,7 @@ namespace reflection { namespace binding {
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),
-                    &tes_func_holder::tes_func,
-                    *reinterpret_cast<State*>(args.shared_state)
+                    &tes_func_holder::tes_func
                 );
             }
 

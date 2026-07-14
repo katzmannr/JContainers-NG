@@ -1,6 +1,8 @@
 #include "SKSE/SKSE.h"
 #include "REL/Relocation.h"
 
+using namespace std::literals;
+
 SKSEPluginInfo(
     .Version = REL::Version{ 1, 0, 0, 0 },
     .Name = "JContainers"sv,
