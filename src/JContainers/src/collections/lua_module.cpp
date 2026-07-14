@@ -299,7 +299,7 @@ namespace lua { namespace aux_wip {
 
         EXPECT_TRUE(*testTransporting("return 10") == 10.0f);
         EXPECT_TRUE(*testTransporting("return 'die'") == std::string("die"));
-        EXPECT_TRUE(*testTransporting("return Form(20)") == cl::make_weak_form_id(FormId(20), tc));
+        EXPECT_TRUE(*testTransporting("return Form(20)") == cl::make_weak_form_id(RE::FormID(20), tc));
 
 
         auto& db = tc.root();
