@@ -72,6 +72,16 @@ namespace reflection { namespace binding {
         //typedef ValueConverter<TesType> Conv;
     };
 
+    template<> struct GetConv<void> {
+        using tes_type = void;
+    };
+
+    template<> struct GetConv<const char*> : StringConverter{};
+    template<> struct GetConv<std::string> : StringConverter{};
+
+    template<> struct GetConv<int32_t> : StaticCastValueConverter<int32_t, SInt32>{};
+    template<> struct GetConv<uint32_t> : StaticCastValueConverter<uint32_t, UInt32>{};
+
     template <class T>
     struct tes_type;
 

@@ -77,11 +77,11 @@ namespace collections {
             throw boost::archive::archive_exception (boost::archive::archive_exception::unsupported_version);
 
         case 2: { // v 3.2.X and below
-            using variant_old = boost::variant<boost::blank, SInt32, Real, RE::FormID, internal_object_ref, std::string>;
+            using variant_old = std::variant<boost::blank, SInt32, Real, RE::FormID, internal_object_ref, std::string>;
             variant_old var;
             ar >> var;
             converter_324_to_330<Archive> visitor{ _var, ar };
-            var.apply_visitor(visitor);
+            std::visit(apply_visitor(visitor, var));
         }
             break;
 
