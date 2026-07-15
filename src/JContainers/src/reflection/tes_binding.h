@@ -209,8 +209,8 @@ namespace reflection { namespace binding {
             static void bind(const bind_args& args)
             {
                 args.vm.RegisterFunction(
-                    args.functionName,
-                    args.className,
+                    args.functionName.c_str(),
+                    args.className.c_str(),
                     &tes_func_holder::tes_func
                 );
             }

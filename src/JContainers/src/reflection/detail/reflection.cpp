@@ -1,4 +1,3 @@
-#include "reflection/reflection.h"
 
 #include <map>
 #include <gtest/gtest.h>
@@ -8,6 +7,7 @@
 
 #include "reflection/detail/code_producer.hpp"
 #include "reflection/detail/type_traits.hpp"
+#include "reflection/reflection.h"
 #include "meta.h"
 
 namespace reflection {
