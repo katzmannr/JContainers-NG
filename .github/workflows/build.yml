@@ -19,13 +19,13 @@ jobs:
           cmake -B build
           -S .
           -A x64
-          --verbose
 
       - name: Build
         run: >
           cmake --build build
           --config Release
           --parallel
+          --verbose
 
       - name: Inspect LuaJIT install
         shell: cmd
