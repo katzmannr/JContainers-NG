@@ -7,6 +7,8 @@
 #include "object/autorelease_queue.h"
 #include "util/util.h"
 
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/deque.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
