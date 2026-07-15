@@ -77,6 +77,10 @@ if(MSVC)
     set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS}")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS}")
     set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS}")
+
+    # Flag necessary for CMake to enforce static builds
+    set(CMAKE_MSVC_RUNTIME_LIBRARY
+        MultiThreaded$<$<CONFIG:Debug>:Debug>)
 endif()
 
 ################################################################################
