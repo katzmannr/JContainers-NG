@@ -2,11 +2,14 @@
 
 #include "collections/copying.h"
 #include "collections/lua_module.h"
+#include "collections/context.h"
 #include <reflection/reflection.h>
 #include "reflection/tes_binding.h"
 #include "master.h"
 #include <boost/filesystem.hpp>
 #include "collections/json_serialization.h"
+// Could be moved to context.h, but it is used here.
+#include "object/object_context.hpp"
 
 namespace tes_api_3 {
 

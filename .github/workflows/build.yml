@@ -19,6 +19,7 @@ jobs:
           cmake -B build
           -S .
           -A x64
+          --verbose
 
       - name: Build
         run: >
@@ -30,10 +31,10 @@ jobs:
         shell: cmd
         run: |
           echo ==== INSTALL DIR ====
-          dir /s build\extern-luajit\install
+          dir /s "build\extern-luajit\install"
           echo.
           echo ==== INCLUDE DIR ====
-          dir build\extern-luajit\install\include
+          dir "build\extern-luajit\install\include"
 
       - name: Upload LuaJIT install
         if: always()

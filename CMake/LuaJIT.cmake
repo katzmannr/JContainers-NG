@@ -48,4 +48,7 @@ set_target_properties(LuaJIT::LuaJIT PROPERTIES
 
 add_dependencies(LuaJIT::LuaJIT LuaJIT)
 
+get_target_property(LUA_LIB LuaJIT::LuaJIT IMPORTED_LOCATION)
+message(STATUS "LuaJIT library = ${LUA_LIB}")
+
 message(STATUS "LuaJIT prepare step done.")
