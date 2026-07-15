@@ -28,6 +28,7 @@ file(GLOB ALL_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/forms/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/object/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/reflection/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/reflection/detail/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skse/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.cpp
 )
