@@ -6,6 +6,7 @@
 #include "object/object_registry.h"
 #include "common/IPrefix.h"
 #include "common/IThread.h"
+#include "intrusive_ptr_serialization.hpp"
 
 #include <atomic>
 #include <deque>
