@@ -8,6 +8,7 @@
 
 #include "reflection/detail/code_producer.hpp"
 #include "reflection/detail/type_traits.hpp"
+#include "meta.h"
 
 namespace reflection {
 
@@ -15,7 +16,7 @@ namespace reflection {
         std::map<istring, class_info> classDB;
 
         for (auto & item : meta<class_info_creator>::getListConst()) {
-            class_info& info = item();
+            const class_info& info = item();
 
             auto found = classDB.find(info.className());
             if (found != classDB.end()) {
