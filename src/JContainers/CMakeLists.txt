@@ -180,6 +180,7 @@ add_custom_command(
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         jansson
+        LuaJIT::LuaJIT
         CommonLibSSE::CommonLibSSE
         GTest::gtest_main
         Boost::filesystem

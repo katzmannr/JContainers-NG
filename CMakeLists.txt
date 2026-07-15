@@ -122,7 +122,7 @@ include(FetchContent)
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG v1.12.0   # match CommonLib requirement
+    GIT_TAG v1.10.0   # match CommonLib requirement
     OVERRIDE_FIND_PACKAGE
 )
 
