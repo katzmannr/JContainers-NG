@@ -7,6 +7,9 @@
 #include "object/autorelease_queue.h"
 #include "util/util.h"
 
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+
 namespace collections
 {
     object_context::object_context()
