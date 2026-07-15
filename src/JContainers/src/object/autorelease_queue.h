@@ -10,6 +10,7 @@
 #include <atomic>
 #include <deque>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/deque.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/asio/io_service.hpp>
