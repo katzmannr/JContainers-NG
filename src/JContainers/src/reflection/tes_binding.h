@@ -100,6 +100,11 @@ namespace reflection { namespace binding {
         using type = std::int32_t;
     };
 
+    template<>
+    struct tes_type<skse::string_ref> {
+        using type = RE::BSFixedString;
+    };
+
     template <>
     struct tes_type<std::string> {
         using type = RE::BSFixedString;
