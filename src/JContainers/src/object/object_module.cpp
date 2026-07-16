@@ -1,6 +1,8 @@
 #include <jansson.h>
 
 #define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+#define TEST_COMPILATION_ENABLED 1
+#define BG_WORKER_ENABLED 1
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>

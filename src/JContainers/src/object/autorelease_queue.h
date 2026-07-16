@@ -55,7 +55,9 @@ namespace collections {
             }
         };
 
+#ifdef BG_WORKER_ENABLED // Stop duplicate symbols, only enable in object_moduls
         util::singleton<background_worker> g_background_worker{ [](){ return new background_worker(); } };
+#endif
     }
 
 
@@ -320,6 +322,8 @@ namespace collections {
         }
     };
 
+#ifdef TEST_COMPILATION_ENABLED
+
     TEST(autorelease_queue, time_wrapping)
     {
         auto max = (std::numeric_limits<autorelease_queue::time_point>::max)();
@@ -356,6 +360,8 @@ namespace collections {
         EXPECT_TRUE(a == autorelease_queue::time_subtract(c, b));
         EXPECT_TRUE(b == autorelease_queue::time_subtract(c, a));
     }
+
+#endif
 }
 
 BOOST_CLASS_VERSION(collections::autorelease_queue, 2);

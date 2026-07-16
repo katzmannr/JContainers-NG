@@ -187,7 +187,7 @@ namespace collections {
     typedef id_generator<HandleT, 1, 0x7FFFFFFF - 1> id_generator_type;
 
 
-#   ifndef TEST_COMPILATION_DISABLED
+#   ifdef TEST_COMPILATION_ENABLED
 
     TEST(id_generator, t)
     {
