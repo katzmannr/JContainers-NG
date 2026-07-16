@@ -23,6 +23,7 @@ namespace tes_api_3 {
 
     class tes_array : public class_meta< tes_array >, public collections::array_functions {
     public:
+        tes_array() = default;
         tes_array(const tes_array &) = default;
         tes_array(tes_array &&) = default;
         tes_array &operator=(const tes_array &) = default;
