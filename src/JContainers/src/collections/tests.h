@@ -149,7 +149,7 @@ namespace collections { namespace {
     TEST (forms, string_to_form)
     {
         using namespace std;
-        pair<const char*, optional<forms::FormId>> const args[] =
+        pair<const char*, optional<RE::FormID>> const args[] =
         {
             { (const char*) nullptr, nullopt },
             { "", nullopt },
@@ -225,15 +225,15 @@ namespace collections { namespace {
 
             // Passes:
 
-            { "__formData||3", FormId (0xff000003) },
-            { "__formData|A|2", FormId (('A' << 24) | 2) },
-            { "__formData|Z|1", FormId (('Z' << 24) | 1) },
+            { "__formData||3", RE::FormID (0xff000003) },
+            { "__formData|A|2", RE::FormID (('A' << 24) | 2) },
+            { "__formData|Z|1", RE::FormID (('Z' << 24) | 1) },
 
-            { "__formData||0x00000004", FormId (0xff000004) },
-            { "__formData|A|0x00000005", FormId (('A' << 24) | 5) },
-            { "__formData|Z|0x00000006", FormId (('Z' << 24) | 6) },
-            { "__formData|A|0xff000005", FormId (('A' << 24) | 5) },
-            { "__formData|Z|0xff000006", FormId (('Z' << 24) | 6) }
+            { "__formData||0x00000004", RE::FormID (0xff000004) },
+            { "__formData|A|0x00000005", RE::FormID (('A' << 24) | 5) },
+            { "__formData|Z|0x00000006", RE::FormID (('Z' << 24) | 6) },
+            { "__formData|A|0xff000005", RE::FormID (('A' << 24) | 5) },
+            { "__formData|Z|0xff000006", RE::FormID (('Z' << 24) | 6) }
         };
         for (auto i: args)
         {
