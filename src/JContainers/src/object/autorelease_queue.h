@@ -57,6 +57,8 @@ namespace collections {
 
 #ifdef BG_WORKER_ENABLED // Stop duplicate symbols, only enable in object_moduls
         util::singleton<background_worker> g_background_worker{ [](){ return new background_worker(); } };
+#else
+        extern util::singleton<background_worker> g_background_worker;
 #endif
     }
 
