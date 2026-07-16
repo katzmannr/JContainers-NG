@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
 
 #include "api_3/tes_db.h"

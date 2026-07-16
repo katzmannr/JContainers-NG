@@ -160,7 +160,7 @@ NEGATIVE_IDX_COMMENT);
             doWriteOp(obj, insertAtIndex, [formList, obj, &ctx](uint32_t idx) {
                 auto& arr = obj->u_container();
 
-                for (auto* form : formList->forms())  // OR correct accessor
+                for (auto* form : formList->forms)  // OR correct accessor
                 {
                     arr.insert(
                         arr.begin() + idx,
