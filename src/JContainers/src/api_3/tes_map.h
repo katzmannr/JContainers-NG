@@ -131,7 +131,7 @@ namespace tes_api_3 {
             JC_LOG_API ("%p", (void*) obj);
 
             if (!obj) {
-                return VMResultArray<tes_key>();
+                return reflection::binding::rbArray<tes_key>();
             }
 
             std::vector<tes_key> keys;
