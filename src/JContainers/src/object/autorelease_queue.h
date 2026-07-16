@@ -17,6 +17,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <gtest/gtest.h>
+#include <memory>
 
 namespace collections {
 
@@ -54,12 +55,6 @@ namespace collections {
 #   endif
             }
         };
-
-#ifdef BG_WORKER_ENABLED // Stop duplicate symbols, only enable in object_moduls
-        util::singleton<background_worker> g_background_worker{ [](){ return new background_worker(); } };
-#else
-        extern util::singleton<background_worker> g_background_worker;
-#endif
     }
 
 
@@ -91,6 +86,7 @@ namespace collections {
         time_point _tickCounter;
         spinlock _queue_mutex;
         
+        std::unique_ptr<detail::background_worker> _backgroundWorker = std::make_unique<detail::background_worker>();
         boost::asio::deadline_timer _timer;
         std::mutex _timer_mutex;
         bool _timer_stopped = true;
@@ -161,7 +157,7 @@ namespace collections {
             : _registry(registry)
             , _queue()
             , _tickCounter(0)
-            , _timer(detail::g_background_worker.get()._io)
+            , _timer(_backgroundWorker->_io)
         {
             start();
             //jc_debug("aqueue created")
