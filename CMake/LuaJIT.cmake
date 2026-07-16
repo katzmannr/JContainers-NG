@@ -33,7 +33,8 @@ ExternalProject_Add(
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/lauxlib.h      <INSTALL_DIR>/include/ &&
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luajit.h       <INSTALL_DIR>/include/ &&
         ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luaconf.h      <INSTALL_DIR>/include/ &&
-        ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luajit51.lib   <INSTALL_DIR>/lib/
+        ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/luajit.lib     <INSTALL_DIR>/lib/
+        ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/src/lua51.lib      <INSTALL_DIR>/lib/
 #    COMMAND cmd /c dir /s "${LUAJIT_PREFIX_NATIVE}"
 )
 
@@ -42,7 +43,7 @@ ExternalProject_Get_Property(LuaJIT INSTALL_DIR)
 add_library(LuaJIT::LuaJIT STATIC IMPORTED GLOBAL)
 
 set_target_properties(LuaJIT::LuaJIT PROPERTIES
-    IMPORTED_LOCATION             "${INSTALL_DIR}/lib/luajit51.lib"
+    IMPORTED_LOCATION             "${INSTALL_DIR}/lib/lua51.lib"
     INTERFACE_INCLUDE_DIRECTORIES "${INSTALL_DIR}/include"
 )
 
