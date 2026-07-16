@@ -4,8 +4,10 @@
 
 #include <boost/optional.hpp>
 #include <boost/filesystem.hpp>
+#include "collections/bind_traits.h"
 #include "reflection/detail/type_traits.hpp"
 #include "tes_object.h"
+#include "tes_form_db.h"
 #include <shlobj.h>
 
 namespace collections {

@@ -4,7 +4,7 @@
 #include "collections/lua_module.h"
 #include "collections/context.h"
 #include <reflection/reflection.h>
-#include "reflection/tes_binding.h"
+#include "collections/bind_traits.h"
 #include "master.h"
 #include <boost/filesystem.hpp>
 #include "collections/json_serialization.h"

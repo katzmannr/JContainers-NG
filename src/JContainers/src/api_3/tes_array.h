@@ -3,10 +3,10 @@
 #include <cstdint>
 
 #include "api_3/tes_object.h"
+#include "tes_atomic.h"
 #include "collections/functions.h"
 #include "collections/collections_types.h"
 #include "collections/bind_traits.h" // Required for convert2J variants
-#include "reflection/tes_binding.h"
 #include "master.h"
 #include <SKSE/SKSE.h>
 #include "RE/B/BGSListForm.h"

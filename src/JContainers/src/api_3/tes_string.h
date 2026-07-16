@@ -7,13 +7,9 @@
 #include "api_3/tes_object.h"
 #include "collections/collections_types.h"
 #include "collections/context.h"
-#include "reflection/reflection.h"
 #include "reflection/tes_binding.h"
 #include "util/util.h"
 #include "util/stl_ext.h"
-
-#include "common/ITypes.h"
-#include "skse/string.h"
 
 #include "RE/B/BSCoreTypes.h"
 

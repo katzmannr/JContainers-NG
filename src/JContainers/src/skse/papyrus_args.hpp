@@ -3,6 +3,7 @@
 #include <common/ITypes.h>
 #include <SKSE/SKSE.h>
 #include "skse/jc_skse.h"
+#include "collections/bind_traits.h"
 #include "reflection/tes_binding.h"
 
 // Different meachanism used in CommonLibNG-SE to identify the types, these methods are now obsolete.

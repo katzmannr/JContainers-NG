@@ -4,12 +4,12 @@
 #include <cstring>
 #include <gtest/gtest.h>
 
-#include "api_3/master.h"
-#include "api_3/tes_object.h"
+#include "master.h"
+#include "tes_object.h"
+#include "tes_lua.h"
 #include "collections/collections.h"
-#include "reflection/tes_binding.h"
+#include "collections/bind_traits.h"
 
-#include "api_3/tes_types.h"
 #include <shlobj.h>
 
 namespace tes_api_3 {

@@ -1,9 +1,13 @@
 #pragma once
 
+// To use this include implementation, add "bind_traits" as dependency
+// Adding it here leads to circular include dependencies
+
 #include "common/ITypes.h"
 #include "reflection/reflection.h"
 #include "reflection/tes_binding.h"
 #include "skse/string.h"
+
 namespace reflection {  namespace binding {
 
     template<>
