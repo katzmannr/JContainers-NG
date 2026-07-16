@@ -98,6 +98,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${Boost_SOURCE_DIR}/libs/uuid/include"
     "${Boost_SOURCE_DIR}/libs/align/include"
     "${Boost_SOURCE_DIR}/libs/parameter/include"
+    "${Boost_SOURCE_DIR}/libs/random/include"
+    "${Boost_SOURCE_DIR}/libs/tti/include"
     "${jansson_SOURCE_DIR}/src"
     "${jansson_BINARY_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/."
