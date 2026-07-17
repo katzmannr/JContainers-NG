@@ -20,7 +20,6 @@ def makepath (*args):
 
 class JCLib(object):
 
-    suffix = ''
     name = ''
 
     def __init__(self, location):
@@ -116,11 +115,10 @@ def make_archive (dst, src):
 if __name__ == '__main__':
     try:
         if len (sys.argv) < 3:
-            print ("Usage: install.py x64/[Release[VR|GOG]|Debug[VR|GOG]] [64|VR|GOG]")
+            print ("Usage: install.py x64/[Release|Debug]")
             exit (1)
 
-        JCLib.suffix = sys.argv[2]
-        JCLib.name = "JContainers" + JCLib.suffix + ".dll"
+        JCLib.name = "JContainers" + ".dll"
 
         config = Config (sys.argv[1])
 
@@ -152,7 +150,7 @@ if __name__ == '__main__':
         shutil.copytree (config.dataDir, dst, \
                 ignore = shutil.ignore_patterns ('*.exp', '*.lib', 'test_data'))
         make_archive (os.path.join (DIST_DIR, \
-                'JContainers' + JCLib.suffix + '-v' + config.jcLib.version ()), dst)
+                'JContainers' + '-v' + config.jcLib.version ()), dst)
         shutil.rmtree (dst, ignore_errors = True)
 
         print ("API example skipped - its under revision...")

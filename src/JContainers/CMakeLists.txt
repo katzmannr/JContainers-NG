@@ -182,8 +182,7 @@ add_custom_command(
         ${Python3_EXECUTABLE}
         -u
         ${CMAKE_SOURCE_DIR}/tools/install.py
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        64
+        "$<TARGET_FILE:${PROJECT_NAME}>"
 )
 
 target_link_libraries(${PROJECT_NAME}
