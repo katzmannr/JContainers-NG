@@ -346,9 +346,9 @@ namespace reflection { namespace binding {
             metaF.argument_names = (argument_names) ? (argument_names) : "";
             if constexpr (std::is_convertible_v<String2, const char*>) {
                 metaF.setComment(comment);
-            } else if constexpr (std::is_convertible_v<String2, std::string_view>) {
-                auto sv = std::string_view(comment);
-                metaF.setComment(sv.data());
+            } else if constexpr (std::is_convertible_v<String2, std::string>) {
+                auto sv = std::string(comment);
+                metaF.setComment(sv.c_str());
             } else {
                 static_assert(sizeof(String2) == 0, "Unsupported comment type");
                 metaF.setComment("Unsuppported");

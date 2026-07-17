@@ -203,7 +203,7 @@ If @createMissingKeys is True, the function attemps to create missing @path elem
             EXPECT_EQ(result, value.expect_return);
 
             boost::optional<item> newValue = ca::get(obj, path);
-            EXPECT_NE(newValue, boost::none);
+            EXPECT_EQ(newValue.has_value(), true);
             EXPECT_NE((newValue->get<internal_item_type>()), nullptr);
             EXPECT_EQ(value.expect_new_value, *newValue->get<internal_item_type>());
 
