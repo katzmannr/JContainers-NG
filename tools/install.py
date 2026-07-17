@@ -114,7 +114,7 @@ def make_archive (dst, src):
 
 if __name__ == '__main__':
     try:
-        if len (sys.argv) < 3:
+        if len (sys.argv) < 2:
             print ("Usage: install.py x64/[Release|Debug]")
             exit (1)
 
