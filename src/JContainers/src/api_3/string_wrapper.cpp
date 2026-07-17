@@ -15,7 +15,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/range/iterator_range.hpp>
 
-namespace collections {
+namespace tes_api_3 {
 
 namespace bs = boost;
 
