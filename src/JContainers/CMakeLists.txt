@@ -180,6 +180,7 @@ add_custom_command(
     POST_BUILD
     COMMAND
         ${Python3_EXECUTABLE}
+        -u
         ${CMAKE_SOURCE_DIR}/tools/install.py
         x64/$<CONFIG>
         64
