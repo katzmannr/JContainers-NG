@@ -189,7 +189,7 @@ namespace collections {
                     size_t index = 0;
                     json_t *value = nullptr;
                     json_array_foreach(val, index, value) {
-                        auto itm = self->make_item(value, arr, index);
+                        auto itm = self->make_item(value, arr, static_cast<int>(index));
                         arr.u_push(std::move(itm));
                     }
                 }
@@ -425,7 +425,7 @@ namespace collections {
                 void operator () (const array& cnt) {
                     size_t index = 0;
                     for (auto& itm : cnt.u_container()) {
-                        self->fill_key_info(itm, cnt, index++);
+                        self->fill_key_info(itm, cnt, static_cast<int>(index++));
                         json_array_append_new(object, self->create_value(itm));
                     }
                 }

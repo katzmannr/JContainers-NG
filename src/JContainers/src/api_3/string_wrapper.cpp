@@ -15,8 +15,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/range/iterator_range.hpp>
 
-extern std::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine);
-
 namespace collections {
 
 namespace bs = boost;
@@ -45,10 +43,11 @@ namespace {
         std::vector<wstring_range> words;
 
         int charCount() const {
-            return std::accumulate(words.begin(), words.end(), 0, [](int val, const wstring_range& str) {
+            auto result = std::accumulate(words.begin(), words.end(), 0, [](int val, const wstring_range& str) {
                 return val + (int)str.size();
             })
                 + (words.size() > 0 ? words.size() - 1 : 0);
+            return static_cast<int>(result);
         }
 
         void addWord(const wstring_range& word) {
@@ -256,7 +255,7 @@ namespace {
 
     line_set initialSet(const wstring_range& data, int charsPerLine = 40) {
 
-        float cpl = charactersPerLine(data.size(), charsPerLine);
+        float cpl = charactersPerLine(static_cast<int>(data.size()), charsPerLine);
 
         line_set result;
 
@@ -370,10 +369,10 @@ std::optional<std::vector<std::string>> wrap_string(const char *csource, int cha
 
         for (size_t i = 0; i < set.lines.size(); ++i) {
 
-            bool needIncr = set.charDiffIn(i) < 0;
+            bool needIncr = set.charDiffIn(static_cast<int>(i)) < 0;
 
             float oldDelta = set.meanSquare();
-            setOpr.doIncr(needIncr, i, set);
+            setOpr.doIncr(needIncr, static_cast<int>(i), set);
             float newDelta = set.meanSquare();
 
             if (newDelta > oldDelta) {

@@ -193,7 +193,7 @@ namespace forms {
 
     template<class Archive, class Collection, class ElementSaver>
     void save_collection(Archive& archive, const Collection& collection, ElementSaver&& saver) {
-        uint32_t count = collection.size();
+        uint32_t count = static_cast<uint32_t>(collection.size());
         archive << count;
         for (const auto& pair : collection) {
             saver(archive, pair);
