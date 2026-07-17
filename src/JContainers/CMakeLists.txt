@@ -173,11 +173,16 @@ endif()
 ################################################################################
 # Post build events
 ################################################################################
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND      $<CONFIG:Debug> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
-    COMMAND    $<CONFIG:Release> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
+    COMMAND
+        ${Python3_EXECUTABLE}
+        ${CMAKE_SOURCE_DIR}/tools/install.py
+        x64/$<CONFIG>
+        64
 )
 
 target_link_libraries(${PROJECT_NAME}
