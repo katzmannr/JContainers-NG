@@ -81,7 +81,7 @@ namespace tes_api_3 {
                 me.u_container().reserve(arr.Length());
                 for (UInt32 i = 0; i < arr.Length(); ++i) {
                     TesType val;
-                    arr.Get(val, i);
+                    arr.Get(&val, i);
                     me.u_container().emplace_back(reflection::binding::get_converter<JCType>::convert2J(val, ctx));
                 }
             },
