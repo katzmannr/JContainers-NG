@@ -344,7 +344,15 @@ namespace reflection { namespace binding {
             metaF.param_list_func = &Binder::base::parameter_info;
              
             metaF.argument_names = (argument_names) ? (argument_names) : "";
-            metaF.setComment(comment);
+            if constexpr (std::is_convertible_v<String2, const char*>) {
+                metaF.setComment(comment);
+            } else if constexpr (std::is_convertible_v<String2, std::string_view>) {
+                auto sv = std::string_view(comment);
+                metaF.setComment(sv.data());
+            } else {
+                static_assert(sizeof(String2) == 0, "Unsupported comment type");
+                metaF.setComment("Unsuppported");
+            }
             metaF.name = funcname;
             metaF.tes_func = &Binder::tes_func_holder::tes_func;
             metaF.c_func = static_cast<c_function>(Binder::func_ptr());

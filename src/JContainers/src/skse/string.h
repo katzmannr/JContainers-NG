@@ -22,10 +22,6 @@ namespace skse
             _str(val)
         {}
 
-        explicit string_ref(std::string_view val) :
-            _str(val)
-        {}
-
         string_ref(const string_ref&) = default;
         string_ref(string_ref&&) = default;
 
