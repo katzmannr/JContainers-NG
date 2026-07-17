@@ -5,6 +5,7 @@
 #include <RE/T/TypeTraits.h>
 #include <RE/T/TypeInfo.h>
 #include <RE/P/PackUnpack.h>
+#include <string_view>
 
 namespace skse
 {
@@ -14,6 +15,14 @@ namespace skse
         string_ref() = default;
 
         explicit string_ref(const char* val) :
+            _str(val)
+        {}
+
+        explicit string_ref(const std::string_view& val) :
+            _str(val)
+        {}
+
+        explicit string_ref(std::string_view val) :
             _str(val)
         {}
 

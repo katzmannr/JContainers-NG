@@ -125,7 +125,7 @@ namespace tes_api_3 {
                 return std::string();
             }
 
-            strcat_s(path, sizeof(path), std::string{"/"} + std::string{user_files()}.c_str());
+            strcat_s(path, sizeof(path), (std::string{"/"} + std::string{user_files()}).c_str());
 
             // race condition possible. hope it's not critical
             if (!boost::filesystem::exists(path) && (boost::filesystem::create_directories(path), !boost::filesystem::exists(path))) {
