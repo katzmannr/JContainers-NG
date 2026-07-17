@@ -344,11 +344,12 @@ namespace reflection { namespace binding {
             metaF.param_list_func = &Binder::base::parameter_info;
              
             metaF.argument_names = (argument_names) ? (argument_names) : "";
-            if constexpr (std::is_convertible_v<String2, const char*>) {
-                metaF.setComment(comment);
+            if constexpr (std::is_convertible_v<String2, function_info::comment_generator>) {
+                metaF.setComment(static_cast<function_info::comment_generator>(comment));
             } else if constexpr (std::is_convertible_v<String2, std::string>) {
-                auto sv = std::string(comment);
-                metaF.setComment(sv.c_str());
+                metaF.setComment(comment.c_str());
+            } else if constexpr (std::is_convertible_v<String2, const char*>) {
+                metaF.setComment(comment);
             } else {
                 static_assert(sizeof(String2) == 0, "Unsupported comment type");
                 metaF.setComment("Unsuppported");
