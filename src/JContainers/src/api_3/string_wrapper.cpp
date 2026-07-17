@@ -7,15 +7,15 @@
 #include <algorithm>
 #include <cctype>
 #include <locale>
-#include <codecvt> //See _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+#include <codecvt>
+#include <optional>//See _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/optional.hpp>
 
-extern boost::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine);
+extern std::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine);
 
 namespace collections {
 
@@ -332,11 +332,11 @@ namespace {
 
 }
 
-boost::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine)
+std::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine)
 {
     if (!csource || charsPerLine <= 0) {
         // invalid input
-        return boost::none;
+        return std::nullopt;
     }
 
     wide_string_converter converter;
@@ -347,7 +347,7 @@ boost::optional<std::vector<std::string>> wrap_string(const char *csource, int c
     }
     catch (const std::range_error&) {
         // invalid input - non UTF-8 source string probably
-        return boost::none;
+        return std::nullopt;
     }
 
     if (wstr.empty()) {

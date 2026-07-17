@@ -232,7 +232,7 @@ JValue.cleanPool(\"uniquePoolName\")"
         }
         REGISTERF2(empty, "*", "Returns true, if the container is empty")
 
-        static size_t count (tes_context& ctx, ref obj)
+        static SInt32 count (tes_context& ctx, ref obj)
         {
             JC_LOG_API ("0x%p", (void*) obj);
 

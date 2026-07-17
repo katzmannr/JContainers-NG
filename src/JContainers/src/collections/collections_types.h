@@ -109,7 +109,7 @@ namespace collections
             _array.clear();
         }
 
-        size_t u_count() const override {
+        SInt32 u_count() const override {
             return static_cast<SInt32>(_array.size());
         }
 
@@ -280,8 +280,8 @@ namespace collections
             u_set(key, std::forward<T>(value));
         }
 
-        size_t u_count() const override {
-            return cnt.size();
+        SInt32 u_count() const override {
+            return static_cast<SInt32>(cnt.size());
         }
 
         template<class Key>
