@@ -8,6 +8,7 @@
 #include "reflection/detail/type_traits.hpp"
 #include "tes_object.h"
 #include "tes_form_db.h"
+#include "tes_jcontainers.h"
 #include <shlobj.h>
 
 namespace collections {
