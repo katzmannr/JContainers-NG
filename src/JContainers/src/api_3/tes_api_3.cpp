@@ -9,6 +9,8 @@
 #include "tes_object.h"
 #include "tes_form_db.h"
 #include "tes_jcontainers.h"
+// Required for string.h
+#include "RE/Skyrim.h"
 #include <shlobj.h>
 
 namespace collections {
