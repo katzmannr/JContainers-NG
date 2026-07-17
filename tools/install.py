@@ -126,9 +126,20 @@ if __name__ == '__main__':
 
         print ("Setup Skyrim Mod tree...")
         srcdata = os.path.join (ROOT, 'src', 'Data')
+
+        src = os.path.join(config.origin, JCLib.name)
+        dst = config.jcLibPath
+
+        print(f"origin     = {config.origin}")
+        print(f"JCLib.name = {JCLib.name}")
+        print(f"src        = {src}")
+        print(f"dst        = {dst}")
+        print(f"exists(src)= {os.path.exists(src)}")
+        print(f"exists(dst dir)= {os.path.exists(os.path.dirname(dst))}")
+
         shutil.rmtree (config.dataDir, ignore_errors=True)
         shutil.copytree (srcdata, config.dataDir)
-        shutil.copy2 (os.path.join (config.origin, JCLib.name), config.jcLibPath)
+        shutil.copy2 (src, dst)
 
         print ("Generate and compile scripts...")
         config.jcLib.produce_code (config.pscDir)

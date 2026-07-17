@@ -182,7 +182,7 @@ add_custom_command(
         ${Python3_EXECUTABLE}
         -u
         ${CMAKE_SOURCE_DIR}/tools/install.py
-        x64/$<CONFIG>
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
         64
 )
 
