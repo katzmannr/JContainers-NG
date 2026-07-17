@@ -15,6 +15,8 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/optional.hpp>
 
+extern boost::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine);
+
 namespace collections {
 
 namespace bs = boost;

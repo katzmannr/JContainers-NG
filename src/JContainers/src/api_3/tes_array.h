@@ -72,19 +72,8 @@ namespace tes_api_3 {
         }
         REGISTERF2(objectWithSize, "size", "Creates a new array of given size, filled with empty (None) items");
 
-        template <class T>
-        class VMArrayCompat
-        {
-        public:
-            RE::BSScript::Array array;
-
-            std::uint32_t Length() const;
-            bool Get(T& out, std::uint32_t i);
-            bool Set(std::uint32_t i, const T& value);
-        };
-
         template<class TesType, class JCType = TesType>
-        static object_base* fromArray(tes_context& ctx, VMArrayCompat<TesType> arr)
+        static object_base* fromArray(tes_context& ctx, reflection::binding::rbArray<TesType> arr)
         {
             JC_LOG_API ("...");
 
