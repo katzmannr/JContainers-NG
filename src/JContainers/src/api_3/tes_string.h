@@ -4,11 +4,9 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
 
-#include "api_3/tes_db.h"
-#include "api_3/tes_object.h"
+#include "tes_object.h"
 #include "collections/collections_types.h"
 #include "collections/context.h"
-#include "reflection/tes_binding.h"
 #include "util/util.h"
 #include "util/stl_ext.h"
 

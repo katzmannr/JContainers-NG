@@ -1,8 +1,8 @@
 #pragma once
 
-#include "api_3/master.h"
-#include "api_3/tes_map.h"
-#include "api_3/tes_db.h"
+#include "master.h"
+#include "tes_map.h"
+#include "tes_db.h"
 #include "boost_extras.h"
 #include <boost/algorithm/string.hpp>
 

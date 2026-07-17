@@ -15,8 +15,6 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/optional.hpp>
 
-#include "tes_string.h"
-
 namespace collections {
 
 namespace bs = boost;

@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "master.h"
-#include "tes_object.h"
+#include "tes_string.h"
 #include "tes_lua.h"
 #include "collections/collections.h"
 #include "collections/bind_traits.h"
