@@ -56,13 +56,6 @@ set(ROOT_NAMESPACE plugin_example)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
 )
-################################################################################
-# Target name
-################################################################################
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    TARGET_NAME_DEBUG      "JContainers64"
-    TARGET_NAME_RELEASE    "JContainers64"
-)
 
 ################################################################################
 # Output directory
@@ -182,7 +175,7 @@ add_custom_command(
         ${Python3_EXECUTABLE}
         -u
         ${CMAKE_SOURCE_DIR}/tools/install.py
-        "$<TARGET_FILE:${PROJECT_NAME}>"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
 target_link_libraries(${PROJECT_NAME}
