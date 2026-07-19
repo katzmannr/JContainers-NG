@@ -72,9 +72,9 @@ namespace reflection {
             _comment_func = func;
         }
 
-        void setComment(std::string func) {
-            _comment_func() = func;
-        }
+        void setComment(std::string comment) {
+            _comment_str = comment.c_str();
+            _comment_func = nullptr;        }
 
         void setComment(std::nullptr_t) {
             _comment_func = nullptr;
