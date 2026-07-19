@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RE/Skyrim.h>
+#include <windows.h>
 #include "REL/Relocation.h"
 #include <SKSE/SKSE.h>
 #include <cstdint>
