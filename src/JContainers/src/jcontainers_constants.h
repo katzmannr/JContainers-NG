@@ -1,5 +1,6 @@
 #pragma once
 
+#include <RE/Skyrim.h>
 #include "REL/Relocation.h"
 #include <SKSE/SKSE.h>
 #include <cstdint>
@@ -74,7 +75,7 @@ inline std::string_view plugin_name()
 
 inline std::string_view skse_logs()
 {
-    if (REL::Module::IsVR()) {
+    if (is_vr()) {
         return "\\My Games\\Skyrim VR\\SKSE\\";
     }
 
@@ -87,7 +88,7 @@ inline std::string_view skse_logs()
 
 inline std::string_view user_files()
 {
-    if (REL::Module::IsVR()) {
+    if (is_vr()) {
         return "My Games/Skyrim VR/JCUser/";
     }
 
