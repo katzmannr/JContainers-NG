@@ -36,9 +36,9 @@ jobs:
           echo ==== INCLUDE DIR ====
           dir "build\extern-luajit\install\include"
 
-      - name: Upload LuaJIT install
+      - name: Upload JContainers install
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: luajit-install
-          path: build/extern-luajit/install
+          name: jcontainers-install
+          path: build/src/JContainers/Release
