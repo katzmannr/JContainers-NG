@@ -1,14 +1,15 @@
-#pragma once
+// Do NOT use the statement below
+//#pragma once
+// The dumb MSVC compiler does not make a difference from SKSE.h and skse.h
+// Instead we are forced to use "old style" header guards.
 
-#include "forms/form_id.h"
+#ifndef JC_SKSE_H
+#define JC_SKSE_H
+
 #include <cstdint>
-#include <string_view>
 #include <optional>
 
-class TESForm;
-
-/// Wraps calls to SKSE - fakes the calls when SKSE/Skyrim inactive (during synthetic tests)
-namespace skse
+namespace jc_skse
 {
 
 /**
@@ -43,27 +44,27 @@ std::optional<std::string_view> loaded_light_mod_name (std::uint16_t idx);
  * or the input handle is for dynamic form.
  */
 
-forms::FormId resolve_handle (forms::FormId handle);
+RE::FormID resolve_handle (RE::FormID handle);
 
 /**
  * Valid handles are forwarded to `LookupByFormID`
  * @returns the looked up handle, nullptr if silent API, random blob if test API
  */
 
-TESForm* lookup_form (forms::FormId handle);
+RE::TESForm* lookup_form (RE::FormID handle);
 
 /**
  * Uses SKSE `IObjectHandlePolicy::Resolve` and `AddRef`
  * @returns true on successfully retained handle, or if silent/test API
  */
 
-bool try_retain_handle (forms::FormId handle);
+bool try_retain_handle (RE::FormID handle);
 
 /**
  * Forwards to SKSE `IObjectHandlePolicy::Release` (ignored on silent/test API)
  */
 
-void release_handle (forms::FormId handle);
+void release_handle (RE::FormID handle);
 
 /**
  * If there is a console manager will call its `VPrint` function (ignored on silent/test API).
@@ -98,3 +99,4 @@ void set_silent_api ();
 
 }
 
+#endif // JC_SKSE_H

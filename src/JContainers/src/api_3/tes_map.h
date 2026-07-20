@@ -1,3 +1,20 @@
+#pragma once
+
+#include <collections/collections.h>
+#include <reflection/reflection.h>
+#include <collections/access.h>
+#include <collections/context.h>
+#include "api_3/tes_array.h"
+#include "collections/functions.h"
+#include "collections/tests.h"
+#include "collections/collections_types.h"
+#include <gtest/gtest.h>
+
+#include "api_3/master.h"
+#include "api_3/tes_object.h"
+#include "reflection/reflection.h"
+#include "reflection/tes_binding.h"
+
 namespace tes_api_3 {
 
 /// Redefine in each logging module
@@ -18,13 +35,15 @@ namespace tes_api_3 {
         using map_functions = map_functions_templ < Cnt >;
         using map_type = Cnt;
         using tes_key = reflection::binding::convert_to_tes_type<typename map_type::key_type>;
+        using class_meta<tes_map_t<Key, Cnt, key_ref, key_cref>>::metaInfo;
 
-        typedef typename Cnt* ref;
+        using ref = Cnt*;
 
         tes_map_t() {
             metaInfo.comment = "Associative key-value container.\n"
                 "Inherits JValue functionality";
         }
+
 
         REGISTERF(tes_object::object<Cnt>, "object", "", kCommentObject);
 
@@ -85,7 +104,7 @@ namespace tes_api_3 {
             map_functions::doReadOp(obj, key, [&](item& itm) { type = itm.type(); });
             return (SInt32)type;
         }
-        REGISTERF2(valueType, "* key", "Returns type of the value associated with the @key.\n"VALUE_TYPE_COMMENT);
+        REGISTERF2(valueType, "* key", "Returns type of the value associated with the @key.\n" VALUE_TYPE_COMMENT);
 
         static object_base* allKeys(tes_context& ctx, ref obj)
         {
@@ -99,7 +118,7 @@ namespace tes_api_3 {
                 object_lock g(obj);
 
                 arr._array.reserve(obj->u_count());
-                for each(auto& pair in obj->u_container()) {
+                for (const auto& pair : obj->u_container()) {
                     arr.u_container().emplace_back(pair.first);
                 }
             },
@@ -107,15 +126,15 @@ namespace tes_api_3 {
         }
         REGISTERF(allKeys, "allKeys", "*", "Returns a new array containing all keys");
 
-        static VMResultArray<tes_key> allKeysPArray(tes_context& ctx, ref obj)
+        static std::vector<tes_key> allKeysPArray(tes_context& ctx, ref obj)
         {
             JC_LOG_API ("%p", (void*) obj);
 
             if (!obj) {
-                return VMResultArray<tes_key>();
+                return std::vector<tes_key>();
             }
 
-            VMResultArray<tes_key> keys;
+            std::vector<tes_key> keys;
             object_lock l(obj);
             keys.reserve(obj->u_count());
             std::transform(obj->u_container().begin(), obj->u_container().end(),
@@ -141,7 +160,7 @@ namespace tes_api_3 {
                 object_lock g(obj);
 
                 arr._array.reserve(obj->u_count());
-                for each(auto& pair in obj->u_container()) {
+                for (const auto& pair : obj->u_container()) {
                     arr._array.push_back(pair.second);
                 }
             },
@@ -225,15 +244,15 @@ namespace tes_api_3 {
     typedef tes_map_t<form_ref_lightweight, form_map, form_ref_lightweight, form_ref_lightweight> tes_form_map;
     typedef tes_map_t<int32_t, integer_map, int32_t, int32_t> tes_integer_map;
 
-    void tes_map::additionalSetup() {
+    template<> void tes_map::additionalSetup() {
         metaInfo._className = "JMap";
     }
 
-    void tes_form_map::additionalSetup() {
+    template<> void tes_form_map::additionalSetup() {
         metaInfo._className = "JFormMap";
     }
 
-    void tes_integer_map::additionalSetup() {
+    template<> void tes_integer_map::additionalSetup() {
         metaInfo._className = "JIntMap";
     }
 
@@ -271,7 +290,7 @@ Usage:
         }
         REGISTERF(nextKey<skse::string_ref>, "nextKey", STR(* previousKey="" endKey=""), tes_map_nextKey_comment);
 
-        static const char * getNthKey_comment() { return "Retrieves N-th key. " NEGATIVE_IDX_COMMENT "\nWorst complexity is O(n/2)"; }
+        static const char * getNthKey_comment() { return "Retrieves N-th key. "; NEGATIVE_IDX_COMMENT "\nWorst complexity is O(n/2)"; }
 
         template<class Key>
         static Key getNthKey(tes_context& ctx, map* obj, SInt32 keyIndex) {
@@ -290,7 +309,7 @@ Usage:
         struct KeyCompareForNextKey {
             template<class K1, class K2>
             bool operator()(const K1& nKey, const K2& endKey) const {
-                return skse::lookup_form(nKey.get()) == skse::lookup_form(endKey.get());
+                return jc_skse::lookup_form(nKey.get()) == jc_skse::lookup_form(endKey.get());
             }
         };
 
@@ -319,8 +338,8 @@ Usage:
         using namespace collections;
 
         collections::form_map* fmap = tes_object::object<form_map>(context);
-        fmap->u_container()[make_weak_form_id(util::to_enum<FormId>(0x14), context)] = item{ 10 };
-        fmap->u_container()[make_weak_form_id(util::to_enum<FormId>(0x20), context)] = item{ 14 };
+        fmap->u_container()[make_weak_form_id(0x14, context)] = item{ 10 };
+        fmap->u_container()[make_weak_form_id(0x20, context)] = item{ 14 };
 
         auto countIterations = [&](collections::form_map* fmap) -> int {
             int cycle_counter = 0;
@@ -336,7 +355,7 @@ Usage:
         EXPECT_EQ(fmap->s_count(), 2);
         EXPECT_EQ(countIterations(fmap), 2);
 
-        fmap->u_container()[form_ref::make_expired(util::to_enum<FormId>(0x15))] = item{ "nill" };
+        fmap->u_container()[form_ref::make_expired(0x15)] = item{ "nill" };
         fmap->u_container()[form_ref{}] = item{ "nill" };
 
         EXPECT_EQ(fmap->s_count(), 4);

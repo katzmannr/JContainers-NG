@@ -34,9 +34,9 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Release>:"
         "NDEBUG"
     ">"
-    "_CONSOLE;"
-    "UNICODE;"
-    "_UNICODE"
+    _CONSOLE
+    UNICODE
+    _UNICODE
 )
 
 ################################################################################
@@ -48,16 +48,16 @@ if(MSVC)
             /Od
         >
         $<$<CONFIG:Release>:
-            /O2;
-            /Oi;
+            /O2
+            /Oi
             /Gy
         >
-        /permissive-;
-        /std:c++20;
-        /sdl;
-        /W3;
-        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-        ${DEFAULT_CXX_EXCEPTION_HANDLING};
+        /permissive-
+        /std:c++20
+        /sdl
+        /W3
+        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
+        ${DEFAULT_CXX_EXCEPTION_HANDLING}
         /Y-
     )
     target_link_options(${PROJECT_NAME} PRIVATE
@@ -65,11 +65,11 @@ if(MSVC)
             /INCREMENTAL
         >
         $<$<CONFIG:Release>:
-            /OPT:REF;
-            /OPT:ICF;
+            /OPT:REF
+            /OPT:ICF
             /INCREMENTAL:NO
         >
-        /DEBUG;
+        /DEBUG
         /SUBSYSTEM:CONSOLE
     )
 endif()

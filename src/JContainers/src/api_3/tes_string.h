@@ -1,18 +1,24 @@
 ﻿#pragma once
 
-#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/random_generator.hpp>
 
+#include "tes_object.h"
+#include "collections/collections_types.h"
+#include "collections/context.h"
 #include "util/util.h"
 #include "util/stl_ext.h"
 
-namespace collections {
+#include "RE/B/BSCoreTypes.h"
+
+namespace tes_api_3 {
 
 /// Redefine in each logging module
 #undef  JC_LOG_API_SOURCE
 #define JC_LOG_API_SOURCE "JString"
 
-	extern boost::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine);
+    extern std::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine);
 
     class tes_string : public reflection::class_meta_mixin_t<tes_string> {
     public:
@@ -47,19 +53,19 @@ Accepts ASCII and UTF-8 encoded strings only");
 
         static UInt32 decodeFormStringToFormId(const char* form_string) {
             JC_LOG_API ("%s", form_string);
-            return util::to_integral(decodeFormStringToForm(form_string));
+            return decodeFormStringToForm(form_string);
         }
-        static FormId decodeFormStringToForm (const char* form_string) {
+        static RE::FormID decodeFormStringToForm (const char* form_string) {
             JC_LOG_API ("%s", form_string);
-            return forms::string_to_form (form_string).value_or (FormId::Zero);
+            return forms::string_to_form (form_string).value_or (0);
         }
-        static skse::string_ref encodeFormToString (FormId id) {
+        static skse::string_ref encodeFormToString (RE::FormID id) {
             JC_LOG_API ("0x%x", id);
-            return skse::string_ref { forms::form_to_string (id).value_or ("") };
+            return skse::string_ref { skse::string_ref(forms::form_to_string (id).value_or ("").c_str()) };
         }
         static skse::string_ref encodeFormIdToString(UInt32 id) {
             JC_LOG_API ("0x%x", id);
-            return encodeFormToString( util::to_enum<FormId>(id) );
+            return encodeFormToString( util::to_enum<RE::FormID>(id) );
         }
 
         REGISTERF2_STATELESS(decodeFormStringToFormId, "formString", "FormId|Form <-> \"__formData|<pluginName>|<lowFormId>\"-string converisons");
@@ -101,10 +107,10 @@ Accepts ASCII and UTF-8 encoded strings only");
 		auto testWrap = [&](const char *string, int linesCount, int charsPerLine) {
             auto obj = tes_string::wrap(ctx, string, charsPerLine);
             if (linesCount == -1) {
-                EXPECT_NIL(obj);
+                EXPECT_EQ((obj), nullptr);
             }
             else {
-                EXPECT_NOT_NIL(obj);
+                EXPECT_NE((obj), nullptr);
                 EXPECT_TRUE(obj->s_count() >= linesCount);
             }
 		};

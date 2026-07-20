@@ -52,7 +52,7 @@ void IThread::ForceStop(void)
 	}
 }
 
-UInt32 IThread::_ThreadProc(void * param)
+DWORD IThread::_ThreadProc(void * param)
 {
 	IThread	* _this = (IThread *)param;
 

@@ -28,13 +28,22 @@ file(GLOB ALL_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/forms/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/object/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/reflection/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/reflection/detail/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skse/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.cpp
 )
 
+###############################################################################
+# CommonLibSSE-NG extension for cmake
+###############################################################################
+include(${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
+
 ################################################################################
 # Target
 ################################################################################
+#add_commonlibsse_plugin(${PROJECT_NAME}
+#    SOURCES ${ALL_FILES}
+#    VERSION 1.0)
 add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
@@ -46,13 +55,6 @@ set(ROOT_NAMESPACE plugin_example)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
-)
-################################################################################
-# Target name
-################################################################################
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    TARGET_NAME_DEBUG      "JContainers64"
-    TARGET_NAME_RELEASE    "JContainers64"
 )
 
 ################################################################################
@@ -67,12 +69,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ################################################################################
 get_property(MSVC_RUNTIME_LIBRARY_DEFAULT TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY)
 string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
-    $<$<CONFIG:Debug>:
-        MultiThreadedDebug
-    >
-    $<$<CONFIG:Release>:
-        MultiThreaded
-    >
+    $<$<CONFIG:Debug>:MultiThreadedDebug>
+    $<$<CONFIG:Release>:MultiThreaded>
     $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:Release>>>:${MSVC_RUNTIME_LIBRARY_DEFAULT}>
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY_STR})
@@ -81,11 +79,22 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 # Include directories
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/JContainers/src;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest/googletest/googletest/include;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson/jansson/src;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/jansson;"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dep/luajit/luajit-2.0/src;"
+    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/include"
+    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/CommonLibSSE/include"
+    "${CMAKE_SOURCE_DIR}/src"
+    "${Boost_INCLUDE_DIRS}"
+    "${rapidcsv_SOURCE_DIR}/src"
+    "${boost_SOURCE_DIR}/libs/asio/include"
+    "${boost_SOURCE_DIR}/libs/lockfree/include"
+    "${boost_SOURCE_DIR}/libs/iostreams/include"
+    "${boost_SOURCE_DIR}/libs/serialization/include"
+    "${Boost_SOURCE_DIR}/libs/uuid/include"
+    "${Boost_SOURCE_DIR}/libs/align/include"
+    "${Boost_SOURCE_DIR}/libs/parameter/include"
+    "${Boost_SOURCE_DIR}/libs/random/include"
+    "${Boost_SOURCE_DIR}/libs/tti/include"
+    "${jansson_SOURCE_DIR}/src"
+    "${jansson_BINARY_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/."
 )
 
@@ -94,7 +103,7 @@ target_sources(${PROJECT_NAME}
         src/jc_interface.cpp
     PUBLIC
         FILE_SET HEADERS
-        BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/JContainers/src"
+        BASE_DIRS "${CMAKE_SOURCE_DIR}/src/JContainers/src"
         FILES ${JC_HEADERS}
 )
 
@@ -105,17 +114,17 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Release>:"
         "NO_JC_DEBUG"
     ">"
-    "NOMINMAX;"
-    "_SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING;"
-    "_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;"
-    "_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING;"
-    "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;"
-    "GTEST_LANG_CXX11;"
-    "GTEST_HAS_TR1_TUPLE=0;"
-    "_CRT_SECURE_NO_WARNINGS;"
-    "WIN32_LEAN_AND_MEAN;"
-    "BOOST_HAS_HASH;"
-    "_MBCS"
+    NOMINMAX
+    _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING
+    _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
+    _SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
+    _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+    GTEST_LANG_CXX11
+    GTEST_HAS_TR1_TUPLE=0
+    _CRT_SECURE_NO_WARNINGS
+    WIN32_LEAN_AND_MEAN
+    BOOST_HAS_HASH
+    _MBCS
 )
 
 ################################################################################
@@ -124,32 +133,32 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /GL-;
-            /Od;
-            /Ob0;
-            /sdl;
+            /GL-
+            /Od
+            /Ob0
+            /sdl
             -D_SCL_SECURE_NO_WARNINGS
         >
         $<$<CONFIG:Release>:
-            /O1;
-            /Oi;
-            /sdl-;
+            /O1
+            /Oi
+            /sdl-
             /Os
         >
-        /std:c++20;
-        /GF;
-        /W3;
-        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
+        /std:c++20
+        /GF
+        /W3
+        ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT}
         ${DEFAULT_CXX_EXCEPTION_HANDLING}
     )
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:
-            /NODEFAULTLIB:LIBCMT.lib;
+            /NODEFAULTLIB:LIBCMT.lib
             /DEBUG
         >
-        /SUBSYSTEM:CONSOLE;
-        /OPT:REF;
-        /OPT:ICF;
+        /SUBSYSTEM:CONSOLE
+        /OPT:REF
+        /OPT:ICF
         /INCREMENTAL:NO
     )
 endif()
@@ -157,23 +166,28 @@ endif()
 ################################################################################
 # Post build events
 ################################################################################
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND      $<CONFIG:Debug> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
-    COMMAND    $<CONFIG:Release> cd $<SHELL_PATH:${CMAKE_SOURCE_DIR}/> && python tools\\install.py x64\\$<CONFIG> 64
+    COMMAND
+        ${Python3_EXECUTABLE}
+        -u
+        ${CMAKE_SOURCE_DIR}/tools/install.py
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        jansson
+        LuaJIT::LuaJIT
         CommonLibSSE::CommonLibSSE
-)
-
-target_link_directories(${PROJECT_NAME} PRIVATE
-    Boost::filesystem
-    Boost::headers
-    Boost::serialization
-    Boost::date_time
+        GTest::gtest_main
+        Boost::filesystem
+        Boost::headers
+        Boost::serialization
+        Boost::date_time
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC

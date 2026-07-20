@@ -1,7 +1,13 @@
 #pragma once
 
+#include <gtest/gtest.h>
 #include <future>
 #include "util/util.h"
+
+#include "api_3/tes_array.h"
+#include "api_3/tes_jcontainers.h"
+#include "api_3/tes_map.h"
+#include "collections/tests.h"
 
 namespace tes_api_3 {
 

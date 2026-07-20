@@ -1,12 +1,29 @@
 #pragma once
 
-#include "skse64/PapyrusNativeFunctions.h"
-#include "skse/string.h"
-#include "reflection/reflection.h"
+#include <vector>
 
-class BGSListForm;
+#include <SKSE/SKSE.h>
+// Using only SKSE.h is NOT sufficient for NativeFunction and PackUnpack
+#include <RE/N/NativeFunction.h>
+#include <RE/P/PackUnpack.h>
+#include "reflection/reflection.h"
+#include "common/ITypes.h"
+#include "skse/string.h"
 
 namespace reflection { namespace binding {
+
+    template <typename T>
+    class rbArray
+    {
+    public:
+        RE::BSScript::Array      *arr = nullptr;
+        UInt32 Length() const                           { return arr != nullptr ? arr->size() : 0; }
+        void Get(T * dst, const UInt32 idx)     { *dst = RE::BSScript::UnpackValue<T>(&(*arr)[idx]); }
+        void Set(T * src, const UInt32 idx)
+        {
+            RE::BSScript::PackValue(&(*arr)[idx], *src);
+        }
+    };
 
     // traits placeholders
     template<class JType>
@@ -65,6 +82,43 @@ namespace reflection { namespace binding {
     template<> struct GetConv<int32_t> : StaticCastValueConverter<int32_t, SInt32>{};
     template<> struct GetConv<uint32_t> : StaticCastValueConverter<uint32_t, UInt32>{};
 
+    template <class T>
+    struct tes_type;
+
+    template <>
+    struct tes_type<int> {
+        using type = std::int32_t;
+    };
+
+    template <>
+    struct tes_type<float> {
+        using type = float;
+    };
+
+    template <>
+    struct tes_type<bool> {
+        using type = std::int32_t;
+    };
+
+    template<>
+    struct tes_type<skse::string_ref> {
+        using type = RE::BSFixedString;
+    };
+
+    template <>
+    struct tes_type<std::string> {
+        using type = RE::BSFixedString;
+    };
+
+    template <class T>
+    using tes_type_t = typename tes_type<T>::type;
+
+    template <class R>
+    tes_type_t<R> to_tes(R&& r)
+    {
+        return GetConv<R>::convert2Tes(std::forward<R>(r));
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
     template<class T>
@@ -76,7 +130,7 @@ namespace reflection { namespace binding {
         }
     };
 
-    template<class T> struct j2Str < VMArray<T> > {
+    template<class T> struct j2Str < rbArray<T> > {
         static function_parameter typeInfo() {
             std::string str(j2Str<T>::typeInfo().tes_type_name);
             str += "[]";
@@ -85,45 +139,9 @@ namespace reflection { namespace binding {
         }
     };
 
-    template<class T> struct j2Str < VMResultArray<T> > : j2Str < VMArray<T> > {};
+    template<class T> struct j2Str < std::vector<T> > : j2Str < rbArray<T> > {};
 
     //////////////////////////////////////////////////////////////////////////
-
-
-    template<size_t ParamCnt>
-    struct native_function_selector;
-
-#define MAKE_ME_HAPPY(N)\
-    template<> struct native_function_selector<N> {\
-        template<class... Params> using function = ::NativeFunction ## N <::StaticFunctionTag, Params...>;\
-    };
-
-    MAKE_ME_HAPPY(0);
-    MAKE_ME_HAPPY(1);
-    MAKE_ME_HAPPY(2);
-    MAKE_ME_HAPPY(3);
-    MAKE_ME_HAPPY(4);
-    MAKE_ME_HAPPY(5);
-    MAKE_ME_HAPPY(6);
-
-    template<size_t ParamCnt>
-    struct state_native_function_selector;
-
-#undef MAKE_ME_HAPPY
-#define MAKE_ME_HAPPY(N)\
-    template<> struct state_native_function_selector<N> {\
-        template<class State, class... Params> using function = ::NativeFunctionWithState ## N <State, Params...>; \
-    };
-
-    MAKE_ME_HAPPY(0);
-    MAKE_ME_HAPPY(1);
-    MAKE_ME_HAPPY(2);
-    MAKE_ME_HAPPY(3);
-    MAKE_ME_HAPPY(4);
-    MAKE_ME_HAPPY(5);
-    MAKE_ME_HAPPY(6);
-
-#undef  MAKE_ME_HAPPY
 
     template<class T>
     using remove_cref = typename std::remove_const<typename std::remove_reference<T>::type>::type;
@@ -167,7 +185,7 @@ namespace reflection { namespace binding {
 
             struct non_void_ret {
                 static convert_to_tes_type<R> tes_func(
-                    StaticFunctionTag* tag,
+                    RE::StaticFunctionTag* tag,
                     convert_to_tes_type<Params> ... params)
                 {
                     return GetConv<R>::convert2Tes(
@@ -178,9 +196,10 @@ namespace reflection { namespace binding {
                 }
             };
 
+
             struct void_ret {
                 static void tes_func(
-                    StaticFunctionTag* tag,
+                    RE::StaticFunctionTag* tag,
                     convert_to_tes_type<Params> ... params)
                 {
                     func(get_converter<Params>::convert2J(params, tag) ...);
@@ -192,22 +211,15 @@ namespace reflection { namespace binding {
                 void_ret,
                 non_void_ret>::type;
 
-            static void bind(const bind_args& args) {
-                args.registry.RegisterFunction
-                (
-                    new typename native_function_selector<sizeof...(Params)>::template function<
-                        convert_to_tes_type<R>, convert_to_tes_type<Params> ...>
-                        (
-                            args.functionName.c_str(),
-                            args.className.c_str(),
-                            &tes_func_holder::tes_func,
-                            &args.registry
-                        )
+            static void bind(const bind_args& args)
+            {
+                args.vm.RegisterFunction(
+                    args.functionName.c_str(),
+                    args.className.c_str(),
+                    &tes_func_holder::tes_func
                 );
             }
         };
-
-
     };
 
     template <class R, class State, class... Params>
@@ -262,25 +274,43 @@ namespace reflection { namespace binding {
                 void_ret,
                 non_void_ret>::type;
 
-            static void bind(const bind_args& args) {
-                args.registry.RegisterFunction
-                (
-                    new typename state_native_function_selector<sizeof...(Params)>::template function<
-                        State, convert_to_tes_type<R>, convert_to_tes_type<Params> ...>
-                        (
-                            args.functionName.c_str(),
-                            args.className.c_str(),
-                            &tes_func_holder::tes_func,
-                            &args.registry,
-                            *reinterpret_cast<State*>(args.shared_state)
-                        )
+            static void bind(const bind_args& args)
+            {
+                args.vm.RegisterFunction(
+                    args.functionName.c_str(),
+                    args.className.c_str(),
+                    &tes_func_holder::tes_func
                 );
             }
+
         };
 
 
     };
 
+    // Temporary replacement for old state proxy
+    template <auto Func>
+    struct disabled_state_function
+    {
+        using base = state_proxy<decltype(Func)>;
+
+        static auto func_ptr()
+        {
+            return Func;
+        }
+
+        static void bind(const bind_args&)
+        {
+            // intentionally do nothing
+        }
+
+        struct tes_func_holder
+        {
+            static void tes_func(...)
+            {
+            }
+        };
+    };
 
 #define CONCAT(x, y) CONCAT1 (x, y)
 #define CONCAT1(x, y) x##y
@@ -306,7 +336,7 @@ namespace reflection { namespace binding {
         {
             using namespace ::reflection;
 
-            static_assert( false == std::is_same<Binder::base::return_type, const char *>::value,
+            static_assert( false == std::is_same<typename Binder::base::return_type, const char *>::value,
                 "a trap for 'const char *' return types" );
 
             function_info metaF;
@@ -314,7 +344,16 @@ namespace reflection { namespace binding {
             metaF.param_list_func = &Binder::base::parameter_info;
              
             metaF.argument_names = (argument_names) ? (argument_names) : "";
-            metaF.setComment(comment);
+            if constexpr (std::is_convertible_v<String2, function_info::comment_generator>) {
+                metaF.setComment(static_cast<function_info::comment_generator>(comment));
+            } else if constexpr (std::is_convertible_v<String2, const char*>) {
+                metaF.setComment(comment);
+            } else if constexpr (std::is_same_v<std::decay_t<String2>, std::string>) { // std::is_convertible_v<String2, std::string>
+                metaF.setComment(comment.c_str());
+            } else {
+                static_assert(sizeof(String2) == 0, "Unsupported comment type");
+                metaF.setComment("Unsuppported");
+            }
             metaF.name = funcname;
             metaF.tes_func = &Binder::tes_func_holder::tes_func;
             metaF.c_func = static_cast<c_function>(Binder::func_ptr());
@@ -333,12 +372,18 @@ namespace reflection { namespace binding {
 #define REGISTERF2(func, args, comment)     REGISTERF(func, #func, args, comment)
 #define REGISTERF2_STATELESS(func, args, comment)     REGISTERF_STATELESS(func, #func, args, comment)
 
-#define REGISTERF_STATE(func, _funcname, _args, _comment)\
+#define REGISTERF_STATE(func, _funcname, _args, _comment) \
     ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
-        metaInfo, \
-        ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::magick<&func>(), \
-        _funcname, _args, _comment \
+         metaInfo, \
+         ::reflection::binding::disabled_state_function<&func>{}, \
+         _funcname, _args, _comment \
     };
+//#define REGISTERF_STATE(func, _funcname, _args, _comment)\
+// ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
+//     metaInfo, \
+//     ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
+//     _funcname, _args, _comment \
+// };
 
     struct papyrus_textblock_setter {
         explicit papyrus_textblock_setter(class_info& info, const papyrus_text_block& text) {

@@ -107,3 +107,10 @@ project so the build is done in a similar way as on the CI (github actions).
 
 That's it!
 
+### NOTE for VR users
+Original code used old CommonLib tArray.
+CommonLibSSE-NG no longer exposes that type.
+RE::BSTArray is used here as a compatibility approximation.
+
+Layout compatibility for Skyrim VR has NOT been verified.
+VR support should currently be considered experimental.

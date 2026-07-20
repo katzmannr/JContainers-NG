@@ -1,3 +1,8 @@
+#pragma once
+
+#include "api_3/master.h"
+#include "api_3/tes_object.h"
+#include "api_3/tes_map.h"
 
 namespace tes_api_3 {
 
@@ -38,7 +43,7 @@ Usage example:
         REGISTERF(evalLua<SInt32>, "evalLuaInt", ARGNAMES "0" ARGNAMES_2, nullptr);
         REGISTERF(evalLua<skse::string_ref>, "evalLuaStr", ARGNAMES R"("")" ARGNAMES_2, nullptr);
         REGISTERF(evalLua<Handle>, "evalLuaObj", ARGNAMES "0" ARGNAMES_2, nullptr);
-        REGISTERF(evalLua<TESForm*>, "evalLuaForm", ARGNAMES "None" ARGNAMES_2, nullptr);
+        REGISTERF(evalLua<RE::TESForm*>, "evalLuaForm", ARGNAMES "None" ARGNAMES_2, nullptr);
 #undef ARGNAMES
 #undef ARGNAMES_2
 

@@ -1,13 +1,23 @@
 #pragma once
 
+#include "rw_mutex.h"
+#include "util/singleton.h"
+#include "object_base.h"
+#include "object/object_registry.h"
+#include "common/IPrefix.h"
+#include "common/IThread.h"
+#include "intrusive_ptr_serialization.hpp"
+
 #include <atomic>
 #include <deque>
-#include <boost\serialization\version.hpp>
-#include <boost\asio\io_service.hpp>
-#include <boost\asio\deadline_timer.hpp>
-#include "common\IThread.h"
-#include "util\util.h"
-#include "util\singleton.h"
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/deque.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <gtest/gtest.h>
+#include <memory>
 
 namespace collections {
 
@@ -45,15 +55,13 @@ namespace collections {
 #   endif
             }
         };
-
-        util::singleton<background_worker> g_background_worker{ [](){ return new background_worker(); } };
     }
 
 
     class object_registry;
 
     // The purpose of autorelease_queue (aqueue) is to temporarily own an object and increase an object's lifetime
-    class autorelease_queue : boost::noncopyable {
+    class autorelease_queue : boost::asio::noncopyable {
     public:
         typedef std::lock_guard<bshared_mutex> lock;
         typedef object_base::time_point time_point;
@@ -78,6 +86,7 @@ namespace collections {
         time_point _tickCounter;
         spinlock _queue_mutex;
         
+        std::unique_ptr<detail::background_worker> _backgroundWorker = std::make_unique<detail::background_worker>();
         boost::asio::deadline_timer _timer;
         std::mutex _timer_mutex;
         bool _timer_stopped = true;
@@ -148,7 +157,7 @@ namespace collections {
             : _registry(registry)
             , _queue()
             , _tickCounter(0)
-            , _timer(detail::g_background_worker.get()._io)
+            , _timer(_backgroundWorker->_io)
         {
             start();
             //jc_debug("aqueue created")
@@ -311,6 +320,8 @@ namespace collections {
         }
     };
 
+#ifdef TEST_COMPILATION_ENABLED
+
     TEST(autorelease_queue, time_wrapping)
     {
         auto max = (std::numeric_limits<autorelease_queue::time_point>::max)();
@@ -347,6 +358,8 @@ namespace collections {
         EXPECT_TRUE(a == autorelease_queue::time_subtract(c, b));
         EXPECT_TRUE(b == autorelease_queue::time_subtract(c, a));
     }
+
+#endif
 }
 
 BOOST_CLASS_VERSION(collections::autorelease_queue, 2);

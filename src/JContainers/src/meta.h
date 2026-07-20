@@ -5,7 +5,7 @@
 // It's assumed that meta class instance will reside in static memory only!
 template<class T, class Tag = void> class meta
 {
-    private: meta * const next;    // temporary publicly accessible
+    private: meta *next;    // temporary publicly accessible (mutable!)
     public: T info;
 
     public: class iterator {
@@ -45,12 +45,12 @@ template<class T, class Tag = void> class meta
         return getList();
     }
 
-    public: explicit meta(const T& info2) : info(info2), next(0) {
+    public: explicit meta(const T& info2) : info(info2), next(nullptr) {
         list& l = getList();
         if (!l.first)
             l.first = this;
         if (l.last)
-            const_cast<meta *>(l.last->next) = this;
+            l.last->next = this;
         l.last = this;
         ++l.count;
     }

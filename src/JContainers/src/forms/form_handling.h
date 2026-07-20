@@ -3,7 +3,9 @@
 #include <string>
 #include <cstdint>
 #include <optional>
-#include "skse/skse.h"
+#include "forms/form_id.h"
+#include <SKSE/SKSE.h>
+#include "skse/jc_skse.h"
 
 namespace forms 
 {
@@ -12,30 +14,30 @@ inline bool is_form_handle(FormHandle handle) {
     return ((uint64_t)handle >> 32) == 0x0000FFFF;
 }
 
-inline FormId form_handle_to_id(FormHandle handle) {
-    return static_cast<FormId>(handle);
+inline RE::FormID form_handle_to_id(FormHandle handle) {
+    return static_cast<RE::FormID>(handle);
 }
 
-inline FormHandle form_id_to_handle(FormId id) {
+inline FormHandle form_id_to_handle(RE::FormID id) {
     return (FormHandle)(0x0000ffff00000000 | (uint64_t)id);
 }
 
 /// Whether absolute form id is considered static (and not global/dynamic - bound to a plugin)
-inline bool is_static (FormId n) 
+inline bool is_static (RE::FormID n)
 {
     auto u32 = static_cast<std::uint32_t> (n);
     return (u32 & 0xff00'0000u) != 0xff00'0000u;
 }
 
 /// See if that absolute form id looks like originating from a light weight mod (*.esl)
-inline bool is_light (FormId n)
+inline bool is_light (RE::FormID n)
 {
     auto u32 = static_cast<std::uint32_t> (n);
     return (u32 & 0xff00'0000u) == 0xfe00'0000u;
 }
 
 /// Gets the relative, to its mod, index of a form id
-inline std::uint32_t local_id (FormId n) 
+inline std::uint32_t local_id (RE::FormID n)
 {
     auto u32 = static_cast<std::uint32_t> (n);
     return is_light (n) ? u32 & 0x0000'0fffu : u32 & 0x00ff'ffffu;
@@ -52,7 +54,7 @@ inline std::uint32_t local_id (FormId n)
  * @return the string or std::nullopt if a mod for the incoming static form was not found
  */
 
-inline std::optional<std::string> form_to_string (FormId n) 
+inline std::optional<std::string> form_to_string (RE::FormID n)
 {
     using namespace std;
 
@@ -65,17 +67,17 @@ inline std::optional<std::string> form_to_string (FormId n)
 
         if (is_light (n))
         {
-            mod = skse::loaded_light_mod_name (uint16_t ((u32 >> 12) & 0x0fffu));
+            mod = jc_skse::loaded_light_mod_name (uint16_t ((u32 >> 12) & 0x0fffu));
             u32 &= 0x0000'0fffu;
         }
         else
         {
-            mod = skse::loaded_mod_name (uint8_t (u32 >> 24));
+            mod = jc_skse::loaded_mod_name (uint8_t (u32 >> 24));
             u32 &= 0x00ff'ffffu;
         }
 
         if (!mod)
-            return nullopt;
+            return std::nullopt;
 
         s += mod->data ();
     }
@@ -110,19 +112,19 @@ inline bool is_form_string (const char* p)
  * @return the absolute form id, if any
  */
 
-inline std::optional<FormId> form_from_file (std::string_view const& file, std::uint32_t form)
+inline std::optional<RE::FormID> form_from_file (std::string_view const& file, std::uint32_t form)
 {
     using namespace std;
 
     if (file.empty ())
-        return FormId (0xff000000u | form);
+        return RE::FormID (0xff000000u | form);
 
-    if (optional<uint32_t> ndx = skse::form_from_file (file, form))
+    if (optional<uint32_t> ndx = jc_skse::form_from_file (file, form))
     {
-        return FormId (*ndx);
+        return RE::FormID (*ndx);
     }
 
-    return nullopt;
+    return std::optional<RE::FormID>{};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -145,7 +147,7 @@ inline std::optional<FormId> form_from_file (std::string_view const& file, std::
  * @return optional absolute form identifier, converted from the passed string.
  */
 
-inline std::optional<FormId> string_to_form (const char* pstr)
+inline std::optional<RE::FormID> string_to_form (const char* pstr)
 {
     using namespace std;
 

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "util/stl_ext.h"
-#include "skse/skse.h"
 #include "reflection/tes_binding.h"
-#include "collections/collections.h"
-#include "collections/context.h"
+#include "collections.h"
+#include "context.h"
+#include <SKSE/SKSE.h>
+#include "skse/jc_skse.h"
 
 namespace reflection { namespace binding {
 
@@ -43,12 +44,12 @@ namespace reflection { namespace binding {
     //////////////////////////////////////////////////////////////////////////
 
     template<> struct GetConv < FormId > {
-        typedef TESForm* tes_type;
-        static TESForm* convert2Tes(FormId id) {
-            return LookupFormByID((uint32_t)id);
+        typedef RE::TESForm* tes_type;
+        static RE::TESForm* convert2Tes(FormId id) {
+            return RE::TESForm::LookupByID((uint32_t)id);
         }
         template<class Any>
-        static FormId convert2J(const TESForm* form, const Any&) {
+        static FormId convert2J(const RE::TESForm* form, const Any&) {
             return form ? (FormId)form->formID : FormId::Zero;
         }
     };
@@ -56,21 +57,21 @@ namespace reflection { namespace binding {
     /////////////////
 
     template<> struct GetConv < forms::form_ref > {
-        typedef TESForm* tes_type;
-        static TESForm* convert2Tes(const forms::form_ref& id) {
-            return skse::lookup_form(id.get());
+        typedef RE::TESForm* tes_type;
+        static RE::TESForm* convert2Tes(const forms::form_ref& id) {
+            return jc_skse::lookup_form(id.get());
         }
-        static forms::form_ref convert2J(const TESForm* form, tes_context& ctx) {
+        static forms::form_ref convert2J(const RE::TESForm* form, tes_context& ctx) {
             return make_weak_form_id(form, ctx);
         }
     };
 
     template<> struct GetConv < forms::form_ref_lightweight > {
-        typedef TESForm* tes_type;
-        static TESForm* convert2Tes(const forms::form_ref_lightweight& id) {
-            return skse::lookup_form(id.get());
+        typedef RE::TESForm* tes_type;
+        static RE::TESForm* convert2Tes(const forms::form_ref_lightweight& id) {
+            return jc_skse::lookup_form(id.get());
         }
-        static forms::form_ref_lightweight convert2J(const TESForm* form ,tes_context& ctx) {
+        static forms::form_ref_lightweight convert2J(const RE::TESForm* form ,tes_context& ctx) {
             return make_lightweight_form_ref(form, ctx);
         }
     };

@@ -1,18 +1,19 @@
 #pragma once
 
 #include "common/IErrors.h"
+#include <cstdint>
 
 #pragma warning(disable: 4221)
 #include <cmath>
 
-typedef unsigned char		UInt8;		//!< An unsigned 8-bit integer value
-typedef unsigned short		UInt16;		//!< An unsigned 16-bit integer value
-typedef unsigned long		UInt32;		//!< An unsigned 32-bit integer value
-typedef unsigned long long	UInt64;		//!< An unsigned 64-bit integer value
-typedef signed char			SInt8;		//!< A signed 8-bit integer value
-typedef signed short		SInt16;		//!< A signed 16-bit integer value
-typedef signed long			SInt32;		//!< A signed 32-bit integer value
-typedef signed long long	SInt64;		//!< A signed 64-bit integer value
+typedef std::uint8_t		UInt8;		//!< An unsigned 8-bit integer value
+typedef std::uint16_t		UInt16;		//!< An unsigned 16-bit integer value
+typedef std::uint32_t		UInt32;		//!< An unsigned 32-bit integer value
+typedef std::uint64_t		UInt64;		//!< An unsigned 64-bit integer value
+typedef std::int8_t			SInt8;		//!< A signed 8-bit integer value
+typedef std::int16_t		SInt16;		//!< A signed 16-bit integer value
+typedef std::int32_t		SInt32;		//!< A signed 32-bit integer value
+typedef std::int64_t		SInt64;		//!< A signed 64-bit integer value
 typedef float				Float32;	//!< A 32-bit floating point value
 typedef double				Float64;	//!< A 64-bit floating point value
 
@@ -44,8 +45,8 @@ inline UInt64 Swap64(UInt64 in)
 {
 	UInt64	temp;
 
-	temp = Swap32(in);
-	temp <<= 32;
+    temp = Swap32(static_cast<UInt32>(in));
+    temp <<= static_cast<std::uint32_t>(32);
 	temp |= Swap32(in >> 32);
 
 	return temp;

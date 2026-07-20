@@ -38,7 +38,7 @@ void IPipeClient::Close(void)
 
 bool IPipeClient::ReadMessage(UInt8 * buf, UInt32 length)
 {
-	UInt32	bytesRead;
+    DWORD	bytesRead;
 
 	ReadFile(m_pipe, buf, length, &bytesRead, NULL);
 
@@ -51,7 +51,7 @@ bool IPipeClient::ReadMessage(UInt8 * buf, UInt32 length)
 
 bool IPipeClient::WriteMessage(IPipeServer::MessageHeader * msg)
 {
-	UInt32	bytesWritten;
+    DWORD	bytesWritten;
 	UInt32	length = sizeof(IPipeServer::MessageHeader) + msg->length;
 
 	WriteFile(m_pipe, msg, length, &bytesWritten, NULL);

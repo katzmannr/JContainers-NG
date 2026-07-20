@@ -1,18 +1,20 @@
 #pragma once
 
+#include <cstdint>
+
 #include <boost/variant.hpp>
 #include <string>
-#include <xutility>
 #include <boost/serialization/access.hpp>
 
+#include "RE/B/BSCoreTypes.h"
 #include "common/ITypes.h"
+#include <SKSE/SKSE.h>
+#include "skse/jc_skse.h"
 #include "object/object_base.h"
-#include "skse/skse.h"
-#include "skse/string.h"
 
 #include "forms/form_id.h"
 #include "forms/form_observer.h"
-#include "collections/collections.h"
+#include "skse/string.h"
 
 
 namespace collections {
@@ -33,7 +35,7 @@ namespace collections {
     public:
         typedef boost::blank blank;
         typedef Float32 Real;
-        typedef boost::variant<boost::blank, SInt32, Real, form_ref, internal_object_ref, std::string> variant;
+        using variant = std::variant<boost::blank, std::int32_t, item::Real, form_ref, internal_object_ref, std::string>;
 
     private:
         variant _var;
@@ -53,7 +55,7 @@ namespace collections {
 
     private:
         static_assert(std::is_same<
-            boost::variant<boost::blank, SInt32, Real, form_ref, internal_object_ref, std::string>,
+            std::variant<boost::blank, SInt32, Real, form_ref, internal_object_ref, std::string>,
             variant
         >::value, "update _user2variant code below");
 
@@ -84,7 +86,7 @@ namespace collections {
     public:
 
         void u_nullifyObject() {
-            if (auto ref = boost::get<internal_object_ref>(&_var)) {
+            if (auto ref = std::get_if<internal_object_ref>(&_var)) {
                 ref->jc_nullify();
             }
         }
@@ -111,19 +113,21 @@ namespace collections {
         }
 
         template<class T> bool is_type() const {
-            return boost::get<T>(&_var) != nullptr;
+            return std::get_if<T>(&_var) != nullptr;
         }
 
         item_type type() const {
-            return item_type(_var.which() + item_type::none);
+            return static_cast<item_type>(
+                _var.index() + static_cast<std::size_t>(item_type::none)
+                );
         }
 
         template<class T> user2variant_t<T>* get() {
-            return boost::get<user2variant_t<T>>(&_var);
+            return std::get_if<user2variant_t<T>>(&_var);
         }
 
         template<class T> const user2variant_t<T>* get() const {
-            return boost::get<user2variant_t<T>>(&_var);
+            return std::get_if<user2variant_t<T>>(&_var);
         }
 
         //////////////////////////////////////////////////////////////////////////
@@ -139,18 +143,18 @@ namespace collections {
         //////////////////////////////////////////////////////////////////////////
 
 
-        explicit item(Real val) : _var(val) {}
-        explicit item(double val) : _var((Real)val) {}
-        explicit item(SInt32 val) : _var(val) {}
-        explicit item(int val) : _var((SInt32)val) {}
-        explicit item(bool val) : _var((SInt32)val) {}
-        explicit item(const form_ref& id) : _var(id) {}
-        explicit item(form_ref&& id) : _var(std::move(id)) {}
+        explicit item(Real val) : _var(variant(val)) {}
+        explicit item(double val) : _var(static_cast<item::Real>(val)) {}
+        explicit item(std::int32_t val) : _var(variant(val)) {}
+        explicit item(long val) : _var(static_cast<std::int32_t>(val)) {}
+        explicit item(bool val) : _var(static_cast<std::int32_t>(val)) {}
+        explicit item(const form_ref& id) : _var(variant(id)) {}
+        explicit item(form_ref&& id) : _var(std::move(variant(id))) {}
 
-        explicit item(object_base& o) : _var(o) {}
+        explicit item(object_base& o) : _var(variant(o)) {}
 
-        explicit item(const std::string& val) : _var(val) {}
-        explicit item(std::string&& val) : _var(std::move(val)) {}
+        explicit item(const std::string& val) : _var(variant(val)) {}
+        explicit item(std::string&& val) : _var(std::move(variant(val))) {}
 
         // the Item is none if the pointers below are zero:
         explicit item(const char * val) {
@@ -167,7 +171,7 @@ namespace collections {
         }
 
         item& operator = (unsigned int val) { _var = (SInt32)val; return *this; }
-        item& operator = (int val) { _var = (SInt32)val; return *this; }
+        item& operator = (long val) { _var = (SInt32)val; return *this; }
         item& operator = (bool val) { _var = (SInt32)val; return *this; }
         item& operator = (SInt32 val) { _var = val; return *this; }
         item& operator = (Real val) { _var = val; return *this; }
@@ -204,55 +208,55 @@ namespace collections {
         }
 
         object_base *object() const {
-            if (auto ref = boost::get<internal_object_ref>(&_var)) {
+            if (auto ref = std::get_if<internal_object_ref>(&_var)) {
                 return ref->get();
             }
             return nullptr;
         }
 
         Real fltValue() const {
-            if (auto val = boost::get<item::Real>(&_var)) {
+            if (auto val = std::get_if<item::Real>(&_var)) {
                 return *val;
             }
-            else if (auto val = boost::get<SInt32>(&_var)) {
-                return *val;
+            else if (auto val = std::get_if<SInt32>(&_var)) {
+                return static_cast<Real>(*val);
             }
             return 0.f;
         }
 
         SInt32 intValue() const {
-            if (auto val = boost::get<SInt32>(&_var)) {
+            if (auto val = std::get_if<SInt32>(&_var)) {
                 return *val;
             }
-            else if (auto val = boost::get<item::Real>(&_var)) {
-                return *val;
+            else if (auto val = std::get_if<item::Real>(&_var)) {
+                return static_cast<SInt32>(*val);
             }
             // ability to read forms as integer values. likely not needed anymore
-            /*else if (auto val = boost::get<form_ref>(&_var)) {
+            /*else if (auto val = std::get_if<form_ref>(&_var)) {
                 return static_cast<SInt32>(val->get_raw());
             }*/
             return 0;
         }
 
         const char * strValue() const {
-            if (auto val = boost::get<std::string>(&_var)) {
+            if (auto val = std::get_if<std::string>(&_var)) {
                 return val->c_str();
             }
             return nullptr;
         }
 
-        TESForm * form() const {
-            return skse::lookup_form(formId());
+        RE::TESForm * form() const {
+            return jc_skse::lookup_form(formId());
         }
 
-        FormId formId() const {
-            if (auto val = boost::get<form_ref>(&_var)) {
+        RE::FormID formId() const {
+            if (auto val = std::get_if<form_ref>(&_var)) {
                 return val->get();
             }
-            return FormId::Zero;
+            return 0;
         }
 
-        class are_strict_equals : public boost::static_visitor<bool> {
+        class are_strict_equals {
         public:
 
             template <typename T, typename U>
@@ -271,7 +275,7 @@ namespace collections {
         };
 
         bool isEqual(const item& other) const {
-            return boost::apply_visitor(are_strict_equals(), _var, other._var);
+            return std::visit(are_strict_equals{}, _var, other._var);
         }
 
         bool isNull() const {
@@ -303,10 +307,10 @@ namespace collections {
 
         bool operator < (const item& other) const {
             const auto l = type(), r = other.type();
-            return l == r ? boost::apply_visitor(lesser_comparison(), _var, other._var) : (l < r);
+            return l == r ? std::visit(lesser_comparison{}, _var, other._var) : (l < r);
         }
     private:
-        class lesser_comparison : public boost::static_visitor < bool > {
+        class lesser_comparison {
         public:
 
             template <typename T, typename U>
@@ -340,7 +344,7 @@ namespace collections {
     }
 
     template<> inline std::string item::readAs<std::string>() const {
-        auto str = boost::get<std::string>(&_var);
+        auto str = std::get_if<std::string>(&_var);
         return str ? *str : std::string();
     }
 
@@ -354,7 +358,7 @@ namespace collections {
         return obj ? obj->uid() : Handle::Null;
     }
 
-    template<> inline TESForm * item::readAs<TESForm*>() const {
+    template<> inline RE::TESForm * item::readAs<RE::TESForm*>() const {
         return form();
     }
 
@@ -362,7 +366,7 @@ namespace collections {
         return object();
     }
 
-    template<> inline FormId item::readAs<FormId>() const {
+    template<> inline RE::FormID item::readAs<RE::FormID>() const {
         return formId();
     }
 

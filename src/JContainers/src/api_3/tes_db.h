@@ -1,3 +1,13 @@
+#pragma once
+
+#include "api_3/master.h"
+#include "api_3/tes_object.h"
+#include "api_3/tes_map.h"
+#include "collections/collections.h"
+#include "collections/context.h"
+#include "reflection/tes_binding.h"
+
+
 namespace tes_api_3 {
 
 /// Redefine in each logging module

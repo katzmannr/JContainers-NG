@@ -1,3 +1,14 @@
+#pragma once
+
+#include <collections/collections.h>
+#include <reflection/reflection.h>
+#include <collections/access.h>
+#include <collections/context.h>
+#include <gtest/gtest.h>
+
+#include "api_3/master.h"
+#include "reflection/reflection.h"
+#include "reflection/tes_binding.h"
 
 namespace tes_api_3 {
 
@@ -58,7 +69,7 @@ namespace tes_api_3 {
             T& newValue;
 
             T& operator()(T& oldValue, T& comparer) const {
-                if (d != comparer)
+                if (oldValue != comparer)
                     return newValue;
                 return oldValue;
             }
@@ -192,8 +203,8 @@ If @createMissingKeys is True, the function attemps to create missing @path elem
             EXPECT_EQ(result, value.expect_return);
 
             boost::optional<item> newValue = ca::get(obj, path);
-            EXPECT_NE(newValue, boost::none);
-            EXPECT_NOT_NIL(newValue->get<internal_item_type>());
+            EXPECT_EQ(newValue.has_value(), true);
+            EXPECT_NE((newValue->get<internal_item_type>()), nullptr);
             EXPECT_EQ(value.expect_new_value, *newValue->get<internal_item_type>());
 
             if (previousValue && previousValue->get<internal_item_type>()

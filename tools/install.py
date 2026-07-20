@@ -20,7 +20,6 @@ def makepath (*args):
 
 class JCLib(object):
 
-    suffix = ''
     name = ''
 
     def __init__(self, location):
@@ -114,37 +113,52 @@ def make_archive (dst, src):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    if len (sys.argv) < 3:
-        print ("Usage: install.py x64/[Release[VR|GOG]|Debug[VR|GOG]] [64|VR|GOG]")
-        exit (1)
+    try:
+        if len (sys.argv) < 2:
+            print ("Usage: install.py x64/[Release|Debug]")
+            exit (1)
 
-    JCLib.suffix = sys.argv[2]
-    JCLib.name = "JContainers" + JCLib.suffix + ".dll"
+        JCLib.name = "JContainers" + ".dll"
 
-    config = Config (sys.argv[1])
+        config = Config (sys.argv[1])
 
-    print ("Setup Skyrim Mod tree...")
-    srcdata = os.path.join (ROOT, 'src', 'Data')
-    shutil.rmtree (config.dataDir, ignore_errors=True)
-    shutil.copytree (srcdata, config.dataDir)
-    shutil.copy2 (os.path.join (config.origin, JCLib.name), config.jcLibPath)
+        print ("Setup Skyrim Mod tree...")
+        srcdata = os.path.join (ROOT, 'src', 'Data')
 
-    print ("Generate and compile scripts...")
-    config.jcLib.produce_code (config.pscDir)
-    compile_scripts (config.pscDir, config.compiledDir)
+        src = os.path.join(config.origin, JCLib.name)
+        dst = config.jcLibPath
 
-    print ("Recreate distros...")
-    shutil.rmtree (DIST_DIR, ignore_errors = True)
+        print(f"origin     = {config.origin}")
+        print(f"JCLib.name = {JCLib.name}")
+        print(f"src        = {src}")
+        print(f"dst        = {dst}")
+        print(f"exists(src)= {os.path.exists(src)}")
+        print(f"exists(dst dir)= {os.path.exists(os.path.dirname(dst))}")
 
-    dst = os.path.join (DIST_DIR, 'Data')
-    shutil.copytree (config.dataDir, dst, \
-            ignore = shutil.ignore_patterns ('*.exp', '*.lib', 'test_data'))
-    make_archive (os.path.join (DIST_DIR, \
-            'JContainers' + JCLib.suffix + '-v' + config.jcLib.version ()), dst)
-    shutil.rmtree (dst, ignore_errors = True)
+        shutil.rmtree (config.dataDir, ignore_errors=True)
+        shutil.copytree (srcdata, config.dataDir)
+        shutil.copy2 (src, dst)
 
-    print ("API example skipped - its under revision...")
-    print ("All done.")
+        print ("Generate and compile scripts...")
+        config.jcLib.produce_code (config.pscDir)
+        compile_scripts (config.pscDir, config.compiledDir)
+
+        print ("Recreate distros...")
+        shutil.rmtree (DIST_DIR, ignore_errors = True)
+
+        dst = os.path.join (DIST_DIR, 'Data')
+        shutil.copytree (config.dataDir, dst, \
+                ignore = shutil.ignore_patterns ('*.exp', '*.lib', 'test_data'))
+        make_archive (os.path.join (DIST_DIR, \
+                'JContainers' + '-v' + config.jcLib.version ()), dst)
+        shutil.rmtree (dst, ignore_errors = True)
+
+        print ("API example skipped - its under revision...")
+        print ("All done.")
+    except Exception:
+            import traceback
+            traceback.print_exc()
+            raise
 
 #------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@
 #include <array>
 #include <boost/optional.hpp>
 
-#include "collections/collections.h"
+#include "collections.h"
 
 namespace collections {
 
@@ -53,7 +53,7 @@ namespace collections {
         }
 
         template<class Op>
-        static void doReadOp(array * obj, index pyIndex, Op& operation) {
+        static void doReadOp(array * obj, index pyIndex, Op&& operation) {
             if (!obj) {
                 return;
             }
@@ -66,7 +66,7 @@ namespace collections {
         }
 
         template<class Op, class Index, size_t N>
-        static void doReadOp(array * obj, const Index(&pyIndex)[N], Op& operation) {
+        static void doReadOp(array * obj, const Index(&pyIndex)[N], Op&& operation) {
             if (!obj) {
                 return;
             }
@@ -79,7 +79,7 @@ namespace collections {
         }
 
         template<class Op>
-        static void doWriteOp(array * obj, index pyIndex, Op& operation) {
+        static void doWriteOp(array * obj, index pyIndex, Op&& operation) {
             if (!obj) {
                 return;
             }
@@ -96,7 +96,7 @@ namespace collections {
     struct map_key_checker {
         static bool check(const std::string& s)  { return !s.empty(); }
         static bool check(const char *s)  { return s != nullptr && *s; }
-        static bool check(TESForm *f)  { return f != nullptr; }
+        static bool check(RE::TESForm *f)  { return f != nullptr; }
         static bool check(FormId f)  { return f != FormId::Zero; }
         static bool check(const form_ref& f)  { return f.is_not_expired(); }
         static bool check(const form_ref_lightweight& f)  { return f.is_not_expired(); }
@@ -110,19 +110,19 @@ namespace collections {
         ///typedef typename T::key_type key_type;
 
         template<class Op, class R,/* class RAlter, */class key_type>
-        static R doReadOpR(T * obj, const key_type& key, R default, Op& operation) {
+        static R doReadOpR(T * obj, const key_type& key, R rDefault, Op&& operation) {
             if (obj && key_checker::check(key)) {
                 object_lock g(obj);
                 item *itm = obj->u_get(key);
-                return itm ? operation(*itm) : default;
+                return itm ? operation(*itm) : rDefault;
             }
             else {
-                return default;
+                return rDefault;
             }
         }
 
         template<class Op, class key_type>
-        static void doReadOp(T * obj, const key_type& key, Op& operation) {
+        static void doReadOp(T * obj, const key_type& key, Op&& operation) {
             if (obj && key_checker::check(key)) {
                 object_lock g(obj);
                 item *itm = obj->u_get(key);
@@ -134,7 +134,7 @@ namespace collections {
 
         // force write into an item
         template<class Op, class key_type>
-        static void doWriteOp(T * obj, const key_type& key, Op& operation) {
+        static void doWriteOp(T * obj, const key_type& key, Op&& operation) {
             if (obj && key_checker::check(key)) {
                 object_lock g(obj);
                 item &itm = obj->u_get_or_create(key);
@@ -161,8 +161,8 @@ namespace collections {
         }
 
         struct equal_to {
-            template<class T, class D>
-            inline bool operator()(T& t, D& d) const {
+            template<class cT, class cD>
+            inline bool operator()(cT& t, cD& d) const {
                 return t == d;
             }
         };

@@ -1,11 +1,13 @@
+#include <utility>
 #include "SkyrimVRESLAPI.h"
+#include "RE/T/TESDataHandler.h"
 // Interface code based on https://github.com/adamhynek/higgs
 
 // Stores the API after it has already been fetched
 SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* g_SkyrimVRESLInterface = nullptr;
 
 // Fetches the interface to use from SkyrimVRESL
-SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(const PluginHandle& pluginHandle, SKSEMessagingInterface* messagingInterface)
+SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(const SKSE::PluginHandle& pluginHandle, const SKSE::MessagingInterface* messagingInterface)
 {
 	// If the interface has already been fetched, rturn the same object
 	if (g_SkyrimVRESLInterface) {
@@ -14,7 +16,7 @@ SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimV
 
 	// Dispatch a message to get the plugin interface from SkyrimVRESL
 	SkyrimVRESLMessage message;
-	messagingInterface->Dispatch(pluginHandle, SkyrimVRESLMessage::kMessage_GetInterface, (void*)&message, sizeof(SkyrimVRESLMessage*), SkyrimVRESLPluginName);
+    messagingInterface->Dispatch(SkyrimVRESLMessage::kMessage_GetInterface, (void*)&message, sizeof(SkyrimVRESLMessage*), SkyrimVRESLPluginName);
 	if (!message.GetApiFunction) {
 		return nullptr;
 	}
@@ -24,9 +26,9 @@ SkyrimVRESLPluginAPI::ISkyrimVRESLInterface001* SkyrimVRESLPluginAPI::GetSkyrimV
 	return g_SkyrimVRESLInterface;
 }
 
-const ModInfo* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modName)
+const RE::TESFile* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modName)
 {
-	DataHandler* dataHandler = DataHandler::GetSingleton();
+    RE::TESDataHandler* dataHandler = RE::TESDataHandler::GetSingleton();
 	if (dataHandler)
 	{
 		if (!g_SkyrimVRESLInterface)
@@ -35,7 +37,7 @@ const ModInfo* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modNam
 		}
 		else
 		{
-			const ModInfo* modInfo = dataHandler->LookupLoadedModByName(modName);
+            const RE::TESFile* modInfo = dataHandler->LookupLoadedModByName(modName);
 			if (modInfo == nullptr)
 			{
 				modInfo = SkyrimVRESLPluginAPI::LookupLoadedLightModByName(modName);
@@ -46,12 +48,12 @@ const ModInfo* SkyrimVRESLPluginAPI::LookupAllLoadedModByName(const char* modNam
 	return nullptr;
 }
 
-const ModInfo* SkyrimVRESLPluginAPI::LookupLoadedLightModByName(const char* modName)
+const RE::TESFile* SkyrimVRESLPluginAPI::LookupLoadedLightModByName(const char* modName)
 {
 	if (!g_SkyrimVRESLInterface)
 	{
-		DataHandler* dataHandler = DataHandler::GetSingleton();
-		if (dataHandler)
+        RE::TESDataHandler* dataHandler = RE::TESDataHandler::GetSingleton();
+        if (dataHandler)
 		{
 			return dataHandler->LookupLoadedModByName(modName);
 		}
@@ -65,14 +67,12 @@ const ModInfo* SkyrimVRESLPluginAPI::LookupLoadedLightModByName(const char* modN
 		const SkyrimVRESLPluginAPI::TESFileCollection* fileCollection = g_SkyrimVRESLInterface->GetCompiledFileCollection();
 		if (fileCollection != nullptr)
 		{
-			for (int i = 0; i < fileCollection->smallFiles.count; i++)
+			for (auto* smallFile : fileCollection->smallFiles)
 			{
-				ModInfo* smallFile = nullptr;
-				fileCollection->smallFiles.GetNthItem(i, smallFile);
 				if (smallFile != nullptr)
 				{
 					int modNameLength = strlen(modName);
-					if (modNameLength == strlen(smallFile->name) && _strnicmp(smallFile->name, modName, modNameLength) == 0)
+                    if (modNameLength == smallFile->GetFilename().length() && _strnicmp(smallFile->GetFilename().data(), modName, modNameLength) == 0)
 					{
 						return smallFile;
 					}

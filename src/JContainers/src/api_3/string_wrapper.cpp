@@ -3,25 +3,25 @@
 #include <assert.h>
 #include <vector>
 #include <numeric>
+#include <math.h>
 #include <algorithm>
 #include <cctype>
 #include <locale>
-#include <codecvt> //See _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+#include <codecvt>
+#include <optional>//See _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/optional.hpp>
 
-namespace collections {
+namespace tes_api_3 {
 
-using namespace std;
 namespace bs = boost;
 
 namespace {
 
-    typedef basic_string<char32_t, char_traits<char32_t>, allocator<char32_t>> wide_string;
+    typedef std::basic_string<char32_t, std::char_traits<char32_t>, std::allocator<char32_t>> wide_string;
     //typedef std::codecvt<char32_t, char, std::mbstate_t> wide_string_codec;
     typedef std::codecvt_utf8 < int32_t > wide_string_codec;
     typedef std::wstring_convert<wide_string_codec, int32_t > wide_string_converter;
@@ -40,20 +40,21 @@ namespace {
 
     struct line
     {
-        vector<wstring_range> words;
+        std::vector<wstring_range> words;
 
         int charCount() const {
-            return std::accumulate(words.begin(), words.end(), 0, [](int val, const wstring_range& str) {
+            auto result = std::accumulate(words.begin(), words.end(), 0, [](int val, const wstring_range& str) {
                 return val + (int)str.size();
             })
                 + (words.size() > 0 ? words.size() - 1 : 0);
+            return static_cast<int>(result);
         }
 
         void addWord(const wstring_range& word) {
             words.push_back(word);
         }
 
-        string toUTF8String(wide_string_converter& conv) const {
+        std::string toUTF8String(wide_string_converter& conv) const {
             std::string result;
             for (const auto& str : words) {
                 result.append(conv.to_bytes((int32_t*) str.begin(), (int32_t*) str.end()));
@@ -66,7 +67,7 @@ namespace {
 
     struct line_set
     {
-        vector<line> lines;
+        std::vector<line> lines;
         float idealCpl;
 
         line& operator[] (int idx) {
@@ -177,8 +178,8 @@ namespace {
     */
     /*
 
-        vector<int> sortedIndices() const {
-            vector<int> indices;
+        std::vector<int> sortedIndices() const {
+            std::vector<int> indices;
 
 
             int idx = 0;
@@ -201,8 +202,8 @@ namespace {
                 - lines.begin();
         }*/
 
-        vector<string> utf8Strings(wide_string_converter& conv) const {
-            vector<string> result;
+        std::vector<std::string> utf8Strings(wide_string_converter& conv) const {
+            std::vector<std::string> result;
 
             std::transform(lines.begin(), lines.end(), std::back_inserter(result), [&](const line& ln) {
                 return ln.toUTF8String(conv);
@@ -247,14 +248,14 @@ namespace {
         }
     }
 
-    vector<wstring_range> split_range(wstring_range::iterator beg, wstring_range::iterator end) {
-        vector<wstring_range> strings;
+    std::vector<wstring_range> split_range(wstring_range::iterator beg, wstring_range::iterator end) {
+        std::vector<wstring_range> strings;
 		return boost::split(strings, boost::make_iterator_range(beg, end), &is_blank_or_space);
     }
 
     line_set initialSet(const wstring_range& data, int charsPerLine = 40) {
 
-        float cpl = charactersPerLine(data.size(), charsPerLine);
+        float cpl = charactersPerLine(static_cast<int>(data.size()), charsPerLine);
 
         line_set result;
 
@@ -330,11 +331,11 @@ namespace {
 
 }
 
-boost::optional<vector<string>> wrap_string(const char *csource, int charsPerLine)
+std::optional<std::vector<std::string>> wrap_string(const char *csource, int charsPerLine)
 {
     if (!csource || charsPerLine <= 0) {
         // invalid input
-        return boost::none;
+        return std::nullopt;
     }
 
     wide_string_converter converter;
@@ -345,11 +346,11 @@ boost::optional<vector<string>> wrap_string(const char *csource, int charsPerLin
     }
     catch (const std::range_error&) {
         // invalid input - non UTF-8 source string probably
-        return boost::none;
+        return std::nullopt;
     }
 
     if (wstr.empty()) {
-        return vector<string>();
+        return std::vector<std::string>();
     }
 
     wstring_range range(&wstr.front(), &wstr.back() + 1);
@@ -368,10 +369,10 @@ boost::optional<vector<string>> wrap_string(const char *csource, int charsPerLin
 
         for (size_t i = 0; i < set.lines.size(); ++i) {
 
-            bool needIncr = set.charDiffIn(i) < 0;
+            bool needIncr = set.charDiffIn(static_cast<int>(i)) < 0;
 
             float oldDelta = set.meanSquare();
-            setOpr.doIncr(needIncr, i, set);
+            setOpr.doIncr(needIncr, static_cast<int>(i), set);
             float newDelta = set.meanSquare();
 
             if (newDelta > oldDelta) {

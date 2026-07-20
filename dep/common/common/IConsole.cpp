@@ -29,7 +29,7 @@ IConsole::~IConsole()
  */
 void IConsole::Write(char * buf)
 {
-	UInt32	charsWritten;
+    DWORD	charsWritten = 0;
 	
 	WriteConsole(outputHandle, buf, std::strlen(buf), &charsWritten, NULL);
 }
@@ -67,8 +67,8 @@ void IConsole::Write(char * buf, UInt32 bufLen, const char * fmt, ...)
  */
 char IConsole::ReadChar(void)
 {
-	char	data;
-	UInt32	charsRead;
+    char	data = 0;
+    DWORD	charsRead = 0;
 	
 	ReadConsole(inputHandle, &data, 1, &charsRead, NULL);
 	
@@ -84,7 +84,7 @@ char IConsole::ReadChar(void)
  */
 UInt32 IConsole::ReadBuf(char * buf, UInt32 len)
 {
-	UInt32	charsRead;
+    DWORD	charsRead;
 	
 	buf[0] = 0;
 	
@@ -95,7 +95,7 @@ UInt32 IConsole::ReadBuf(char * buf, UInt32 len)
 	while(!charsRead);
 	
 	int done = 0;
-	for(UInt32 i = charsRead - 1; (i > 0) && !done; i--)
+    for(DWORD i = charsRead - 1; (i > 0) && !done; i--)
 	{
 		switch(buf[i])
 		{
@@ -112,5 +112,5 @@ UInt32 IConsole::ReadBuf(char * buf, UInt32 len)
 	
 	buf[charsRead] = 0;
 	
-	return charsRead;
+    return static_cast<UInt32>(charsRead);
 }

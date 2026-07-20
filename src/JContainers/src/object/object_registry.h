@@ -1,5 +1,15 @@
-#include <hash_set>
-#include <hash_map>
+#pragma once
+
+#include "object/id_generator.h"
+#include "object/object_base.h"
+#include "rw_mutex.h"
+#include <unordered_set>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/unordered_set.hpp>
+#include <boost/serialization/unordered_map.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/version.hpp>
 
 namespace collections
 {

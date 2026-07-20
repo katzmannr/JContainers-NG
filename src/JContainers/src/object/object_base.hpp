@@ -1,3 +1,8 @@
+#include "object/object_registry.h"
+#include "object_base.h"
+#include "object_context.h"
+#include "autorelease_queue.h"
+
 namespace collections
 {
     void object_base::_registerSelf() {

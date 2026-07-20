@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
 project(JContainers LANGUAGES C CXX)
+#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ################################################################################
 # A current compiler is needed, set it via C++ Standard (stricter code handling)
@@ -76,6 +77,10 @@ if(MSVC)
     set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS}")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS}")
     set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS}")
+
+    # Flag necessary for CMake to enforce static builds
+    set(CMAKE_MSVC_RUNTIME_LIBRARY
+        MultiThreaded$<$<CONFIG:Debug>:Debug>)
 endif()
 
 ################################################################################
@@ -92,7 +97,8 @@ cmake_policy(SET CMP0167 OLD)
 #    serialization
 #    date_time
 #)
-#find_package(googletest REQUIRED)
+find_package(googletest CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 ################################################################################
 # Use solution folders feature
@@ -116,7 +122,7 @@ include(FetchContent)
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG v1.12.0   # match CommonLib requirement
+    GIT_TAG v1.10.0   # match CommonLib requirement
     OVERRIDE_FIND_PACKAGE
 )
 
@@ -143,6 +149,7 @@ set(RAPIDCSV_INCLUDE_DIRS
 # Boost Package provided by us, but include folders require find_package
 ################################################################################
 find_package(Boost CONFIG REQUIRED)
+find_package(rapidcsv CONFIG REQUIRED)
 
 ################################################################################
 # Sub-projects
@@ -169,12 +176,12 @@ add_subdirectory(src/DebugJC)
 ###############################################################################
 # C++ Linker Dependencies
 ###############################################################################
-#target_link_libraries(JContainersTests PRIVATE gtest)
 target_link_libraries(JContainers
     PRIVATE
         jc::common
         jansson
-        LuaJIT
+        LuaJIT::LuaJIT
+        CommonLibSSE::CommonLibSSE
         Boost::filesystem
         Boost::thread
         Boost::serialization

@@ -5,13 +5,13 @@
 #include <map>
 #include <jansson.h>
 #include <memory>
+#include <boost/filesystem.hpp>
 
-#include "boost/filesystem/path.hpp"
-#include "boost_extras.h"
-
+#include "collections/context.h"
 #include "forms/form_handling.h"
-#include "collections/collections.h"
-#include "collections/access.h"
+#include "collections.h"
+#include "object/object_base.h"
+#include "access.h"
 
 namespace collections {
 
@@ -189,7 +189,8 @@ namespace collections {
                     size_t index = 0;
                     json_t *value = nullptr;
                     json_array_foreach(val, index, value) {
-                        arr.u_push(self->make_item(value, arr, index));
+                        auto itm = self->make_item(value, arr, static_cast<int>(index));
+                        arr.u_push(std::move(itm));
                     }
                 }
                 void operator()(map& cnt) {
@@ -308,7 +309,7 @@ namespace collections {
                             a. lost info and convert it to FormZero
                             b. save info and convert it to string
                         */
-                        item = make_weak_form_id (forms::string_to_form (string).value_or (FormId::Zero), _context);
+                        item = make_weak_form_id (forms::string_to_form (string).value_or (0), _context);
                     }
                     else if (schedule_ref_resolving(string, container, item_key)) { // otherwise it's reference string?
                         ;
@@ -424,7 +425,7 @@ namespace collections {
                 void operator () (const array& cnt) {
                     size_t index = 0;
                     for (auto& itm : cnt.u_container()) {
-                        self->fill_key_info(itm, cnt, index++);
+                        self->fill_key_info(itm, cnt, static_cast<int>(index++));
                         json_array_append_new(object, self->create_value(itm));
                     }
                 }
@@ -515,7 +516,7 @@ namespace collections {
 
             } item_visitor = { *this };
 
-            json_ref val = item.var().apply_visitor(item_visitor);
+            json_ref val = std::visit(item_visitor, item.var());
             return val;
         }
 

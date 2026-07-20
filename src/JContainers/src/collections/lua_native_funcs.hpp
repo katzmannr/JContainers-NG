@@ -1,5 +1,13 @@
 #pragma once
 
+#include "collections/collections.h"
+#include "collections/context.h"
+#include "collections/functions.h"
+#include "collections/access.h"
+#include "collections/item.h"
+#include "reflection/reflection.h"
+#include "object/object_base.h"
+
 namespace lua {
     using array = collections::array;
     using map = collections::map;
@@ -36,11 +44,11 @@ namespace lua { namespace api {
     }
 
     JCToLuaValue JCToLuaValue_None() {
-        return{ item_type::no_item, { 0 }, 0 };
+        return{ collections::item_type::no_item, { 0 }, 0 };
     }
 
     cexport void JCToLuaValue_free(JCToLuaValue* v) {
-        if (v && v->type == item_type::string) {
+        if (v && v->type == collections::item_type::string) {
             free((void *)v->string);
         }
     }
@@ -70,7 +78,7 @@ namespace lua { namespace api {
         return CString_copy(origin.c_str(), origin.size());
     }
 
-    JCToLuaValue JCToLuaValue_fromItem(const item& itm) {
+    JCToLuaValue JCToLuaValue_fromItem(const collections::item& itm) {
         struct t : public boost::static_visitor < > {
             JCToLuaValue value;
 
@@ -79,7 +87,7 @@ namespace lua { namespace api {
                 value.stringLength = str.size();
             }
 
-            void operator ()(const item::Real& val) {
+            void operator ()(const collections::item::Real& val) {
                 value.real = val;
             }
 
@@ -100,34 +108,34 @@ namespace lua { namespace api {
         } converter;
 
         converter.value.type = itm.type();
-        itm.var().apply_visitor(converter);
+        std::visit(converter, itm.var());
         return converter.value;
     }
     
-    JCToLuaValue JCToLuaValue_fromItem(const item* itm) {
+    JCToLuaValue JCToLuaValue_fromItem(const collections::item* itm) {
         return itm ? JCToLuaValue_fromItem(*itm) : JCToLuaValue_None();
     }
 
-    void JCValue_fillItem(tes_context& context, const JCValue *v, item& itm) {
-        switch (v ? v->type : item_type::no_item) {
-        case item_type::form:
-            itm = collections::make_weak_form_id((FormId)v->form.___id, context);
+    void JCValue_fillItem(collections::tes_context& context, const JCValue *v, collections::item& itm) {
+        switch (v ? v->type : collections::item_type::no_item) {
+        case collections::item_type::form:
+            itm = collections::make_weak_form_id((RE::FormID)v->form.___id, context);
             break;
         // @see issue #40
-        case item_type::integer:
+        case collections::item_type::integer:
             itm = v->integer;
             break;
-        case item_type::real:
+        case collections::item_type::real:
             itm = v->real;
             break;
-        case item_type::object:
-            itm = (object_base *)v->object;
+        case collections::item_type::object:
+            itm = (collections::object_base *)v->object;
             break;
-        case item_type::string:
+        case collections::item_type::string:
             itm = v->string;
             break;
-        case item_type::no_item:
-        case item_type::none:
+        case collections::item_type::no_item:
+        case collections::item_type::none:
             itm = boost::blank();
             break;
         default:
@@ -175,16 +183,16 @@ namespace lua { namespace api {
     }
     template<class JCV> std::string JCValue_toString(const JCV &v) { return JCValue_toString(&v); }
 
-    cexport handle JValue_retain(object_base* obj) { return (obj ? obj->stack_retain(), obj : nullptr); }
-    cexport handle JValue_release(object_base* obj) { return (obj ? obj->stack_release(), nullptr : nullptr); }
-    cexport collections::CollectionType JValue_typeId(object_base* obj) { return (obj ? obj->_type : CollectionType::None); }
+    cexport handle JValue_retain(collections::object_base* obj) { return (obj ? obj->stack_retain(), obj : nullptr); }
+    cexport handle JValue_release(collections::object_base* obj) { return (obj ? obj->stack_release(), nullptr : nullptr); }
+    cexport collections::CollectionType JValue_typeId(collections::object_base* obj) { return (obj ? obj->_type : CollectionType::None); }
 
-    cexport JCToLuaValue JValue_solvePath(tes_context *context, object_base *obj, cstring path) {
+    cexport JCToLuaValue JValue_solvePath(collections::tes_context *context, collections::object_base *obj, cstring path) {
         namespace ca = collections::ca;
         assert(context && "context is null");
         auto value = JCToLuaValue_None();
         if (obj) {
-            ca::visit_value(*obj, path, ca::constant, [&value](const item &itm) {
+            ca::visit_value(*obj, path, ca::constant, [&value](const collections::item &itm) {
                 value = JCToLuaValue_fromItem(&itm);
             });
         }
@@ -210,7 +218,7 @@ namespace lua { namespace api {
     cexport void JArray_insert(array* obj, const JCValue* val, index key) {
         array_functions::doWriteOp(obj, key, [=](index idx) {
             auto& cnt = obj->u_container();
-            JCValue_fillItem(HACK_get_tcontext(*obj), val, *cnt.insert(cnt.begin() + idx, item()));
+            JCValue_fillItem(HACK_get_tcontext(*obj), val, *cnt.insert(cnt.begin() + idx, collections::item()));
         });
         //std::cout << "value assigned: " << JCValue_toString(val) << std::endl;
     }
@@ -223,31 +231,31 @@ namespace lua { namespace api {
     }
 
     cexport void JMap_setValue(map *obj, cstring key, const JCValue* val) {
-        map_functions::doWriteOp(obj, key, [obj, val](item& itm) { JCValue_fillItem(HACK_get_tcontext(*obj), val, itm); });
+        map_functions::doWriteOp(obj, key, [obj, val](collections::item& itm) { JCValue_fillItem(HACK_get_tcontext(*obj), val, itm); });
     }
 
     cexport JCToLuaValue JMap_getValue(map *obj, cstring key) {
-        return map_functions::doReadOpR(obj, key, JCToLuaValue_None(), [](item& itm) { return JCToLuaValue_fromItem(itm); });
+        return map_functions::doReadOpR(obj, key, JCToLuaValue_None(), [](collections::item& itm) { return JCToLuaValue_fromItem(itm); });
     }
     //////////////////////////////////////////////////////////////////////////
 
-    static_assert(sizeof FormId == sizeof CForm, "");
+    static_assert(sizeof(RE::FormID) == sizeof(CForm), "");
 
-    cexport FormId JFormMap_nextKey(const form_map *obj, FormId lastKey) {
+    cexport RE::FormID JFormMap_nextKey(const form_map *obj, RE::FormID lastKey) {
         form_ref next;
         formmap_functions::nextKey(obj, make_weak_form_id(lastKey, HACK_get_tcontext(*obj)), [&](const form_ref& key) { next = key; });
         return next.get();
     }
 
-    cexport void JFormMap_setValue(form_map *obj, FormId key, const JCValue* val) {
-        formmap_functions::doWriteOp(obj, make_weak_form_id(key, HACK_get_tcontext(*obj)), [obj, val](item& itm) { JCValue_fillItem(HACK_get_tcontext(*obj), val, itm); });
+    cexport void JFormMap_setValue(form_map *obj, RE::FormID key, const JCValue* val) {
+        formmap_functions::doWriteOp(obj, make_weak_form_id(key, HACK_get_tcontext(*obj)), [obj, val](collections::item& itm) { JCValue_fillItem(HACK_get_tcontext(*obj), val, itm); });
     }
 
-    cexport JCToLuaValue JFormMap_getValue(form_map *obj, FormId key) {
-        return formmap_functions::doReadOpR(obj, make_weak_form_id(key, HACK_get_tcontext(*obj)), JCToLuaValue_None(), [](item& itm) { return JCToLuaValue_fromItem(itm); });
+    cexport JCToLuaValue JFormMap_getValue(form_map *obj, RE::FormID key) {
+        return formmap_functions::doReadOpR(obj, make_weak_form_id(key, HACK_get_tcontext(*obj)), JCToLuaValue_None(), [](collections::item& itm) { return JCToLuaValue_fromItem(itm); });
     }
 
-    cexport void JFormMap_removeKey(form_map *obj, FormId key) {
+    cexport void JFormMap_removeKey(form_map *obj, RE::FormID key) {
         if (obj) {
             obj->erase(make_weak_form_id(key, HACK_get_tcontext(*obj)));
         }
@@ -255,7 +263,7 @@ namespace lua { namespace api {
 
     ////////////////////////////
 
-    cexport handle JDB_instance(tes_context *jc_context) {
+    cexport handle JDB_instance(collections::tes_context *jc_context) {
         return &jc_context->root();
     }
 }

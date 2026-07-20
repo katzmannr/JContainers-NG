@@ -1,5 +1,14 @@
+#pragma once
+
+#include "master.h"
+#include "tes_map.h"
+#include "tes_db.h"
 #include "boost_extras.h"
 #include <boost/algorithm/string.hpp>
+
+#include "collections/context.h"
+#include "forms/form_observer.h"
+#include "reflection/tes_binding.h"
 
 namespace tes_api_3 {
 
@@ -264,13 +273,13 @@ namespace tes_api_3 {
         const char *storageName = "forms";
 
         auto formStorage = tes_form_db::makeFormStorage(ctx, storageName);
-        EXPECT_NOT_NIL(formStorage);
+        EXPECT_NE((formStorage), nullptr);
         EXPECT_EQ(formStorage, tes_form_db::makeFormStorage(ctx, storageName));
 
-        auto fakeForm = make_lightweight_form_ref((FormId)0x14, ctx);
+        auto fakeForm = make_lightweight_form_ref((RE::FormID)0x14, ctx);
 
         auto entry = tes_form_db::makeMapEntry(ctx, storageName, fakeForm);
-        EXPECT_NOT_NIL(entry);
+        EXPECT_NE((entry), nullptr);
         EXPECT_EQ(entry, tes_form_db::makeMapEntry(ctx, storageName, fakeForm));
     }
 
@@ -279,13 +288,13 @@ namespace tes_api_3 {
     {
         tes_context_standalone ctx;
 
-        auto fakeForm = make_lightweight_form_ref((FormId)0x14, ctx);
+        auto fakeForm = make_lightweight_form_ref((RE::FormID)0x14, ctx);
 
         {
             const char *path = ".forms.object";
 
             auto ar = tes_array::objectWithSize(ctx, 0);
-            EXPECT_NOT_NIL(ar);
+            EXPECT_NE((ar), nullptr);
             tes_form_db::setItem(ctx, fakeForm, path, ar);
 
             EXPECT_TRUE(ar == tes_form_db::getItem<object_base*>(ctx, fakeForm, path));
@@ -295,7 +304,7 @@ namespace tes_api_3 {
             const char *path = ".forms.object2.key1";
 
             auto ar = tes_array::objectWithSize(ctx, 0);
-            EXPECT_NOT_NIL(ar);
+            EXPECT_NE((ar), nullptr);
             EXPECT_TRUE(tes_form_db::solveSetter<object_base*>(ctx, fakeForm, path, ar, true));
             EXPECT_TRUE(ar == tes_form_db::solveGetter<object_base*>(ctx, fakeForm, path));
         }

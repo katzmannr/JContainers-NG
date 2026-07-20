@@ -1,8 +1,14 @@
+#pragma once
+
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
-#include "util/singleton.h"
+#include "boost/archive/binary_oarchive.hpp"
+#include "boost/serialization/version.hpp"
+#include "collections/context.h"
 
+#include "iarchive_with_blob.h"
 #include "jansson.h"
+#include "util/atomic_serialization.h"
 
 BOOST_CLASS_VERSION(collections::tes_context, 2);
 
@@ -134,9 +140,6 @@ namespace collections {
     }
 
     void tes_context::write_to_stream(std::ostream& stream) {
-
-        stream.flags(stream.flags() | std::ios::binary);
-
         activity_stopper s{ *this };
         {
             // we can also cleanup objects here
