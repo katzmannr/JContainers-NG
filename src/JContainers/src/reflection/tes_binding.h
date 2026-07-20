@@ -347,7 +347,7 @@ namespace reflection { namespace binding {
             if constexpr (std::is_convertible_v<String2, function_info::comment_generator>) {
                 metaF.setComment(static_cast<function_info::comment_generator>(comment));
             } else if constexpr (std::is_convertible_v<String2, std::string>) {
-                metaF.setComment(std::string(comment));
+                metaF.setComment(comment.c_str());
             } else if constexpr (std::is_convertible_v<String2, const char*>) {
                 metaF.setComment(comment);
             } else {
