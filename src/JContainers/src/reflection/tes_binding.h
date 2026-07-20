@@ -346,10 +346,10 @@ namespace reflection { namespace binding {
             metaF.argument_names = (argument_names) ? (argument_names) : "";
             if constexpr (std::is_convertible_v<String2, function_info::comment_generator>) {
                 metaF.setComment(static_cast<function_info::comment_generator>(comment));
-            } else if constexpr (std::is_convertible_v<String2, std::string>) {
-                metaF.setComment(comment.c_str());
             } else if constexpr (std::is_convertible_v<String2, const char*>) {
                 metaF.setComment(comment);
+            } else if constexpr (std::is_same_v<std::decay_t<String2>, std::string>) { // std::is_convertible_v<String2, std::string>
+                metaF.setComment(comment.c_str());
             } else {
                 static_assert(sizeof(String2) == 0, "Unsupported comment type");
                 metaF.setComment("Unsuppported");
