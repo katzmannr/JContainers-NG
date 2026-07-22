@@ -159,8 +159,10 @@ namespace reflection { namespace binding {
     template <typename T> struct proxy;
     template <typename T> struct state_proxy;
 
-    template <class R, class... Params>
-    struct proxy<R(*)(Params ...)>
+    struct no_state {};
+
+    template<class Derived, class R, class State = no_state, class... Params>
+    struct proxy_common
     {
         static std::vector<type_info_func> parameter_info() {
             return {
@@ -170,146 +172,71 @@ namespace reflection { namespace binding {
         }
 
         using return_type = R;
-
-        static const bool is_stateless = true;
 
         // subtype @magick to workaround some msvc2013 bug
         template< R(*func)(Params ...) >
         struct magick {
 
-            using base = proxy;
-
             static auto func_ptr() -> decltype(func) {
                 return func;
             }
 
-            struct non_void_ret {
-                static convert_to_tes_type<R> tes_func(
+            struct runtime_callback {
+                runtime_callback(bool isStateless = false) : _isStateless(isStateless) {}
+                State _callbackState;
+                bool _isStateless;
+
+                convert_to_tes_type<R> operator() (
                     RE::StaticFunctionTag* tag,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    return GetConv<R>::convert2Tes(
-                        func(
-                            get_converter<Params>::convert2J(params, tag) ...
-                        )
-                    );
-                }
+                    convert_to_tes_type<Params>... params)
+                    {
+                        if constexpr (std::is_void_v<R>)
+                        {
+                            if (_isStateless) {
+                                func(get_converter<Params>::convert2J(params, tag) ...);
+                            } else {
+                                func(_callbackState, get_converter<Params>::convert2J(params, _callbackState) ...);
+                            }
+                            return;    // OK for void
+                        }
+                        else
+                        {
+                            return GetConv<R>::convert2Tes(
+                                func(
+                                    get_converter<Params>::convert2J(params, tag) ...
+                                    )
+                                );
+                        }
+                    }
             };
 
-
-            struct void_ret {
-                static void tes_func(
-                    RE::StaticFunctionTag* tag,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    func(get_converter<Params>::convert2J(params, tag) ...);
-                }
-            };
-
-            using tes_func_holder = typename std::conditional<
-                std::is_void<R>::value,
-                void_ret,
-                non_void_ret>::type;
 
             static void bind(const bind_args& args)
             {
+                runtime_callback runtimeCallback;
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),
-                    &tes_func_holder::tes_func
+                    runtimeCallback.runtime_callback::tes_func
                 );
             }
         };
+    };
+
+    template <class R, class... Params>
+    struct proxy<R(*)(Params ...)>
+        : proxy_common<proxy<R(*)(Params...)>, R, no_state, Params...>
+    {
+        static const bool is_stateless = true;
+        using base = proxy;
     };
 
     template <class R, class State, class... Params>
     struct state_proxy<R(*)(State&, Params ...)>
+        : proxy_common<proxy<R(*)(Params...)>, R, State, Params...>
     {
-        static std::vector<type_info_func> parameter_info() {
-            return {
-                &j2Str< convert_to_tes_type<R> >::typeInfo,
-                &j2Str< convert_to_tes_type<Params> >::typeInfo ...
-            };
-        }
-
-        using return_type = R;
-
         static const bool is_stateless = false;
-
-        // subtype @magick to workaround some msvc2013 bug
-        template< R(*func)(State&, Params ...) >
-        struct magick {
-
-            using base = state_proxy;
-
-            static auto func_ptr() -> decltype(func) {
-                return func;
-            }
-
-            struct non_void_ret {
-                static convert_to_tes_type<R> tes_func(
-                    State& state,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    return GetConv<R>::convert2Tes(
-                        func(
-                            state,
-                            get_converter<Params>::convert2J(params, state) ...
-                        )
-                    );
-                }
-            };
-
-            struct void_ret {
-                static void tes_func(
-                    State& state,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    func(state, get_converter<Params>::convert2J(params, state) ...);
-                }
-            };
-
-            using tes_func_holder = typename std::conditional<
-                std::is_void<R>::value,
-                void_ret,
-                non_void_ret>::type;
-
-            static void bind(const bind_args& args)
-            {
-                args.vm.RegisterFunction(
-                    args.functionName.c_str(),
-                    args.className.c_str(),
-                    &tes_func_holder::tes_func
-                );
-            }
-
-        };
-
-
-    };
-
-    // Temporary replacement for old state proxy
-    template <auto Func>
-    struct disabled_state_function
-    {
-        using base = state_proxy<decltype(Func)>;
-
-        static auto func_ptr()
-        {
-            return Func;
-        }
-
-        static void bind(const bind_args&)
-        {
-            // intentionally do nothing
-        }
-
-        struct tes_func_holder
-        {
-            static void tes_func(...)
-            {
-            }
-        };
+        using base = state_proxy;
     };
 
 #define CONCAT(x, y) CONCAT1 (x, y)
@@ -365,25 +292,20 @@ namespace reflection { namespace binding {
 
 #define REGISTERF REGISTERF_STATE
 #define REGISTERF_STATELESS(func, _funcname, _args, _comment)\
-    ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ metaInfo,\
-        ::reflection::binding::proxy<decltype(::reflection::binding::msvc_identity(&func))>::magick<&func>(), \
+    ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
+        metaInfo,\
+    ::reflection::binding::proxy<decltype(::reflection::binding::msvc_identity(&func))>::magick<&func>(), \
         _funcname, _args, _comment };
 
 #define REGISTERF2(func, args, comment)     REGISTERF(func, #func, args, comment)
 #define REGISTERF2_STATELESS(func, args, comment)     REGISTERF_STATELESS(func, #func, args, comment)
 
-#define REGISTERF_STATE(func, _funcname, _args, _comment) \
+#define REGISTERF_STATE(func, _funcname, _args, _comment)\
     ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
-         metaInfo, \
-         ::reflection::binding::disabled_state_function<&func>{}, \
-         _funcname, _args, _comment \
-    };
-//#define REGISTERF_STATE(func, _funcname, _args, _comment)\
-// ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
-//     metaInfo, \
-//     ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
-//     _funcname, _args, _comment \
-// };
+        metaInfo, \
+    ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
+        _funcname, _args, _comment \
+};
 
     struct papyrus_textblock_setter {
         explicit papyrus_textblock_setter(class_info& info, const papyrus_text_block& text) {
