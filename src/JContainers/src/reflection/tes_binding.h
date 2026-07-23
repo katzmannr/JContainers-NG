@@ -186,7 +186,11 @@ namespace reflection { namespace binding {
             }
 
             struct runtime_callback {
-                State _callbackState;
+                State &_callbackState;
+
+                runtime_callback(State &callbackState )
+                    : _callbackState(callbackState)
+                {};
 
                 convert_to_tes_type<R> operator() (
                     RE::StaticFunctionTag* tag,
@@ -233,7 +237,7 @@ namespace reflection { namespace binding {
 
             static void bind(const bind_args& args)
             {
-                runtime_callback runtimeCallback;
+                runtime_callback runtimeCallback(*reinterpret_cast<State*>(args.shared_state));
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),
