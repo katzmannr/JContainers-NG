@@ -180,17 +180,23 @@ namespace reflection { namespace binding {
 
             using return_type = R;
             using base = proxy_common;
+            inline static State* callbackState = nullptr;
+
+            static void initialize(State& state)
+            {
+                callbackState = &state;
+            }
 
             static auto func_ptr() -> decltype(func) {
                 return func;
             }
 
             struct runtime_callback {
-                State &_callbackState;
+                State& _callbackState;
 
-                runtime_callback(State &callbackState )
-                    : _callbackState(callbackState)
-                {};
+                runtime_callback(State& state)
+                    : _callbackState(state)
+                {}
 
                 convert_to_tes_type<R> operator() (
                     RE::StaticFunctionTag* tag,
@@ -231,13 +237,15 @@ namespace reflection { namespace binding {
                 RE::StaticFunctionTag* tag,
                 convert_to_tes_type<Params>... params)
             {
-                static runtime_callback cb{};
+                static runtime_callback cb(*callbackState);
                 return cb(tag, params...);
             }
 
             static void bind(const bind_args& args)
             {
-                runtime_callback runtimeCallback(*reinterpret_cast<State*>(args.shared_state));
+                auto& state = *reinterpret_cast<State*>(args.shared_state);
+                initialize(state);
+                runtime_callback runtimeCallback(state);
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),
