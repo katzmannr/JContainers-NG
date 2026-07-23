@@ -387,3 +387,11 @@ namespace collections
         void serialize(Archive & ar, const unsigned int version);
     };
 }
+
+namespace RE::BSScript
+{
+    template<>
+    struct is_alias_pointer<collections::array*> :
+        std::true_type
+    {};
+}

@@ -76,5 +76,21 @@ namespace reflection { namespace binding {
         }
     };
 
+    template<class T>
+    struct GetConv<rbArray<T>>
+    {
+        using tes_type = RE::BSScript::reference_array<T>;
+
+        static rbArray<T> convert2J(RE::BSScript::Array* arr, ...)
+        {
+            return rbArray<T>{arr};
+        }
+
+        static RE::BSScript::Array* convert2Tes(const rbArray<T>& arr)
+        {
+            return arr.arr;
+        }
+    };
+
 }
 }

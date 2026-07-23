@@ -6,6 +6,7 @@
 // Using only SKSE.h is NOT sufficient for NativeFunction and PackUnpack
 #include <RE/N/NativeFunction.h>
 #include <RE/P/PackUnpack.h>
+#include "collections/collections_types.h"
 #include "reflection/reflection.h"
 #include "common/ITypes.h"
 #include "skse/string.h"
@@ -230,6 +231,7 @@ namespace reflection { namespace binding {
 
             static void initialize(State& state)
             {
+                assert(!callback && "Function registered twice");
                 callback = std::make_unique<runtime_callback>(state);
             }
 
@@ -238,8 +240,7 @@ namespace reflection { namespace binding {
                 RE::StaticFunctionTag* tag,
                 convert_to_tes_type<Params>... params)
             {
-                // If below crashes, multiple same functions are registerd
-                assert(!callback);
+                assert(callback && "runtime callback not initialized");
                 return (*callback)(tag, params...);
             }
 
