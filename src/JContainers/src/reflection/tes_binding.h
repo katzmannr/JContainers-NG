@@ -237,7 +237,7 @@ namespace reflection { namespace binding {
         : proxy_common<proxy<R(*)(Params...)>, R, no_state, Params...>
     {
         using base = proxy;
-        using common = proxy_common<proxy<R(*)(no_state, Params...)>, R, no_state, Params...>;
+        using common = proxy_common<proxy<R(*)(Params...)>, R, no_state, Params...>;
         template<R(*func)(Params...)>
         struct magick : common::template magick_impl<func> {};
     };
