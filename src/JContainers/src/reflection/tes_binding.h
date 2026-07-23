@@ -171,20 +171,19 @@ namespace reflection { namespace binding {
             };
         }
 
-        using return_type = R;
-
         // subtype @magick to workaround some msvc2013 bug
-        template< R(*func)(Params ...) >
-        struct magick {
+        template< R(*func)(State&, Params ...) >
+        struct magick_impl {
+
+            using return_type = R;
+            using base = proxy_common;
 
             static auto func_ptr() -> decltype(func) {
                 return func;
             }
 
             struct runtime_callback {
-                runtime_callback(bool isStateless = false) : _isStateless(isStateless) {}
                 State _callbackState;
-                bool _isStateless;
 
                 convert_to_tes_type<R> operator() (
                     RE::StaticFunctionTag* tag,
@@ -192,7 +191,7 @@ namespace reflection { namespace binding {
                     {
                         if constexpr (std::is_void_v<R>)
                         {
-                            if (_isStateless) {
+                            if constexpr (std::is_same_v<State, no_state>) {
                                 func(get_converter<Params>::convert2J(params, tag) ...);
                             } else {
                                 func(_callbackState, get_converter<Params>::convert2J(params, _callbackState) ...);
@@ -201,11 +200,21 @@ namespace reflection { namespace binding {
                         }
                         else
                         {
-                            return GetConv<R>::convert2Tes(
-                                func(
-                                    get_converter<Params>::convert2J(params, tag) ...
-                                    )
-                                );
+                            if constexpr (std::is_same_v<State, no_state>) {
+                                return GetConv<R>::convert2Tes(
+                                    func(
+                                        get_converter<Params>::convert2J(params, tag) ...
+                                        )
+                                    );
+                            }
+                            else {
+                                return GetConv<R>::convert2Tes(
+                                    func(
+                                        _callbackState,
+                                        get_converter<Params>::convert2J(params, _callbackState) ...
+                                        )
+                                    );
+                            }
                         }
                     }
             };
@@ -217,7 +226,7 @@ namespace reflection { namespace binding {
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),
-                    runtimeCallback.runtime_callback::tes_func
+                    runtimeCallback
                 );
             }
         };
@@ -227,16 +236,20 @@ namespace reflection { namespace binding {
     struct proxy<R(*)(Params ...)>
         : proxy_common<proxy<R(*)(Params...)>, R, no_state, Params...>
     {
-        static const bool is_stateless = true;
         using base = proxy;
+        using common = proxy_common<proxy<R(*)(no_state, Params...)>, R, no_state, Params...>;
+        template<R(*func)(Params...)>
+        struct magick : common::template magick_impl<func> {};
     };
 
     template <class R, class State, class... Params>
     struct state_proxy<R(*)(State&, Params ...)>
         : proxy_common<proxy<R(*)(Params...)>, R, State, Params...>
     {
-        static const bool is_stateless = false;
         using base = state_proxy;
+        using common = proxy_common<proxy<R(*)(State, Params...)>, R, State, Params...>;
+        template<R(*func)(State&, Params...)>
+        struct magick : common::template magick_impl<func> {};
     };
 
 #define CONCAT(x, y) CONCAT1 (x, y)
