@@ -172,7 +172,7 @@ namespace reflection { namespace binding {
         }
 
         // subtype @magick to workaround some msvc2013 bug
-        template< R(*func)(State&, Params ...) >
+        template<auto func>
         struct magick_impl {
 
             using return_type = R;
@@ -247,7 +247,7 @@ namespace reflection { namespace binding {
         : proxy_common<proxy<R(*)(Params...)>, R, State, Params...>
     {
         using base = state_proxy;
-        using common = proxy_common<proxy<R(*)(State, Params...)>, R, State, Params...>;
+        using common = proxy_common<proxy<R(*)(State&, Params...)>, R, State, Params...>;
         template<R(*func)(State&, Params...)>
         struct magick : common::template magick_impl<func> {};
     };
@@ -282,7 +282,7 @@ namespace reflection { namespace binding {
             function_info metaF;
             metaF.registrator = &Binder::bind;
             metaF.param_list_func = &Binder::base::parameter_info;
-             
+
             metaF.argument_names = (argument_names) ? (argument_names) : "";
             if constexpr (std::is_convertible_v<String2, function_info::comment_generator>) {
                 metaF.setComment(static_cast<function_info::comment_generator>(comment));
