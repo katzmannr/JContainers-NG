@@ -171,6 +171,9 @@ namespace reflection { namespace binding {
             };
         }
 
+        static constexpr bool is_stateless =
+            std::is_same_v<State, no_state>;
+
         // subtype @magick to workaround some msvc2013 bug
         template<auto func>
         struct magick_impl {
@@ -219,6 +222,14 @@ namespace reflection { namespace binding {
                     }
             };
 
+            // Revive interface for external access to callback
+            static convert_to_tes_type<R> tes_func(
+                RE::StaticFunctionTag* tag,
+                convert_to_tes_type<Params>... params)
+            {
+                static runtime_callback cb{};
+                return cb(tag, params...);
+            }
 
             static void bind(const bind_args& args)
             {
@@ -276,7 +287,7 @@ namespace reflection { namespace binding {
         {
             using namespace ::reflection;
 
-            static_assert( false == std::is_same<typename Binder::base::return_type, const char *>::value,
+            static_assert( false == std::is_same<typename Binder::return_type, const char *>::value,
                 "a trap for 'const char *' return types" );
 
             function_info metaF;
@@ -295,7 +306,7 @@ namespace reflection { namespace binding {
                 metaF.setComment("Unsuppported");
             }
             metaF.name = funcname;
-            metaF.tes_func = &Binder::tes_func_holder::tes_func;
+            metaF.tes_func = &Binder::tes_func;
             metaF.c_func = static_cast<c_function>(Binder::func_ptr());
             metaF._stateless = Binder::base::is_stateless;
 
