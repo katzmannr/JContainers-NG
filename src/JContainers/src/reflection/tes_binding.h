@@ -17,7 +17,7 @@ namespace reflection { namespace binding {
     class rbArray
     {
     public:
-        RE::BSScript::Array      *arr = nullptr;
+        RE::BSScript::reference_array<T> arr;
         UInt32 Length() const                           { return arr != nullptr ? arr->size() : 0; }
         void Get(T * dst, const UInt32 idx)     { *dst = RE::BSScript::UnpackValue<T>(&(*arr)[idx]); }
         void Set(T * src, const UInt32 idx)
