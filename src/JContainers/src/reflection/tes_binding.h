@@ -241,7 +241,8 @@ namespace reflection { namespace binding {
                 convert_to_tes_type<Params>... params)
             {
                 assert(callback && "runtime callback not initialized");
-                return (*callback)(tag, params...);
+                // Papyrus reference_array is move-only in CommonLib; do not copy it
+                return (*callback)(tag, std::move(params)...);
             }
 
             static void bind(const bind_args& args)
