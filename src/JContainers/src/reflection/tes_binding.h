@@ -18,11 +18,17 @@ namespace reflection { namespace binding {
     {
     public:
         RE::BSScript::reference_array<T> arr;
-        UInt32 Length() const                           { return arr != nullptr ? arr->size() : 0; }
-        void Get(T * dst, const UInt32 idx)     { *dst = RE::BSScript::UnpackValue<T>(&(*arr)[idx]); }
-        void Set(T * src, const UInt32 idx)
+        UInt32 Length() const
         {
-            RE::BSScript::PackValue(&(*arr)[idx], *src);
+            return static_cast<UInt32>(arr.size());
+        }
+        void Get(T* dst, UInt32 idx)
+        {
+            *dst = arr[idx];
+        }
+        void Set(const T* src, UInt32 idx)
+        {
+            arr[idx] = *src;
         }
     };
 

@@ -83,7 +83,7 @@ namespace reflection { namespace binding {
 
         static rbArray<T> convert2J(RE::BSScript::Array* arr, ...)
         {
-            return rbArray<T>{arr};
+            return { RE::BSScript::reference_array<T>{arr} };
         }
 
         static RE::BSScript::Array* convert2Tes(const rbArray<T>& arr)
