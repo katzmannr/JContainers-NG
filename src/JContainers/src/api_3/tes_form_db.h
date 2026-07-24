@@ -100,7 +100,7 @@ namespace tes_api_3 {
             return name && *name;
         }
 
-        static void setEntry(tes_context& ctx, const char *storageName, key_cref formKey, object_stack_ref& entry)
+        static void setEntry(tes_context& ctx, const char *storageName, key_cref formKey, object_stack_ref entry)
         {
             JC_LOG_API ("%s, ..., ...", storageName ? storageName : "");
 
