@@ -9,4 +9,11 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(googletest)
+
+if(TARGET GTest::gtest)
+    message(STATUS "GTest target exists")
+else()
+    message(FATAL_ERROR "GTest target missing")
+endif()
+
 unset(CMAKE_POLICY_VERSION_MINIMUM)
