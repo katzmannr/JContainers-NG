@@ -6,22 +6,41 @@
 // Using only SKSE.h is NOT sufficient for NativeFunction and PackUnpack
 #include <RE/N/NativeFunction.h>
 #include <RE/P/PackUnpack.h>
+#include "collections/collections_types.h"
+#include "collections/context.h"
 #include "reflection/reflection.h"
 #include "common/ITypes.h"
 #include "skse/string.h"
 
 namespace reflection { namespace binding {
 
+    // Wrapper replacement for old VMArray style arrays
     template <typename T>
     class rbArray
     {
     public:
-        RE::BSScript::Array      *arr = nullptr;
-        UInt32 Length() const                           { return arr != nullptr ? arr->size() : 0; }
-        void Get(T * dst, const UInt32 idx)     { *dst = RE::BSScript::UnpackValue<T>(&(*arr)[idx]); }
-        void Set(T * src, const UInt32 idx)
+        rbArray(RE::BSScript::reference_array<T>&& a)
+            : arr(std::move(a))
+        {}
+        rbArray(rbArray&&) = default;
+        rbArray& operator=(rbArray&&) = default;
+
+        rbArray(const rbArray&) = delete;
+        rbArray& operator=(const rbArray&) = delete;
+
+        // Ownership is transferred in GetConv!
+        RE::BSScript::reference_array<T> arr;
+        UInt32 Length() const
         {
-            RE::BSScript::PackValue(&(*arr)[idx], *src);
+            return static_cast<UInt32>(arr.size());
+        }
+        void Get(T* dst, UInt32 idx)
+        {
+            *dst = arr[idx];
+        }
+        void Set(const T* src, UInt32 idx)
+        {
+            arr[idx] = *src;
         }
     };
 
@@ -139,6 +158,22 @@ namespace reflection { namespace binding {
         }
     };
 
+    template<class T>
+    struct j2Str<RE::BSScript::reference_array<T>>
+    {
+        static function_parameter typeInfo()
+        {
+            std::string str(j2Str<T>::typeInfo().tes_type_name);
+            str += "[]";
+
+            function_parameter info = {
+                str,
+                "values"
+            };
+            return info;
+        }
+    };
+
     template<class T> struct j2Str < std::vector<T> > : j2Str < rbArray<T> > {};
 
     //////////////////////////////////////////////////////////////////////////
@@ -159,8 +194,37 @@ namespace reflection { namespace binding {
     template <typename T> struct proxy;
     template <typename T> struct state_proxy;
 
-    template <class R, class... Params>
-    struct proxy<R(*)(Params ...)>
+    struct no_state {};
+
+    template<typename>
+    struct function_traits;
+
+    // Function trait for function (auto func) inspection
+    template<typename R, typename... Args>
+    struct function_traits<R(*)(Args...)>
+    {
+        using return_type = R;
+
+        template<std::size_t I>
+        using arg = std::tuple_element_t<I, std::tuple<Args...>>;
+
+        static constexpr std::size_t argc = sizeof...(Args);
+    };
+
+    template<typename F>
+    struct first_argument
+    {
+        using type = void;
+    };
+
+    template<typename R, typename A0, typename... A>
+    struct first_argument<R(*)(A0, A...)>
+    {
+        using type = A0;
+    };
+
+    template<class Derived, class R, class State = no_state, class... Params>
+    struct proxy_common
     {
         static std::vector<type_info_func> parameter_info() {
             return {
@@ -169,147 +233,135 @@ namespace reflection { namespace binding {
             };
         }
 
-        using return_type = R;
-
-        static const bool is_stateless = true;
+        static constexpr bool is_stateless =
+            std::is_same_v<State, no_state>;
 
         // subtype @magick to workaround some msvc2013 bug
-        template< R(*func)(Params ...) >
-        struct magick {
+        template<auto func>
+        struct magick_impl {
 
-            using base = proxy;
+            using return_type = R;
+            using base = proxy_common;
+
+            using traits = function_traits<decltype(func)>;
 
             static auto func_ptr() -> decltype(func) {
                 return func;
             }
 
-            struct non_void_ret {
-                static convert_to_tes_type<R> tes_func(
+            using first = first_argument<decltype(func)>::type;
+
+            static_assert(std::is_reference_v<first> || is_stateless);
+            static_assert(
+                std::is_same_v<
+                    std::remove_reference_t<first>,
+                    collections::tes_context> || is_stateless);
+
+            struct runtime_callback {
+                State& _callbackState;
+
+                runtime_callback(State& state)
+                    : _callbackState(state)
+                {}
+
+                convert_to_tes_type<R> operator() (
                     RE::StaticFunctionTag* tag,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    return GetConv<R>::convert2Tes(
-                        func(
-                            get_converter<Params>::convert2J(params, tag) ...
-                        )
-                    );
-                }
+                    convert_to_tes_type<Params>... params)
+                    {
+                        if constexpr (std::is_void_v<R>) {
+                            if constexpr (std::is_same_v<State, no_state>) {
+                                func(get_converter<Params>::convert2J(std::move(params), tag) ...);
+                            } else {
+                                func(_callbackState, get_converter<Params>::convert2J(std::move(params), _callbackState) ...);
+                            }
+                            return;
+                        } else {
+                            using first = typename first_argument<decltype(func)>::type;
+
+                            static constexpr bool first_is_state =
+                                std::is_same_v<
+                                    std::remove_cvref_t<first>,
+                                    std::remove_cvref_t<State>>;
+                            if constexpr (std::is_void_v<R>)
+                            {
+                                if constexpr (std::is_same_v<State, no_state>) {
+                                    func(get_converter<Params>::convert2J(params, tag) ...);
+                                } else {
+                                    func(_callbackState, get_converter<Params>::convert2J(std::move(params), _callbackState) ...);
+                                }
+                                return;    // OK for void
+                            }
+                            else
+                            {
+                                if constexpr (std::is_same_v<State, no_state>) {
+                                    return GetConv<R>::convert2Tes(
+                                        func(
+                                            get_converter<Params>::convert2J(std::move(params), tag) ...
+                                            )
+                                        );
+                                }
+                                else {
+                                    return GetConv<R>::convert2Tes(
+                                        func(
+                                            _callbackState,
+                                            get_converter<Params>::convert2J(std::move(params), _callbackState) ...
+                                            )
+                                        );
+                                }
+                            }
+                        }
+                    }
             };
 
+            inline static std::unique_ptr<runtime_callback> callback;
 
-            struct void_ret {
-                static void tes_func(
-                    RE::StaticFunctionTag* tag,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    func(get_converter<Params>::convert2J(params, tag) ...);
-                }
-            };
+            static void initialize(State& state)
+            {
+                assert(!callback && "Function registered twice");
+                callback = std::make_unique<runtime_callback>(state);
+            }
 
-            using tes_func_holder = typename std::conditional<
-                std::is_void<R>::value,
-                void_ret,
-                non_void_ret>::type;
+            // Revive interface for external access to callback
+            static convert_to_tes_type<R> tes_func(
+                RE::StaticFunctionTag* tag,
+                convert_to_tes_type<Params>... params)
+            {
+                assert(callback && "runtime callback not initialized");
+                // reference_array is move-only in CommonLib; do not copy it
+                return (*callback)(tag, std::move(params)...);
+            }
 
             static void bind(const bind_args& args)
             {
+                auto& state = *reinterpret_cast<State*>(args.shared_state);
+                initialize(state);
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),
-                    &tes_func_holder::tes_func
+                    &tes_func
                 );
             }
         };
+    };
+
+    template <class R, class... Params>
+    struct proxy<R(*)(Params ...)>
+        : proxy_common<proxy<R(*)(Params...)>, R, no_state, Params...>
+    {
+        using base = proxy;
+        using common = proxy_common<proxy<R(*)(Params...)>, R, no_state, Params...>;
+        template<R(*func)(Params...)>
+        struct magick : common::template magick_impl<func> {};
     };
 
     template <class R, class State, class... Params>
     struct state_proxy<R(*)(State&, Params ...)>
+        : proxy_common<proxy<R(*)(Params...)>, R, State, Params...>
     {
-        static std::vector<type_info_func> parameter_info() {
-            return {
-                &j2Str< convert_to_tes_type<R> >::typeInfo,
-                &j2Str< convert_to_tes_type<Params> >::typeInfo ...
-            };
-        }
-
-        using return_type = R;
-
-        static const bool is_stateless = false;
-
-        // subtype @magick to workaround some msvc2013 bug
-        template< R(*func)(State&, Params ...) >
-        struct magick {
-
-            using base = state_proxy;
-
-            static auto func_ptr() -> decltype(func) {
-                return func;
-            }
-
-            struct non_void_ret {
-                static convert_to_tes_type<R> tes_func(
-                    State& state,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    return GetConv<R>::convert2Tes(
-                        func(
-                            state,
-                            get_converter<Params>::convert2J(params, state) ...
-                        )
-                    );
-                }
-            };
-
-            struct void_ret {
-                static void tes_func(
-                    State& state,
-                    convert_to_tes_type<Params> ... params)
-                {
-                    func(state, get_converter<Params>::convert2J(params, state) ...);
-                }
-            };
-
-            using tes_func_holder = typename std::conditional<
-                std::is_void<R>::value,
-                void_ret,
-                non_void_ret>::type;
-
-            static void bind(const bind_args& args)
-            {
-                args.vm.RegisterFunction(
-                    args.functionName.c_str(),
-                    args.className.c_str(),
-                    &tes_func_holder::tes_func
-                );
-            }
-
-        };
-
-
-    };
-
-    // Temporary replacement for old state proxy
-    template <auto Func>
-    struct disabled_state_function
-    {
-        using base = state_proxy<decltype(Func)>;
-
-        static auto func_ptr()
-        {
-            return Func;
-        }
-
-        static void bind(const bind_args&)
-        {
-            // intentionally do nothing
-        }
-
-        struct tes_func_holder
-        {
-            static void tes_func(...)
-            {
-            }
-        };
+        using base = state_proxy;
+        using common = proxy_common<proxy<R(*)(State&, Params...)>, R, State, Params...>;
+        template<R(*func)(State&, Params...)>
+        struct magick : common::template magick_impl<func> {};
     };
 
 #define CONCAT(x, y) CONCAT1 (x, y)
@@ -336,13 +388,13 @@ namespace reflection { namespace binding {
         {
             using namespace ::reflection;
 
-            static_assert( false == std::is_same<typename Binder::base::return_type, const char *>::value,
+            static_assert( false == std::is_same<typename Binder::return_type, const char *>::value,
                 "a trap for 'const char *' return types" );
 
             function_info metaF;
             metaF.registrator = &Binder::bind;
             metaF.param_list_func = &Binder::base::parameter_info;
-             
+
             metaF.argument_names = (argument_names) ? (argument_names) : "";
             if constexpr (std::is_convertible_v<String2, function_info::comment_generator>) {
                 metaF.setComment(static_cast<function_info::comment_generator>(comment));
@@ -355,7 +407,7 @@ namespace reflection { namespace binding {
                 metaF.setComment("Unsuppported");
             }
             metaF.name = funcname;
-            metaF.tes_func = &Binder::tes_func_holder::tes_func;
+            metaF.tes_func = &Binder::tes_func;
             metaF.c_func = static_cast<c_function>(Binder::func_ptr());
             metaF._stateless = Binder::base::is_stateless;
 
@@ -365,25 +417,20 @@ namespace reflection { namespace binding {
 
 #define REGISTERF REGISTERF_STATE
 #define REGISTERF_STATELESS(func, _funcname, _args, _comment)\
-    ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ metaInfo,\
-        ::reflection::binding::proxy<decltype(::reflection::binding::msvc_identity(&func))>::magick<&func>(), \
+    ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
+        metaInfo,\
+    ::reflection::binding::proxy<decltype(::reflection::binding::msvc_identity(&func))>::magick<&func>(), \
         _funcname, _args, _comment };
 
 #define REGISTERF2(func, args, comment)     REGISTERF(func, #func, args, comment)
 #define REGISTERF2_STATELESS(func, args, comment)     REGISTERF_STATELESS(func, #func, args, comment)
 
-#define REGISTERF_STATE(func, _funcname, _args, _comment) \
+#define REGISTERF_STATE(func, _funcname, _args, _comment)\
     ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
-         metaInfo, \
-         ::reflection::binding::disabled_state_function<&func>{}, \
-         _funcname, _args, _comment \
-    };
-//#define REGISTERF_STATE(func, _funcname, _args, _comment)\
-// ::reflection::binding::function_registree CONCAT(_func_registree_, __LINE__){ \
-//     metaInfo, \
-//     ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
-//     _funcname, _args, _comment \
-// };
+        metaInfo, \
+    ::reflection::binding::state_proxy<decltype(::reflection::binding::msvc_identity(&func))>::template magick<&func>(), \
+        _funcname, _args, _comment \
+};
 
     struct papyrus_textblock_setter {
         explicit papyrus_textblock_setter(class_info& info, const papyrus_text_block& text) {

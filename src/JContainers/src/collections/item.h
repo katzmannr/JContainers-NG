@@ -166,7 +166,7 @@ namespace collections {
         explicit item(object_base *val) {
             *this = val;
         }
-        explicit item(const object_stack_ref &val) {
+        explicit item(const object_stack_ref val) {
             *this = val.get();
         }
 

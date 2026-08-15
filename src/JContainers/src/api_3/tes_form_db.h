@@ -100,7 +100,7 @@ namespace tes_api_3 {
             return name && *name;
         }
 
-        static void setEntry(tes_context& ctx, const char *storageName, key_cref formKey, object_stack_ref& entry)
+        static void setEntry(tes_context& ctx, const char *storageName, key_cref formKey, object_stack_ref entry)
         {
             JC_LOG_API ("%s, ..., ...", storageName ? storageName : "");
 
@@ -179,7 +179,7 @@ namespace tes_api_3 {
             "With 'createMissingKeys=true' it creates any missing path elements: JFormDB.solveIntSetter(formKey, \".frostfall.keyB\", 10, true) creates {frostfall: {keyB: 10}} structure");
         REGISTERF(solveSetter<SInt32>, "solveIntSetter", "fKey path value createMissingKeys=false", nullptr);
         REGISTERF(solveSetter<const char*>, "solveStrSetter", "fKey path value createMissingKeys=false", nullptr);
-        REGISTERF(solveSetter<object_stack_ref&>, "solveObjSetter", "fKey path value createMissingKeys=false", nullptr);
+        REGISTERF(solveSetter<object_stack_ref>, "solveObjSetter", "fKey path value createMissingKeys=false", nullptr);
         REGISTERF(solveSetter<form_ref>, "solveFormSetter", "fKey path value createMissingKeys=false", nullptr);
 
         static bool hasPath(tes_context& ctx, key_cref form, const char* path)
@@ -233,7 +233,7 @@ namespace tes_api_3 {
         REGISTERF(setItem<SInt32>, "setInt", "fKey key value", "creates key-value association. replaces existing value if any");
         REGISTERF(setItem<Float32>, "setFlt", "fKey key value", "");
         REGISTERF(setItem<const char *>, "setStr", "fKey key value", "");
-        REGISTERF(setItem<object_stack_ref&>, "setObj", "fKey key container", "");
+        REGISTERF(setItem<object_stack_ref>, "setObj", "fKey key container", "");
         REGISTERF(setItem<form_ref>, "setForm", "fKey key value", "");
     };
 

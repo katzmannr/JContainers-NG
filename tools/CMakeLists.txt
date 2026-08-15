@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
-
+# Get rid of overly annoying errors even though qmake is in PATH
+set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
+message(STATUS "MSVC-WINE-Toolchain environment")
+include(CMake/msvc-wine-toolchain.cmake)
 ################################################################################
 # Windows 10 is required. Do NOT increase this to Windows 11.
 ################################################################################
@@ -34,6 +37,10 @@ message("64bit architecture in use")
 if(NOT MSVC)
     message(WARNING "Compiler mismatch. Continue at your own risk.")
 else()
+    # This works with msvc-wine. Result is "1" and "MSVC"
+    message("MSVC=${MSVC}")
+    message("CMAKE_C_COMPILER_ID=${CMAKE_C_COMPILER_ID}")
+    message("CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
     add_compile_options(
         "$<$<COMPILE_LANGUAGE:CXX>:/EHsc>"
     )

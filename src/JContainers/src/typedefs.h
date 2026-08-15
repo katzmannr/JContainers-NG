@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <cstdarg>
 #include <type_traits>
 
 #   define STR(...)     __STR(__VA_ARGS__)
