@@ -4,6 +4,7 @@ set(CMAKE_SYSTEM_PROCESSOR AMD64)
 
 # Don't execute Windows binaries during try_compile.
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+#set(CMAKE_TRY_COMPILE_CONFIGURATION Release)
 
 # MSVC-Wine installation root
 set(MSVC_ROOT "$ENV{HOME}/msvc")
@@ -38,8 +39,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 # Don't try to run compiler tests
-set(CMAKE_C_COMPILER_WORKS TRUE)
-set(CMAKE_CXX_COMPILER_WORKS TRUE)
+# Only enable if compiler works and boost builds
+#set(CMAKE_C_COMPILER_WORKS TRUE)
+#set(CMAKE_CXX_COMPILER_WORKS TRUE)
 
 # Produce Windows executables
 set(CMAKE_EXECUTABLE_SUFFIX ".exe")

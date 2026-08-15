@@ -7,16 +7,28 @@
 #include <RE/N/NativeFunction.h>
 #include <RE/P/PackUnpack.h>
 #include "collections/collections_types.h"
+#include "collections/context.h"
 #include "reflection/reflection.h"
 #include "common/ITypes.h"
 #include "skse/string.h"
 
 namespace reflection { namespace binding {
 
+    // Wrapper replacement for old VMArray style arrays
     template <typename T>
     class rbArray
     {
     public:
+        rbArray(RE::BSScript::reference_array<T>&& a)
+            : arr(std::move(a))
+        {}
+        rbArray(rbArray&&) = default;
+        rbArray& operator=(rbArray&&) = default;
+
+        rbArray(const rbArray&) = delete;
+        rbArray& operator=(const rbArray&) = delete;
+
+        // Ownership is transferred in GetConv!
         RE::BSScript::reference_array<T> arr;
         UInt32 Length() const
         {
@@ -146,6 +158,22 @@ namespace reflection { namespace binding {
         }
     };
 
+    template<class T>
+    struct j2Str<RE::BSScript::reference_array<T>>
+    {
+        static function_parameter typeInfo()
+        {
+            std::string str(j2Str<T>::typeInfo().tes_type_name);
+            str += "[]";
+
+            function_parameter info = {
+                str,
+                "values"
+            };
+            return info;
+        }
+    };
+
     template<class T> struct j2Str < std::vector<T> > : j2Str < rbArray<T> > {};
 
     //////////////////////////////////////////////////////////////////////////
@@ -168,6 +196,33 @@ namespace reflection { namespace binding {
 
     struct no_state {};
 
+    template<typename>
+    struct function_traits;
+
+    // Function trait for function (auto func) inspection
+    template<typename R, typename... Args>
+    struct function_traits<R(*)(Args...)>
+    {
+        using return_type = R;
+
+        template<std::size_t I>
+        using arg = std::tuple_element_t<I, std::tuple<Args...>>;
+
+        static constexpr std::size_t argc = sizeof...(Args);
+    };
+
+    template<typename F>
+    struct first_argument
+    {
+        using type = void;
+    };
+
+    template<typename R, typename A0, typename... A>
+    struct first_argument<R(*)(A0, A...)>
+    {
+        using type = A0;
+    };
+
     template<class Derived, class R, class State = no_state, class... Params>
     struct proxy_common
     {
@@ -188,9 +243,19 @@ namespace reflection { namespace binding {
             using return_type = R;
             using base = proxy_common;
 
+            using traits = function_traits<decltype(func)>;
+
             static auto func_ptr() -> decltype(func) {
                 return func;
             }
+
+            using first = first_argument<decltype(func)>::type;
+
+            static_assert(std::is_reference_v<first> || is_stateless);
+            static_assert(
+                std::is_same_v<
+                    std::remove_reference_t<first>,
+                    collections::tes_context> || is_stateless);
 
             struct runtime_callback {
                 State& _callbackState;
@@ -203,31 +268,46 @@ namespace reflection { namespace binding {
                     RE::StaticFunctionTag* tag,
                     convert_to_tes_type<Params>... params)
                     {
-                        if constexpr (std::is_void_v<R>)
-                        {
+                        if constexpr (std::is_void_v<R>) {
                             if constexpr (std::is_same_v<State, no_state>) {
-                                func(get_converter<Params>::convert2J(params, tag) ...);
+                                func(get_converter<Params>::convert2J(std::move(params), tag) ...);
                             } else {
-                                func(_callbackState, get_converter<Params>::convert2J(params, _callbackState) ...);
+                                func(_callbackState, get_converter<Params>::convert2J(std::move(params), _callbackState) ...);
                             }
-                            return;    // OK for void
-                        }
-                        else
-                        {
-                            if constexpr (std::is_same_v<State, no_state>) {
-                                return GetConv<R>::convert2Tes(
-                                    func(
-                                        get_converter<Params>::convert2J(params, tag) ...
-                                        )
-                                    );
+                            return;
+                        } else {
+                            using first = typename first_argument<decltype(func)>::type;
+
+                            static constexpr bool first_is_state =
+                                std::is_same_v<
+                                    std::remove_cvref_t<first>,
+                                    std::remove_cvref_t<State>>;
+                            if constexpr (std::is_void_v<R>)
+                            {
+                                if constexpr (std::is_same_v<State, no_state>) {
+                                    func(get_converter<Params>::convert2J(params, tag) ...);
+                                } else {
+                                    func(_callbackState, get_converter<Params>::convert2J(std::move(params), _callbackState) ...);
+                                }
+                                return;    // OK for void
                             }
-                            else {
-                                return GetConv<R>::convert2Tes(
-                                    func(
-                                        _callbackState,
-                                        get_converter<Params>::convert2J(params, _callbackState) ...
-                                        )
-                                    );
+                            else
+                            {
+                                if constexpr (std::is_same_v<State, no_state>) {
+                                    return GetConv<R>::convert2Tes(
+                                        func(
+                                            get_converter<Params>::convert2J(std::move(params), tag) ...
+                                            )
+                                        );
+                                }
+                                else {
+                                    return GetConv<R>::convert2Tes(
+                                        func(
+                                            _callbackState,
+                                            get_converter<Params>::convert2J(std::move(params), _callbackState) ...
+                                            )
+                                        );
+                                }
                             }
                         }
                     }
@@ -247,7 +327,7 @@ namespace reflection { namespace binding {
                 convert_to_tes_type<Params>... params)
             {
                 assert(callback && "runtime callback not initialized");
-                // Papyrus reference_array is move-only in CommonLib; do not copy it
+                // reference_array is move-only in CommonLib; do not copy it
                 return (*callback)(tag, std::move(params)...);
             }
 

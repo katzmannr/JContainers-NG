@@ -81,14 +81,16 @@ namespace reflection { namespace binding {
     {
         using tes_type = RE::BSScript::reference_array<T>;
 
-        static rbArray<T> convert2J(RE::BSScript::Array* arr, ...)
+        static rbArray<T> convert2J(
+            RE::BSScript::reference_array<T>&& arr,
+            const collections::tes_context&)
         {
-            return { RE::BSScript::reference_array<T>{arr} };
+            return rbArray<T>{ std::move(arr) };
         }
 
-        static RE::BSScript::Array* convert2Tes(const rbArray<T>& arr)
+        static RE::BSScript::reference_array<T> convert2Tes(rbArray<T>&& arr)
         {
-            return arr.arr;
+            return std::move(arr.arr);
         }
     };
 

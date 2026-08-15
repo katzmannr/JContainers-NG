@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
 ################################################################################
 # Windows 10 is required. Do NOT increase this to Windows 11.
@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
 project(JContainers LANGUAGES C CXX)
-#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ################################################################################
 # A current compiler is needed, set it via C++ Standard (stricter code handling)
@@ -14,12 +14,13 @@ project(JContainers LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_DISABLE_PRECOMPILE_HEADERS OFF)
 
 ################################################################################
 # JContainers-NG does not support Skyrim LE. Don't ask
 ################################################################################
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "This project only supports 64-bit builds.")
+if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
+    message(FATAL_ERROR "This project only supports 64-bit builds")
 endif()
 message("64bit architecture in use")
 
@@ -84,8 +85,9 @@ if(MSVC)
 endif()
 
 ################################################################################
-# Resolve Dependencies
+# Resolve Dependencies - BUG in detection prevent build -> workaround
 ################################################################################
+set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
 include(CMake/dependencies.cmake)
 
 cmake_policy(SET CMP0167 OLD)
@@ -152,6 +154,24 @@ find_package(Boost CONFIG REQUIRED)
 find_package(rapidcsv CONFIG REQUIRED)
 
 ################################################################################
+# Patch CommonLibSSE-NG ReferenceArray.h to support bool arrays
+# Reverse Patch not checked, patch may be removed when updating CommonLib NG
+################################################################################
+find_package(Patch)
+if(Patch_FOUND)
+  execute_process(
+    COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib.patch
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE PATCH_RESULT
+  )
+  if(NOT PATCH_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to apply CommonLibSSE-NG patch")
+  endif()
+else()
+  message(FATAL_ERROR "This project requires patch for building")
+endif()
+
+################################################################################
 # Sub-projects
 ################################################################################
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -182,6 +202,7 @@ target_link_libraries(JContainers
         jansson
         LuaJIT::LuaJIT
         CommonLibSSE::CommonLibSSE
+        GTest::gtest_main
         Boost::filesystem
         Boost::thread
         Boost::serialization

@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
+# Get rid of overly annoying errors even though qmake is in PATH
+set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
 message(STATUS "MSVC-WINE-Toolchain environment")
 include(CMake/msvc-wine-toolchain.cmake)
 ################################################################################
@@ -17,14 +19,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_DISABLE_PRECOMPILE_HEADERS OFF)
 
-#message(STATUS "Pointer size: ${CMAKE_SIZEOF_VOID_P}")
-#message(STATUS "System processor: ${CMAKE_SYSTEM_PROCESSOR}")
-#message(STATUS "Compiler target: ${CMAKE_C_COMPILER_TARGET}")
 ################################################################################
 # JContainers-NG does not support Skyrim LE. Don't ask
 ################################################################################
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "This project only supports 64-bit builds.")
+if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
+    message(FATAL_ERROR "This project only supports 64-bit builds")
 endif()
 message("64bit architecture in use")
 
@@ -40,6 +39,7 @@ if(NOT MSVC)
 else()
     # This works with msvc-wine. Result is "1" and "MSVC"
     message("MSVC=${MSVC}")
+    message("CMAKE_C_COMPILER_ID=${CMAKE_C_COMPILER_ID}")
     message("CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
     add_compile_options(
         "$<$<COMPILE_LANGUAGE:CXX>:/EHsc>"
@@ -159,6 +159,24 @@ set(RAPIDCSV_INCLUDE_DIRS
 ################################################################################
 find_package(Boost CONFIG REQUIRED)
 find_package(rapidcsv CONFIG REQUIRED)
+
+################################################################################
+# Patch CommonLibSSE-NG ReferenceArray.h to support bool arrays
+# Reverse Patch not checked, patch may be removed when updating CommonLib NG
+################################################################################
+find_package(Patch)
+if(Patch_FOUND)
+  execute_process(
+    COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib.patch
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE PATCH_RESULT
+  )
+  if(NOT PATCH_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to apply CommonLibSSE-NG patch")
+  endif()
+else()
+  message(FATAL_ERROR "This project requires patch for building")
+endif()
 
 ################################################################################
 # Sub-projects
