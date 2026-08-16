@@ -291,7 +291,7 @@ namespace reflection { namespace binding {
                                 }
                                 return;    // OK for void
                             }
-                            else
+                            else // callback has non-void return value
                             {
                                 if constexpr (std::is_same_v<State, no_state>) {
                                     return GetConv<R>::convert2Tes(
