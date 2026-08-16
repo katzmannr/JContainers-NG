@@ -140,12 +140,11 @@ if __name__ == '__main__':
         os.makedirs(os.path.dirname(dst), exist_ok=True) # Create destination directory
         shutil.copy2 (src, dst)
 
-        # PDB Will be part of the main distribution until enough stability is reached.
+        # PDB Will be part of the main distribution until sufficient stability is reached.
         shutil.copy2(
             os.path.join(config.origin, 'JContainers.pdb'),
-            os.path.join(dst, 'SKSE', 'Plugins', 'JContainers.pdb')
+            os.path.join(os.path.dirname(dst), 'JContainers.pdb')
         )
-
         print ("Generate and compile scripts...")
         config.jcLib.produce_code (config.pscDir)
         compile_scripts (config.pscDir, config.compiledDir)
