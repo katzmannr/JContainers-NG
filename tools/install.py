@@ -115,10 +115,10 @@ def make_archive (dst, src):
 if __name__ == '__main__':
     try:
         if len (sys.argv) < 2:
-            print ("Usage: install.py x64/[Release|Debug]")
+            print ("Usage: install.py <target-directory>")
             exit (1)
 
-        JCLib.name = "JContainers" + ".dll"
+        JCLib.name = "JContainers.dll"
 
         config = Config (sys.argv[1])
 
@@ -137,6 +137,7 @@ if __name__ == '__main__':
 
         shutil.rmtree (config.dataDir, ignore_errors=True)
         shutil.copytree (srcdata, config.dataDir)
+        os.makedirs(os.path.dirname(dst), exist_ok=True) # Create destination directory
         shutil.copy2 (src, dst)
 
         print ("Generate and compile scripts...")

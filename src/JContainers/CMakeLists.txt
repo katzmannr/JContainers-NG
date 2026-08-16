@@ -180,6 +180,7 @@ add_custom_command(
         -u
         ${CMAKE_SOURCE_DIR}/tools/install.py
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    VERBATIM
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -192,8 +193,4 @@ target_link_libraries(${PROJECT_NAME}
         Boost::headers
         Boost::serialization
         Boost::date_time
-)
-
-target_link_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>"
 )
