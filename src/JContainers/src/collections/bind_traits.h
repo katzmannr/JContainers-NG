@@ -5,7 +5,9 @@
 #include "collections.h"
 #include "context.h"
 #include <SKSE/SKSE.h>
+#include <RE/T/TESForm.h>
 #include "skse/jc_skse.h"
+#include "domains/domain_master.h"
 
 namespace reflection { namespace binding {
 
@@ -43,19 +45,6 @@ namespace reflection { namespace binding {
 
     //////////////////////////////////////////////////////////////////////////
 
-    template<> struct GetConv < FormId > {
-        typedef RE::TESForm* tes_type;
-        static RE::TESForm* convert2Tes(FormId id) {
-            return RE::TESForm::LookupByID((uint32_t)id);
-        }
-        template<class Any>
-        static FormId convert2J(const RE::TESForm* form, const Any&) {
-            return form ? (FormId)form->formID : FormId::Zero;
-        }
-    };
-
-    /////////////////
-
     template<> struct GetConv < forms::form_ref > {
         typedef RE::TESForm* tes_type;
         static RE::TESForm* convert2Tes(const forms::form_ref& id) {
@@ -63,6 +52,10 @@ namespace reflection { namespace binding {
         }
         static forms::form_ref convert2J(const RE::TESForm* form, tes_context& ctx) {
             return make_weak_form_id(form, ctx);
+        }
+        template<class Any>
+        static const forms::form_ref convert2J(const RE::TESForm* form, const Any&) {
+            return forms::form_ref(form->GetFormID(), domain_master::master::instance().get_form_observer());
         }
     };
 
