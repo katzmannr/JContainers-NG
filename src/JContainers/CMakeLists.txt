@@ -144,6 +144,7 @@ if(MSVC)
             /Oi
             /sdl-
             /Os
+            /Zi
         >
         /std:c++20
         /GF
@@ -155,6 +156,9 @@ if(MSVC)
         $<$<CONFIG:Debug>:
             /NODEFAULTLIB:LIBCMT.lib
             /DEBUG
+        >
+        $<$<CONFIG:Release>:
+                    /DEBUG:FULL
         >
         /SUBSYSTEM:CONSOLE
         /OPT:REF
