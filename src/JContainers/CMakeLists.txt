@@ -41,10 +41,10 @@ include(${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
 ################################################################################
 # Target
 ################################################################################
-#add_commonlibsse_plugin(${PROJECT_NAME}
-#    SOURCES ${ALL_FILES}
-#    VERSION 1.0)
-add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
+add_commonlibsse_plugin(${PROJECT_NAME}
+    SOURCES ${ALL_FILES}
+    VERSION 0.0.1.1)
+#add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/jcontainers_pch.h>"

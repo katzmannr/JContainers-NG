@@ -81,7 +81,7 @@ public:
             });
         }
 
-        static void load(SKSE::SerializationInterface * intfc) {
+        static void load(SKSE::SerializationInterface* intfc) {
 
             namespace io = boost::iostreams;
 
@@ -145,9 +145,10 @@ public:
 
         static bool registerAllFunctions(RE::BSScript::IVirtualMachine *vm) {
 
-            gLog.OpenRelative(CSIDL_MYDOCUMENTS, (std::string(skse_logs()) + std::string(plugin_name()) + ".log").c_str());
-            gLog.SetPrintLevel(IDebugLog::kLevel_Error);
-            gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
+            // Registration is done when plugin is loaded. Remove all those logs until here is required to reenable it.
+            // gLog.OpenRelative(CSIDL_MYDOCUMENTS, (std::string(skse_logs()) + std::string(plugin_name()) + ".log").c_str());
+            // gLog.SetPrintLevel(IDebugLog::kLevel_Error);
+            // gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
 
             // store plugin handle so we can identify ourselves later
             s_pluginHandle = SKSE::GetPluginHandle();
@@ -155,7 +156,7 @@ public:
             // This old check could be useful in a rare case of multiple mixed version build
             // messaging && messaging->interfaceVersion >= SKSE::MessagingInterface::kVersion)
 
-            JC_log("%s %s", plugin_name(), JC_VERSION_STR);
+            JC_log("%s %s", plugin_name().data(), JC_VERSION_STR);
 
             jc_assert(vm);
 
@@ -216,18 +217,21 @@ public:
             return true;
         }
 
-        bool SKSEPlugin_Load()
+        bool Plugin_Load()
         {
+            if (!m_serialization || !m_papyrus) {
+                    JC_log("Required SKSE interfaces are unavailable");
+                    return false;
+            }
+
             m_serialization->SetUniqueID(s_pluginHandle);
 
             m_serialization->SetRevertCallback(revert);
             m_serialization->SetSaveCallback(save);
             m_serialization->SetLoadCallback(load);
-
             m_serialization->SetFormDeleteCallback(delet);
 
             m_papyrus->Register(registerAllFunctions);
-
             if (s_messaging) {
                 s_messaging->RegisterListener(listene);
             }
@@ -249,6 +253,37 @@ public:
 
 const SKSE::MessagingInterface *skse_callbacks::s_messaging = nullptr;
 SKSE::PluginHandle skse_callbacks::s_pluginHandle = static_cast<SKSE::PluginHandle>(-1);
+skse_callbacks *g_callbacks;
+
+SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
+{
+    gLog.OpenRelative(
+            CSIDL_MYDOCUMENTS,
+            (std::string(skse_logs()) + std::string(plugin_name()) + ".log").c_str()
+        );
+    gLog.SetPrintLevel(IDebugLog::kLevel_Error);
+    gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
+
+    JC_log("Loading JContainers Plugin");
+
+    // SKSE::Init does the check, but no return value
+    if (!a_skse) {
+        JC_log("Safety check for SKSE::Init failed - no load interface");
+        return false;
+    }
+    SKSE::Init(a_skse);
+
+    // No local variable (destroyed in unload)
+    // any type of smart pointer is removed after return
+    g_callbacks = new skse_callbacks();
+
+    // JC_log("JContainer Plugin Load");
+    bool res = g_callbacks->Plugin_Load();
+
+    JC_log("JContainers PLugin Load finished");
+
+    return res;
+}
 
 }
 
