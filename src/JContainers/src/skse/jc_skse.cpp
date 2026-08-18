@@ -258,9 +258,9 @@ struct real_api : public skse_api
 
     void console_print (const char * fmt, const va_list& args) override
     {
-        RE::ConsoleLog console;
+        static RE::ConsoleLog console;
         // Hangs the game, reason not known
-        //console.Print(fmt, args);
+        console.VPrint(fmt, args);
     }
 };
 

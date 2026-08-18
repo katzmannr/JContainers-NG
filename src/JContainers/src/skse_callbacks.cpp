@@ -166,7 +166,7 @@ public:
             if (info)
             {
                 info->infoVersion = SKSE::PluginInfo::kVersion;
-                info->name = JC_PLUGIN_NAME;
+                info->name = plugin_name().data();
                 info->version = JC_API_VERSION;
             }
 
@@ -175,7 +175,7 @@ public:
             s_pluginHandle = skse->GetPluginHandle();
             JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query Handle: 0x%X", s_pluginHandle );
 
-            //JC_log(JC_PLUGIN_NAME " " JC_VERSION_STR);
+            //JC_log(plugin_name().data() " " JC_VERSION_STR);
 
             JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Checking IsEditor");
             if (skse->IsEditor()) {

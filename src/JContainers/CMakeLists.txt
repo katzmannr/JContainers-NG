@@ -43,7 +43,7 @@ include(${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
 ################################################################################
 add_commonlibsse_plugin(${PROJECT_NAME}
     SOURCES ${ALL_FILES}
-    VERSION 0.0.1.1)
+    VERSION 0.1.1.0)
 #add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
