@@ -11,7 +11,9 @@
 
 #include "SkyrimVRESLAPI.h"
 
+#include "common/IDebugLog.h"
 #include "common/ITypes.h"
+#include "typedefs.h"
 #include "util/util.h"
 #include "jc_interface.h"
 #include "reflection/reflection.h"
@@ -38,13 +40,15 @@ public:
         m_serialization = SKSE::GetSerializationInterface();
         m_papyrus = SKSE::GetPapyrusInterface();
         if (!m_papyrus) {
-            JC_log("couldn't get papyrus interface");
+            JC_log_full(IDebugLog::LogLevel::kLevel_Error,"skse callback: couldn't get papyrus interface");
             return;
         }
         s_messaging = SKSE::GetMessagingInterface();
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"skse callback: s_messaging 0x%X",s_messaging);
     }
 
     static void revert(SKSE::SerializationInterface *intfc) {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"skse callback: revert");
         util::do_with_timing("Revert", []() {
             jc_skse::set_silent_api();
             domain_master::master::instance().clear_state();
@@ -53,6 +57,7 @@ public:
     }
 
     static void save(SKSE::SerializationInterface * intfc) {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"skse callback: save");
 
         namespace io = boost::iostreams;
 
@@ -76,12 +81,13 @@ public:
                     //_DMESSAGE("%lu bytes saved", stream.tellp());
                 }
                 else {
-                    JC_log("Unable open JC record");
+                    JC_log_full(IDebugLog::LogLevel::kLevel_Error, "skse callback: Unable open JC record");
                 }
             });
         }
 
         static void load(SKSE::SerializationInterface* intfc) {
+            JC_log_full(IDebugLog::kLevel_DebugMessage,"skse callback: load");
 
             namespace io = boost::iostreams;
 
@@ -111,6 +117,7 @@ public:
                 UInt32 length = 0;
 
                 while (intfc->GetNextRecordInfo(type, version, length)) {
+                    JC_log_full(IDebugLog::kLevel_VerboseMessage,"skse callback: GetNextRecordInfo t %d v  %d",type,version);
                     if (static_cast<consts>(type) == consts::storage_chunk) {
                         break;
                     }
@@ -122,25 +129,91 @@ public:
         }
 
         static void delet(RE::VMHandle handle) {
+            JC_log_full(IDebugLog::kLevel_VerboseMessage, "skse callback: delet, handle=%016llX",handle);
             domain_master::master::instance().get_form_observer().on_form_deleted((forms::FormHandle)handle);
         }
 
         static void listene(SKSE::MessagingInterface::Message* msg) {
-            if (msg && msg->type == SKSE::MessagingInterface::kPostPostLoad) {
+            if( msg == nullptr ) {
+                JC_log_full(IDebugLog::kLevel_Warning,"skse callback: Message: Invalid");
+                return;
+            }
+            JC_log_full(
+                IDebugLog::kLevel_DebugMessage,"skse callback: Message from %s type=%u dataLen=%u data=%p",
+                    (msg->sender ? msg->sender : "unknown"), msg->type, msg->dataLen, msg->data);
+            if (msg->type == SKSE::MessagingInterface::kPostPostLoad) {
                 s_messaging->Dispatch(jc::message_root_interface, (void *)&jc::root, sizeof(void*), nullptr);
-                if (!REL::Module::IsVR())
+                if (REL::Module::IsVR())
                 {
                     SkyrimVRESLPluginAPI::GetSkyrimVRESLInterface001(s_pluginHandle, s_messaging);
                     if (g_SkyrimVRESLInterface)
                     {
-                        JC_log("SkyrimVRESL interface detected and initialized!");
+                        JC_log("skse callback: SkyrimVRESL interface detected and initialized!");
                     }
                     else
                     {
-                        JC_log("SkyrimVRESL interface is not present or has failed to be retrieved... ESL related functionality is disabled.");
+                        JC_log("skse callback: SkyrimVRESL interface is not present or has failed to be retrieved... ESL related functionality is disabled.");
                     }
                 }
             }
+        }
+
+        /// Since SKSE 2.3.1 it is not actually called, kept for minimizing changes
+        /// KR: Called means SKSE is not calling it, but we still need to call it!
+        bool SKSEPlugin_Query (const SKSE::LoadInterface * skse, SKSE::PluginInfo * info)
+        {
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query");
+            if (info)
+            {
+                info->infoVersion = SKSE::PluginInfo::kVersion;
+                info->name = JC_PLUGIN_NAME;
+                info->version = JC_API_VERSION;
+            }
+
+            // store plugin handle so we can identify ourselves later
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query get Plugin Handle");
+            s_pluginHandle = skse->GetPluginHandle();
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query Handle: 0x%X", s_pluginHandle );
+
+            //JC_log(JC_PLUGIN_NAME " " JC_VERSION_STR);
+
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Checking IsEditor");
+            if (skse->IsEditor()) {
+                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: loaded in editor, marking as incompatible");
+                return false;
+            }
+
+            // get the serialization interface and query its version
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: query serialization interface");
+            m_serialization = (SKSE::SerializationInterface *)skse->QueryInterface(SKSE::LoadInterface::kSerialization);
+            if (!m_serialization) {
+                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: couldn't get serialization interface");
+                return false;
+            }
+
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: version");
+            if (m_serialization->Version() < SKSE::SerializationInterface::kVersion) {
+                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: serialization interface too old (%d expected %d)", m_serialization->Version(), SKSE::SerializationInterface::kVersion);
+                return false;
+            }
+
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: query papyrus interface");
+            m_papyrus = (SKSE::PapyrusInterface *)skse->QueryInterface(SKSE::LoadInterface::kPapyrus);
+
+            if (!m_papyrus) {
+                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: couldn't get papyrus interface");
+                return false;
+            }
+
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: query messaging interface");
+            auto messaging = (SKSE::MessagingInterface *)skse->QueryInterface(SKSE::LoadInterface::kMessaging);
+            if (messaging && messaging->Version() >= SKSE::MessagingInterface::kVersion) {
+                s_messaging = messaging;
+            } else {
+                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: couldn't get messaging interface: Incorrect Version %d.", messaging->Version());
+            }
+
+            return true;
         }
 
         static bool registerAllFunctions(RE::BSScript::IVirtualMachine *vm) {
@@ -159,6 +232,10 @@ public:
             JC_log("%s %s", plugin_name().data(), JC_VERSION_STR);
 
             jc_assert(vm);
+            if (vm==nullptr) {
+                JC_log_full(IDebugLog::kLevel_Error, "skse callback: registerAllFunctions: Invalid vm");
+                return false;
+            }
 
             // One of the ways: temp. clone class meta infos, register them
             // 2nd: pass each context into "info.bind(*registry, some-context);"
@@ -196,6 +273,7 @@ public:
                             func.name,
                             reinterpret_cast<reflection::bind_args::shared_state_t*>(&dom)
                         };
+                        JC_log_full(IDebugLog::kLevel_VerboseMessage,"skse callback: registerAllFunctions:\n class %s function %s", args.className.data(), args.functionName.data());
                         func.registrator(args);
                         // Replaces setting NoWait flag using SetFunctionFlags
                         vm->SetCallableFromTasklets(args.className.c_str(),
@@ -214,35 +292,44 @@ public:
                 }
             });
 
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: activating real api");
+            jc_skse::set_real_api();
+
             return true;
         }
 
         bool Plugin_Load()
         {
             if (!m_serialization || !m_papyrus) {
-                    JC_log("Required SKSE interfaces are unavailable");
+                    JC_log_full(IDebugLog::LogLevel::kLevel_Error, "skse callback: Required SKSE interfaces are unavailable");
                     return false;
             }
 
             m_serialization->SetUniqueID(s_pluginHandle);
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Unique ID %08X", s_pluginHandle);
 
             m_serialization->SetRevertCallback(revert);
             m_serialization->SetSaveCallback(save);
             m_serialization->SetLoadCallback(load);
             m_serialization->SetFormDeleteCallback(delet);
 
-            m_papyrus->Register(registerAllFunctions);
+            JC_log_full(
+                IDebugLog::kLevel_DebugMessage, "skse callback: pluginHandle=%u serialization=%p version=%u",
+                s_pluginHandle, m_serialization, m_serialization->Version()
+            );
+
+            bool res = m_papyrus->Register(registerAllFunctions);
+            if (!res) {
+                return false;
+            }
             if (s_messaging) {
                 s_messaging->RegisterListener(listene);
             }
 
-            JC_log("plugin loaded");
+            JC_log("skse callback: plugin loaded");
 
             return true;
         }
-
-        /// Since SKSE 2.3.1 it is not actually called, now CommonLibSSE-NG takes care of this part.
-        // bool SKSEPlugin_Query (const SKSEInterface * skse, PluginInfo * info)
 
         private:
             const SKSE::SerializationInterface * m_serialization = nullptr;
@@ -264,11 +351,11 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
     gLog.SetPrintLevel(IDebugLog::kLevel_Error);
     gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
 
-    JC_log("Loading JContainers Plugin");
+    JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"skse callback: Loading JContainers Plugin");
 
     // SKSE::Init does the check, but no return value
     if (!a_skse) {
-        JC_log("Safety check for SKSE::Init failed - no load interface");
+        JC_log_full(IDebugLog::LogLevel::kLevel_Error, "skse callback: Safety check for SKSE::Init failed - no load interface");
         return false;
     }
     SKSE::Init(a_skse);
@@ -277,10 +364,17 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
     // any type of smart pointer is removed after return
     g_callbacks = new skse_callbacks();
 
-    // JC_log("JContainer Plugin Load");
-    bool res = g_callbacks->Plugin_Load();
+    bool res = true; // Do not set to false!
+#ifndef JC_SKSE_VR
+    res = g_callbacks->SKSEPlugin_Query (a_skse, nullptr);
+#endif
+    if (res) {
+        res = g_callbacks->Plugin_Load();
+    } else {
+        JC_log_full(IDebugLog::LogLevel::kLevel_Error,"skse callback: SKSEPlugin Query failed");
+    }
 
-    JC_log("JContainers PLugin Load finished");
+    JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"skse callback: PLugin Load finished with result %s", (res ? "success":"error"));
 
     return res;
 }

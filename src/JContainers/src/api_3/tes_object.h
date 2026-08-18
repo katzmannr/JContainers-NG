@@ -20,7 +20,7 @@ namespace tes_api_3 {
 
 #define JC_LOG_API(params, ...) \
         if (tes_api_3::log_api_calls) \
-            JC_log("[Info] " JC_LOG_API_SOURCE ".%s (" params ")",     \
+            JC_log(JC_LOG_API_SOURCE ".%s (" params ")",     \
                 __func__,                                            \
                 __VA_ARGS__)
 

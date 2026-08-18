@@ -246,6 +246,7 @@ namespace collections {
         }
 
         RE::TESForm * form() const {
+            JC_log_full(IDebugLog::kLevel_DebugMessage,"item form");
             return jc_skse::lookup_form(formId());
         }
 
@@ -359,6 +360,7 @@ namespace collections {
     }
 
     template<> inline RE::TESForm * item::readAs<RE::TESForm*>() const {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"item readAs");
         return form();
     }
 

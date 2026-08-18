@@ -33,6 +33,7 @@ namespace {
     static_assert (sizeof (int32_t) == sizeof (char32_t), "Required to fix a bug in MSVC");
 
     float charactersPerLine(int total, int maxCharsPerLine) {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"string_wrapper: maxCharsPerLine %d",maxCharsPerLine);
         jc_assert(maxCharsPerLine > 0);
         float result = (total) / (1.f + (float)total / maxCharsPerLine);
         return result;

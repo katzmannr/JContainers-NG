@@ -76,6 +76,10 @@ namespace tes_api_3 {
         static object_base* fromArray(tes_context& ctx, reflection::binding::rbArray<TesType> arr)
         {
             JC_LOG_API ("...");
+            if (std::is_same_v<TesType, form_ref> || std::is_same_v<TesType, RE::TESForm*>) {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_array fromArray");
+            }
+
 
             auto obj = &array::objectWithInitializer([&](array &me) {
                 me.u_container().reserve(arr.Length());
@@ -152,6 +156,7 @@ NEGATIVE_IDX_COMMENT);
 
                 for (auto* form : formList->forms)  // OR correct accessor
                 {
+                    JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_array addFromFormList");
                     arr.insert(
                         arr.begin() + idx,
                         item{ make_weak_form_id(form, ctx) }
@@ -166,6 +171,9 @@ NEGATIVE_IDX_COMMENT);
         static T itemAtIndex(tes_context& ctx, ref obj, Index index, T t = default_value<T>())
         {
             JC_LOG_API ("%p, %d, ...", (void*) obj, index);
+            if (std::is_same_v<T, form_ref>) {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_array itemAtIndex");
+            }
 
             doReadOp(obj, index, [=, &t](uint32_t idx) {
                 t = obj->_array[idx].readAs<T>();

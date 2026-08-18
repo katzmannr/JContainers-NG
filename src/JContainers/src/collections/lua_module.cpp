@@ -1,4 +1,3 @@
-
 #include "lua_module.h"
 
 #include <boost/noncopyable.hpp>
@@ -103,7 +102,7 @@ namespace lua { namespace aux_wip {
             for (seconds = -1; !_lua && seconds < 180; seconds++) {
                 if ((_lua = luaL_newstate ())) {
                     if (seconds < 0)
-                        JC_log ("reopen_if_closed(): initial Lua allocation failed; retrying up to 3 minutes (32-bit or low memory)");
+                        JC_log_full (IDebugLog::LogLevel::kLevel_Warning,"reopen_if_closed(): initial Lua allocation failed; retrying up to 3 minutes (32-bit or low memory)");
                     std::this_thread::sleep_for (std::chrono::milliseconds (1000));
                 }
             }

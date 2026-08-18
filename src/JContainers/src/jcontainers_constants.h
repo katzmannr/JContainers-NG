@@ -20,6 +20,7 @@ namespace collections {
                                     "." STR(JC_REVISION_VERSION)
 
 #   define JC_DATA_FILES            "JCData/"
+#   define JC_PLUGIN_NAME           "JContainers"
 
 // Previous constant have been replaced with inline functions (since we have one dll)
 
