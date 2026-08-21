@@ -4,8 +4,8 @@
 #include <cstring>
 #include <gtest/gtest.h>
 
-#include "boost/filesystem/directory.hpp"
 #include "master.h"
+#include <filesystem>
 #include "tes_string.h"
 #include "tes_lua.h"
 #include "collections/collections.h"
@@ -74,6 +74,7 @@ namespace tes_api_3 {
             ,const char *nameEndsWith = "")
         {
             JC_LOG_API ("%s, %s", directoryPath ? directoryPath : "", nameEndsWith ? nameEndsWith : "");
+            JC_LOG_API ("absolut %s", directoryPath ? std::filesystem::absolute(directoryPath).generic_string().c_str() : "");
 
             if (!directoryPath) {
                 return StringList{};
@@ -81,15 +82,18 @@ namespace tes_api_3 {
 
             if (!nameEndsWith) {
                 nameEndsWith = "";
+            } else if (nameEndsWith[0] == '.') {
+                nameEndsWith = &nameEndsWith[1];
             }
 
             StringList result{};
-            namespace fs = boost::filesystem;
+            namespace fs = std::filesystem;
 
             try {
                 fs::path root(directoryPath);
                 for (fs::directory_iterator itr(root), end_itr; itr != end_itr; ++itr) {
                     const fs::path& path = itr->path();
+                    JC_log_full(IDebugLog::kLevel_DebugMessage, "Checking %s", fs::absolute(path).generic_string().c_str());
                     if (!*nameEndsWith ||
                         path.extension().generic_string().compare(nameEndsWith) == 0)
                     {
@@ -97,10 +101,18 @@ namespace tes_api_3 {
                     }
                 }
             }
-            catch (const boost::filesystem::filesystem_error& exc) {
+            catch (const std::filesystem::filesystem_error& exc) {
                 JC_LOG_TES_API_ERROR(JContainsers, contentsOfDirectoryAtPath, "throws '%s'", exc.what());
             }
 
+            fs::path root(directoryPath);
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "cwd = %s", fs::current_path().generic_string().c_str());
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "root = %s", fs::absolute(root).generic_string().c_str());
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "exists = %d directory = %d",
+                       fs::exists(root),
+                       fs::is_directory(root));
+            
+			JC_LOG_API("contentsOfDirectoryAtPath -> returning %d files", result.size());
             return result;
         }
         REGISTERF_STATELESS(
@@ -112,7 +124,7 @@ namespace tes_api_3 {
             JC_LOG_API ("%s", filename ? filename : "");
 
             if (filename) {
-                boost::filesystem::remove_all(filename);
+                std::filesystem::remove_all(filename);
             }
         }
         REGISTERF2_STATELESS(removeFileAtPath, "path", "Deletes the file or directory identified by the @path");
@@ -129,7 +141,7 @@ namespace tes_api_3 {
             strcat_s(path, sizeof(path), (std::string{"/"} + std::string{user_files()}).c_str());
 
             // race condition possible. hope it's not critical
-            if (!boost::filesystem::exists(path) && (boost::filesystem::create_directories(path), !boost::filesystem::exists(path))) {
+            if (!std::filesystem::exists(path) && (std::filesystem::create_directories(path), !std::filesystem::exists(path))) {
                 return std::string();
             }
 
@@ -160,22 +172,22 @@ endfunction
     {
         tes_context_standalone ctx;
 
-        auto write_file = [&](const boost::filesystem::path& path) {
-            boost::filesystem::remove_all(path);
+        auto write_file = [&](const std::filesystem::path& path) {
+            std::filesystem::remove_all(path);
 
-            EXPECT_FALSE(boost::filesystem::is_regular_file(path));
+            EXPECT_FALSE(std::filesystem::is_regular_file(path));
 
             object_stack_ref obj = tes_object::object<map>(ctx);
             tes_object::writeToFile(ctx, obj.get(), path.string().c_str());
 
-            EXPECT_TRUE(boost::filesystem::is_regular_file(path));
+            EXPECT_TRUE(std::filesystem::is_regular_file(path));
 
-            boost::filesystem::remove_all(path);
+            std::filesystem::remove_all(path);
         };
 
         auto path = tes_jcontainers::userDirectory();
         EXPECT_TRUE(!path.empty());
-        EXPECT_TRUE(boost::filesystem::is_directory(path));
+        EXPECT_TRUE(std::filesystem::is_directory(path));
 
         write_file(tes_jcontainers::userDirectory() + "/MyMod/123/settings.json");
         write_file(tes_jcontainers::userDirectory() + "/settings.json");

@@ -158,54 +158,41 @@ public:
             }
         }
 
-        /// Since SKSE 2.3.1 it is not actually called, kept for minimizing changes
-        /// KR: Called means SKSE is not calling it, but we still need to call it!
-        bool SKSEPlugin_Query (const SKSE::LoadInterface * skse, SKSE::PluginInfo * info)
+        // Internal Query interface to checka and store object provided by SKSE
+        bool SKSEQuery (const SKSE::LoadInterface * skse)
         {
             JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query");
-            if (info)
-            {
-                info->infoVersion = SKSE::PluginInfo::kVersion;
-                info->name = plugin_name().data();
-                info->version = JC_API_VERSION;
-            }
 
             // store plugin handle so we can identify ourselves later
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query get Plugin Handle");
             s_pluginHandle = skse->GetPluginHandle();
             JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query Handle: 0x%X", s_pluginHandle );
 
-            //JC_log(plugin_name().data() " " JC_VERSION_STR);
+            //JC_log(JC_PLUGIN_NAME " " JC_VERSION_STR);
 
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Checking IsEditor");
             if (skse->IsEditor()) {
-                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: loaded in editor, marking as incompatible");
+                JC_log_full(IDebugLog::kLevel_Error, "skse callback: loaded in editor, marking as incompatible");
                 return false;
             }
 
             // get the serialization interface and query its version
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: query serialization interface");
             m_serialization = (SKSE::SerializationInterface *)skse->QueryInterface(SKSE::LoadInterface::kSerialization);
             if (!m_serialization) {
-                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: couldn't get serialization interface");
+                JC_log_full(IDebugLog::kLevel_Error, "skse callback: couldn't get serialization interface");
                 return false;
             }
 
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: version");
             if (m_serialization->Version() < SKSE::SerializationInterface::kVersion) {
-                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: serialization interface too old (%d expected %d)", m_serialization->Version(), SKSE::SerializationInterface::kVersion);
+                JC_log_full(IDebugLog::kLevel_Error, "skse callback: serialization interface too old (%d expected %d)", m_serialization->Version(), SKSE::SerializationInterface::kVersion);
                 return false;
             }
 
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: query papyrus interface");
             m_papyrus = (SKSE::PapyrusInterface *)skse->QueryInterface(SKSE::LoadInterface::kPapyrus);
 
             if (!m_papyrus) {
-                JC_log_full(IDebugLog::kLevel_Warning, "skse callback: couldn't get papyrus interface");
+                JC_log_full(IDebugLog::kLevel_Error, "skse callback: couldn't get papyrus interface");
                 return false;
             }
 
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: query messaging interface");
             auto messaging = (SKSE::MessagingInterface *)skse->QueryInterface(SKSE::LoadInterface::kMessaging);
             if (messaging && messaging->Version() >= SKSE::MessagingInterface::kVersion) {
                 s_messaging = messaging;
@@ -342,6 +329,37 @@ const SKSE::MessagingInterface *skse_callbacks::s_messaging = nullptr;
 SKSE::PluginHandle skse_callbacks::s_pluginHandle = static_cast<SKSE::PluginHandle>(-1);
 skse_callbacks *g_callbacks;
 
+extern "C" [[maybe_unused]] __declspec(dllexport)
+constinit SKSE::PluginDeclaration SKSEPlugin_Version({
+    .Version = { JC_FILE_VERSION },
+    .Name = JC_PLUGIN_NAME,
+   .Author = ""sv,
+    .SupportEmail = ""sv,
+    .StructCompatibility = SKSE::StructCompatibility::Independent,
+    .RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary,
+    .MinimumSKSEVersion = REL::Version{ 0, 0, 0, 0 }
+});
+
+extern "C" [[maybe_unused]] __declspec(dllexport)
+bool SKSEPlugin_Query(
+    SKSE::QueryInterface* a_skse,
+    SKSE::PluginInfo* a_info)
+{
+    if (!a_info) {
+        return false;
+    }
+
+    a_info->infoVersion = SKSE::PluginInfo::kVersion;
+    static const std::string pluginName{collections::plugin_name()};
+    a_info->name = pluginName.c_str();
+    a_info->version =
+        static_cast<std::uint32_t>(
+            SKSEPlugin_Version.GetVersion().pack());
+    JC_log_full(IDebugLog::kLevel_DebugMessage, "%s %s, %s, %s", plugin_name().data(), JC_VERSION_STR, a_info->name);
+
+    return true;
+}
+
 SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
 {
     gLog.OpenRelative(
@@ -366,7 +384,7 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
 
     bool res = true; // Do not set to false!
 #ifndef JC_SKSE_VR
-    res = g_callbacks->SKSEPlugin_Query (a_skse, nullptr);
+    res = g_callbacks->SKSEQuery(a_skse);
 #endif
     if (res) {
         res = g_callbacks->Plugin_Load();

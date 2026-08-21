@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <cstdint>
 
+using namespace std::literals;
+
 namespace collections {
 
 #   define JC_API_VERSION           0
@@ -20,6 +22,7 @@ namespace collections {
                                     "." STR(JC_REVISION_VERSION)
 
 #   define JC_DATA_FILES            "JCData/"
+#   define JC_PLUGIN_NAME           "JContainers"sv
 
 // Previous constant have been replaced with inline functions (since we have one dll)
 

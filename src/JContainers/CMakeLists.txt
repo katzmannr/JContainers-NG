@@ -41,10 +41,10 @@ include(${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
 ################################################################################
 # Target
 ################################################################################
-add_commonlibsse_plugin(${PROJECT_NAME}
-    SOURCES ${ALL_FILES}
-    VERSION 0.1.1.0)
-#add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
+#add_commonlibsse_plugin(${PROJECT_NAME}
+#    SOURCES ${ALL_FILES}
+#    VERSION 0.1.1.0)
+add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/jcontainers_pch.h>"
@@ -79,8 +79,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 # Include directories
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/include"
-    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/CommonLibSSE/include"
+    CommonLibSSE_INCLUDE_DIRS
     "${CMAKE_SOURCE_DIR}/src"
     "${Boost_INCLUDE_DIRS}"
     "${rapidcsv_SOURCE_DIR}/src"
