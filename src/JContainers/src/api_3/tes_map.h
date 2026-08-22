@@ -50,6 +50,9 @@ namespace tes_api_3 {
         template<class T>
         static T getItem(tes_context& ctx, ref obj, key_cref key, T def = default_value<T>()) {
             JC_LOG_API ("%p, ..., ...", (void*) obj);
+            if (std::is_same_v<T, form_ref>) {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_map getItem");
+            }
             map_functions::doReadOp(obj, key, [&](item& itm) { def = itm.readAs<T>(); });
             return def;
         }
@@ -62,6 +65,9 @@ namespace tes_api_3 {
         template<class T>
         static void setItem(tes_context& ctx, ref obj, key_cref key, T val) {
             JC_LOG_API ("%p, ..., ...", (void*) obj);
+            if (std::is_same_v<T, form_ref>) {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_map setItem");
+            }
             map_functions::doWriteOp(obj, key, [&](item& itm) { itm = val; });
         }
         REGISTERF(setItem<SInt32>, "setInt", "* key value", "Inserts @key: @value pair. Replaces existing pair with the same @key");
@@ -79,6 +85,9 @@ namespace tes_api_3 {
                 object_lock g (obj);
                 if (item* i = obj->u_get (key))
                 {
+                    if (std::is_same_v<T, form_ref>) {
+                        JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_map insertItem");
+                    }
                     return i->readAs<T> ();
                 }
                 obj->u_get_or_create (key) = val;
@@ -309,6 +318,7 @@ Usage:
         struct KeyCompareForNextKey {
             template<class K1, class K2>
             bool operator()(const K1& nKey, const K2& endKey) const {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_map KeyCompareForNextKey: Form Id %d vs %d",nKey.get(),endKey.get());
                 return jc_skse::lookup_form(nKey.get()) == jc_skse::lookup_form(endKey.get());
             }
         };
@@ -319,6 +329,7 @@ Usage:
         {
             // @KeyCompare predicate customizes @nextKey_forPapyrus function
             // so that the function will not return unloaded (None) form keys at Papyrus level
+            JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_map nextKey");
             return map_functions_templ < form_map >::nextKey_forPapyrus(obj, previousKey, endKey, KeyCompareForNextKey{});
         }
     };

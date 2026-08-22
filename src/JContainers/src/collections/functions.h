@@ -96,7 +96,14 @@ namespace collections {
     struct map_key_checker {
         static bool check(const std::string& s)  { return !s.empty(); }
         static bool check(const char *s)  { return s != nullptr && *s; }
-        static bool check(RE::TESForm *f)  { return f != nullptr; }
+        static bool check(RE::TESForm *f)  {
+            if (f != nullptr) {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"functions - map_key_checker: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(f->GetFormType()).data(), f->GetFormID(), f);
+            } else {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"functions - map_key_checker: Invalid Form");
+            }
+            return f != nullptr;
+        }
         static bool check(FormId f)  { return f != FormId::Zero; }
         static bool check(const form_ref& f)  { return f.is_not_expired(); }
         static bool check(const form_ref_lightweight& f)  { return f.is_not_expired(); }

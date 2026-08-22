@@ -161,6 +161,7 @@ namespace forms {
             //"If failed, then there is static form destruction event too? fId %" PRIX64, handle);
 
         if (!fh::is_form_handle(handle)) {
+            //JC_log_full(IDebugLog::kLevel_VerboseMessage,"on_form_deleted: no form handle",handle);
             return;
         }
 

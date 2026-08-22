@@ -2,8 +2,11 @@
 
 #include "RE/B/BSCoreTypes.h"
 #include "RE/C/ConsoleLog.h"
+#include "RE/F/FormTypes.h"
 #include "RE/T/TESDataHandler.h"
+#include "RE/T/TESForm.h"
 #include "SkyrimVRESLAPI.h"
+#include "common/IDebugLog.h"
 
 #include <gtest/gtest.h>
 
@@ -65,6 +68,7 @@ struct fake_api : public skse_api
 
     RE::TESForm* lookup_form (RE::FormID) override
     {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse FAKE lookupById");
         static char blob[sizeof(RE::TESForm)] = { '\0' };
         return reinterpret_cast<RE::TESForm*> (&blob);
     }
@@ -99,7 +103,10 @@ struct silent_api : public skse_api
     std::optional<std::string_view> loaded_mod_name (std::uint8_t) override { return ""; }
     std::optional<std::string_view> loaded_light_mod_name (std::uint16_t) override { return ""; }
     RE::FormID resolve_handle (RE::FormID) override { return 0; }
-    RE::TESForm* lookup_form (RE::FormID) override { return nullptr; }
+    RE::TESForm* lookup_form (RE::FormID) override {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse SILENT lookupById");
+        return nullptr;
+    }
     bool try_retain_handle (RE::FormID) override { return true; }
     void release_handle (RE::FormID) override {}
     void console_print (const char*, const va_list&) override {}
@@ -112,9 +119,10 @@ struct real_api : public skse_api
 {
     std::optional<std::uint32_t> form_from_file (std::string_view const& name, std::uint32_t form) override
     {
+        JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"jc_skse REAL form_from_file: view name %s, form 0x%X", name.data(), form);
         using namespace std;
         RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
-        if (!REL::Module::IsVR())
+        if (REL::Module::IsVR())
         {
             if (g_SkyrimVRESLInterface)
             {
@@ -142,12 +150,14 @@ struct real_api : public skse_api
                 return retval;
             }
         }
-        return nullopt;
+        return std::nullopt;
     }
 
     /// Question: order in *Mods list is considered as modIndex or modLighIndex?
     std::optional<std::string_view> loaded_mod_name (std::uint8_t i) override
     {
+        JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"jc_skse REAL loaded_mod_name");
+
         RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
         if (!REL::Module::IsVR())
         {
@@ -165,7 +175,9 @@ struct real_api : public skse_api
 
     std::optional<std::string_view> loaded_light_mod_name (std::uint16_t i) override
     {
-        if (!REL::Module::IsVR())
+        JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"jc_skse REAL loaded_light_mod_name");
+
+        if (REL::Module::IsVR())
         {
             if (g_SkyrimVRESLInterface)
             {
@@ -179,7 +191,7 @@ struct real_api : public skse_api
             }
             else
             {
-                JC_log("WARNING: Attempted to fetch a light plugin name in VR, but VR ESL support is not  present!");
+                JC_log_full(IDebugLog::LogLevel::kLevel_Warning, "jc_skse Attempted to fetch a light plugin name in VR, but VR ESL support is not  present!");
             }
         } else {
             RE::TESDataHandler* p = RE::TESDataHandler::GetSingleton ();
@@ -191,6 +203,8 @@ struct real_api : public skse_api
 
     RE::FormID resolve_handle (RE::FormID id) override
     {
+        JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"jc_skse REAL resolve_handle");
+
         // Already resolved ? Just return the id
         // return g_serialization->ResolveFormId (old_id, &new_id) ? static_cast<FormId> (new_id) : FormId::Zero;
         // not resolved
@@ -200,11 +214,20 @@ struct real_api : public skse_api
 
     RE::TESForm* lookup_form (RE::FormID id) override
     {   
-        return RE::TESForm::LookupByID(id);
+        RE::TESForm *form;
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse REAL lookupById: id is %d ", id);
+        form = RE::TESForm::LookupByID(id);
+        if (form!=nullptr) {
+            JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse REAL lookupById: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(form->GetFormType()).data(), form->GetFormID(), form);
+        } else {
+            JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse REAL lookupById: Invalid Form Id");
+        }
+        return form;
     }
 
     bool try_retain_handle (RE::FormID id) override
     {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse REAL try_retain_handle: Form Id %d",id);
         auto form = lookup_form (id);
         if (!form)
             return false;
@@ -221,6 +244,7 @@ struct real_api : public skse_api
 
     void release_handle (RE::FormID id) override
     {
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse REAL release_handle: Form Id %d",id);
         // Now done internally in CommonLibNG-SE
         // auto form = lookup_form (id);
         // if (!form)
@@ -234,8 +258,8 @@ struct real_api : public skse_api
 
     void console_print (const char * fmt, const va_list& args) override
     {
-        RE::ConsoleLog console;
-        console.Print(fmt, args);
+        static RE::ConsoleLog console;
+        console.VPrint(fmt, args);
     }
 };
 
@@ -252,41 +276,63 @@ skse_api* g_current_api = &g_fake_api;
 
 void set_real_api ()
 {
-    g_current_api = &g_real_api;
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: set_real_api");
+    auto real_api = &g_real_api;
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: set_real_api: Assigned simple variable: %p",real_api);
+    g_current_api = real_api;
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: real api activated. Good luck");
 }
 
 void set_fake_api ()
 {
+   JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: set_fake_api");
    g_current_api = &g_fake_api;
 }
 
 void set_silent_api ()
 {
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: set_silent_api");
     g_current_api = &g_silent_api;
 }
 
 RE::FormID resolve_handle (RE::FormID handle)
 {
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: resolve_handle: %d", handle);
     return g_current_api->resolve_handle (handle);
 }
 
 RE::TESForm* lookup_form (RE::FormID handle)
 {
-    return handle != 0 ? g_current_api->lookup_form (handle) : nullptr;
+    RE::TESForm *form = nullptr;
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse lookup_form: Handle is %d ", handle);
+    if (handle == 0) {
+        JC_log_full(IDebugLog::kLevel_Warning,"jc_skse lookup_form: Invalid handle 0");
+    } else {
+        form = g_current_api->lookup_form (handle);
+        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse lookup_form: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(form->GetFormType()).data(), form->GetFormID(), form);
+        if (g_current_api != &g_real_api) // Prevent crash on new game
+        {
+            form = nullptr; // This may cause test failures
+        }
+    }
+    return form;
 }
 
 std::optional<std::uint32_t> form_from_file (std::string_view const& name, std::uint32_t form)
 {
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: form_from_file: %s", name.data());
     return g_current_api->form_from_file (name, form);
 }
 
 std::optional<std::string_view> loaded_mod_name (std::uint8_t idx)
 {
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: loaded_mod_name: idx %d", idx);
     return g_current_api->loaded_mod_name (idx);
 }
 
 std::optional<std::string_view> loaded_light_mod_name (std::uint16_t idx)
 {
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: loaded_light_mod_name: idx %d", idx);
     return g_current_api->loaded_light_mod_name (idx);
 }
 
@@ -305,11 +351,13 @@ void console_print (const char* fmt, ...)
 
 bool try_retain_handle (RE::FormID handle)
 {
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: try_retain_handle: %d", handle);
     return g_current_api->try_retain_handle (handle);
 }
 
 void release_handle (RE::FormID handle)
 {
+    JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse: release_handle: %d", handle);
     g_current_api->release_handle (handle);
 }
 

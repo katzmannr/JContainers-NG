@@ -50,6 +50,7 @@ namespace collections
         static bool _map_visit_helper(tes_context& context, T& container, path_type path, std::function<void(item *)>&& function)
         {
             if (path.empty()) {
+                JC_log_full(IDebugLog::LogLevel::kLevel_Warning, "Access _map_visit_helper: empty path (%s)", context.write_to_string().c_str());
                 return false;
             }
 
@@ -65,6 +66,7 @@ namespace collections
                 isKeyVisit = false;
                 rightPath = path.begin() + bs::size(".value") - 1;
             } else {
+                JC_log_full(IDebugLog::LogLevel::kLevel_Warning, "Access _map_visit_helper: unknown path (%s)",context.write_to_string().c_str());
                 return false;
             }
 
@@ -89,6 +91,7 @@ namespace collections
             const std::function<void(item *)>& itemFunction, bool createMissingKeys)
         {
             if (!cpath) {
+                JC_log_full(IDebugLog::LogLevel::kLevel_Warning, "Access resolve: empty cpath (%s)", context.write_to_string().c_str());
                 return;
             }
 
@@ -105,6 +108,7 @@ namespace collections
         {
 
             if (!collection || !cpath) {
+                JC_log_full(IDebugLog::LogLevel::kLevel_Warning, "Access resolve: empty cpath or collection (%s)", context.write_to_string().c_str());
                 return;
             }
 

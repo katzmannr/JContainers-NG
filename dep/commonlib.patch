@@ -11,4 +11,20 @@ index df9bdcbe..fa7987ab 100644
  					}
  				}
  			}
+diff --git a/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake b/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake
+index c8e46627..cb608971 100644
+--- a/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake
++++ b/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake
+@@ -106,8 +106,10 @@ function(target_commonlibsse_properties TARGET)
+     endif ()
+ 
+     file(WRITE "${commonlibsse_plugin_file}"
+-            "#include \"REL/Relocation.h\"\n"
+             "#include \"SKSE/SKSE.h\"\n"
++            "#include \"REL/Relocation.h\"\n"
++            "\n"
++            "using namespace std::literals;"
+             "\n"
+             "SKSEPluginInfo(\n"
+             "    .Version = ${commonlibsse_plugin_version},\n"
 

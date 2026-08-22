@@ -99,6 +99,10 @@ namespace forms {
         void swap(form_ref& other) {
             static_assert(sizeof(other) == sizeof(_watched_form),
                 "ensures that no additional fields were added");
+            if (sizeof(other) != sizeof(_watched_form)) {
+                JC_log_full(IDebugLog::kLevel_Error,"form_observer swap: additional fields were added");
+                return;
+            }
             _watched_form.swap(other._watched_form);
         }
 
@@ -216,6 +220,9 @@ namespace collections {
 
     template<class Context>
     inline form_ref make_weak_form_id(const RE::TESForm* form, Context& context) {
+        if (form != nullptr) {
+            JC_log_full(IDebugLog::kLevel_DebugMessage,"fo make_weak: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(form->GetFormType()).data(), form->GetFormID(), form);
+        }
         return form ? form_ref(*form, context._form_watcher) : form_ref();
     }
 
@@ -226,6 +233,9 @@ namespace collections {
 
     template<class Context>
     inline form_ref_lightweight make_lightweight_form_ref(const RE::TESForm* form, Context& context) {
+        if (form != nullptr) {
+            JC_log_full(IDebugLog::kLevel_DebugMessage,"fo make_lightweight: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(form->GetFormType()).data(), form->GetFormID(), form);
+        }
         return form_ref_lightweight{ form != nullptr ? util::to_enum<RE::FormID>(form->GetFormID()) : 0, context._form_watcher };
     }
 

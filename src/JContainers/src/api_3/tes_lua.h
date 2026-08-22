@@ -51,6 +51,9 @@ Usage example:
         static ResultType evalLua(tes_context& ctx, const char* luaCode, object_base* transport, ResultType def, bool minimizeLifetime = true)
         {
             JC_LOG_API ("..., ..., ..., %d", int (minimizeLifetime));
+            if (std::is_same_v<ResultType, form_ref>) {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_lua evalLua");
+            }
 
             auto result = lua::eval_lua_function(ctx, transport, luaCode);
             if (transport && minimizeLifetime) {
@@ -73,6 +76,9 @@ Returns @transport)===");
         static map* pushArg(tes_context& ctx, const char* key, ArgType arg, map* transport = nullptr)
         {
             JC_LOG_API ("%s, ..., ...", key ? key : "");
+            if (std::is_same_v<ArgType, form_ref>) {
+                JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_lua evalLua");
+            }
 
             if (!transport) {
                 transport = &map::object(ctx);

@@ -3,21 +3,24 @@
 #include <assert.h>
 #include <cstdarg>
 #include <type_traits>
+#include <common/IDebugLog.h>
 
 #   define STR(...)     __STR(__VA_ARGS__)
 #   define __STR(...)   #__VA_ARGS__
 
 #   define ARGS(...)    __VA_ARGS__
 
+extern void JC_log_full(IDebugLog::LogLevel level, const char* fmt, ...);
+extern void JC_log_full(IDebugLog::LogLevel level, const char* fmt, va_list& args);
 extern void JC_log(const char * fmt, ...);
 extern void JC_log(const char* fmt, va_list& args);
 
 
 #   define JC_LOG_TES_API_ERROR(Class, function, message, ...) \
-        JC_log("[Error] " STR(Class) "." STR(function) " " message, __VA_ARGS__);
+        JC_log_full(IDebugLog::LogLevel::kLevel_Error, STR(Class) "." STR(function) " " message, __VA_ARGS__)
 
 #   define JC_LOG_ERROR(message, ...) \
-        JC_log("[Error] " message, __VA_ARGS__);
+        JC_log_full(IDebugLog::LogLevel::kLevel_Error, message, __VA_ARGS__)
 
 #   ifdef NO_JC_DEBUG
 #       define jc_assert(expr)

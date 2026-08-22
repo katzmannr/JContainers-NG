@@ -22,6 +22,8 @@
 #include <set>
 
 #include <gtest/gtest.h>
+#include "common/IDebugLog.h"
+#include "typedefs.h"
 #include "util/stl_ext.h"
 
 #include "intrusive_ptr.hpp"
@@ -74,6 +76,7 @@ namespace collections {
         {
         default:
             BOOST_ASSERT_MSG (false, "Invalid version of JContainers archive");
+            JC_log_full(IDebugLog::kLevel_Error, "Invalid version of JContainers archive");
             throw boost::archive::archive_exception (boost::archive::archive_exception::unsupported_version);
 
         case 2: { // v 3.2.X and below
@@ -123,6 +126,7 @@ namespace collections {
         switch (version) {
         default:
             BOOST_ASSERT_MSG(false, "invalid form_map version");
+            JC_log_full(IDebugLog::kLevel_Error, "Invalid form map Version");
             break;
         case 0: {   // v3.2.X -> v3.3.X
             std::map<RE::FormID, item> oldMap;

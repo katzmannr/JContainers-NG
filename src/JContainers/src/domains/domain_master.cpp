@@ -33,7 +33,7 @@ namespace domain_master {
             path dir = util::relative_to_dll_path (JC_DATA_FILES "Domains/");
 
             if (!exists (dir)) // it will throw below
-                JC_log ("JC Domains folder must exist! (%s)", dir.generic_string ().c_str ());
+                JC_log_full(IDebugLog::LogLevel::kLevel_Error, "JC Domains folder must exist! (%s)", dir.generic_string ().c_str ());
 
             for (directory_iterator it (dir), end; it != end; ++it) 
             {
@@ -142,6 +142,7 @@ namespace domain_master {
 
                 auto js = make_unique_ptr(json_loadb(&buffer.front(), buffer.size(), 0, nullptr), &json_decref);
                 if (!js) { // parsing failed
+                    JC_log_full(IDebugLog::kLevel_Warning,"read_from_stream: json parsing failed. Imitating old header.");
                     return imitate_old_header();
                 }
 
@@ -304,6 +305,9 @@ namespace domain_master {
                 auto domains = get_domains_from_fs();
                 auto m = new master();
                 m->active_domain_names = std::move (domains);
+                if (m==nullptr) {
+                    JC_log_full(IDebugLog::kLevel_FatalError,"util::singleton Unable to create master..");
+                }
                 return m;
             }
         };

@@ -115,10 +115,10 @@ def make_archive (dst, src):
 if __name__ == '__main__':
     try:
         if len (sys.argv) < 2:
-            print ("Usage: install.py x64/[Release|Debug]")
+            print ("Usage: install.py <target-directory>")
             exit (1)
 
-        JCLib.name = "JContainers" + ".dll"
+        JCLib.name = "JContainers.dll"
 
         config = Config (sys.argv[1])
 
@@ -137,8 +137,14 @@ if __name__ == '__main__':
 
         shutil.rmtree (config.dataDir, ignore_errors=True)
         shutil.copytree (srcdata, config.dataDir)
+        os.makedirs(os.path.dirname(dst), exist_ok=True) # Create destination directory
         shutil.copy2 (src, dst)
 
+        # PDB Will be part of the main distribution until sufficient stability is reached.
+        shutil.copy2(
+            os.path.join(config.origin, 'JContainers.pdb'),
+            os.path.join(os.path.dirname(dst), 'JContainers.pdb')
+        )
         print ("Generate and compile scripts...")
         config.jcLib.produce_code (config.pscDir)
         compile_scripts (config.pscDir, config.compiledDir)

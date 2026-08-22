@@ -43,7 +43,7 @@ include(${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
 ################################################################################
 #add_commonlibsse_plugin(${PROJECT_NAME}
 #    SOURCES ${ALL_FILES}
-#    VERSION 1.0)
+#    VERSION 0.1.1.0)
 add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
@@ -79,8 +79,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUN
 # Include directories
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/include"
-    "${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/CommonLibSSE/include"
+    CommonLibSSE_INCLUDE_DIRS
     "${CMAKE_SOURCE_DIR}/src"
     "${Boost_INCLUDE_DIRS}"
     "${rapidcsv_SOURCE_DIR}/src"
@@ -144,6 +143,7 @@ if(MSVC)
             /Oi
             /sdl-
             /Os
+            /Zi
         >
         /std:c++20
         /GF
@@ -155,6 +155,9 @@ if(MSVC)
         $<$<CONFIG:Debug>:
             /NODEFAULTLIB:LIBCMT.lib
             /DEBUG
+        >
+        $<$<CONFIG:Release>:
+                    /DEBUG:FULL
         >
         /SUBSYSTEM:CONSOLE
         /OPT:REF
@@ -176,6 +179,7 @@ add_custom_command(
         -u
         ${CMAKE_SOURCE_DIR}/tools/install.py
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    VERBATIM
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -188,8 +192,4 @@ target_link_libraries(${PROJECT_NAME}
         Boost::headers
         Boost::serialization
         Boost::date_time
-)
-
-target_link_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>"
 )
