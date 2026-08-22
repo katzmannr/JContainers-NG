@@ -73,18 +73,18 @@ namespace tes_api_3 {
             const char *directoryPath
             ,const char *nameEndsWith = "")
         {
-            JC_LOG_API ("%s, %s", directoryPath ? directoryPath : "", nameEndsWith ? nameEndsWith : "");
-            JC_LOG_API ("absolut %s", directoryPath ? std::filesystem::absolute(directoryPath).generic_string().c_str() : "");
+            JC_LOG_API ("path %s, %s", directoryPath ? directoryPath : "", nameEndsWith ? nameEndsWith : "");
+            JC_LOG_API ("absolute path %s", directoryPath ? std::filesystem::absolute(directoryPath).generic_string().c_str() : "");
 
             if (!directoryPath) {
                 return StringList{};
             }
 
-            if (!nameEndsWith) {
-                nameEndsWith = "";
-            } else if (nameEndsWith[0] == '.') {
-                nameEndsWith = &nameEndsWith[1];
-            }
+			std::string file_extension = nameEndsWith ? nameEndsWith : "";
+			
+			if (!file_extension.empty() && file_extension.front() != '.') {
+    			file_extension.insert(file_extension.begin(), '.');
+			}
 
             StringList result{};
             namespace fs = std::filesystem;
@@ -93,22 +93,21 @@ namespace tes_api_3 {
                 fs::path root(directoryPath);
                 for (fs::directory_iterator itr(root), end_itr; itr != end_itr; ++itr) {
                     const fs::path& path = itr->path();
-                    JC_log_full(IDebugLog::kLevel_DebugMessage, "Checking %s", fs::absolute(path).generic_string().c_str());
-                    if (!*nameEndsWith ||
-                        path.extension().generic_string().compare(nameEndsWith) == 0)
+                    JC_log_full(IDebugLog::kLevel_DebugMessage, "JContainers checking %s", fs::absolute(path).generic_string().c_str());
+                    if (!file_extension.empty() ||
+                        path.extension().generic_string().compare(file_extension) == 0)
                     {
                         result.emplace_back(itr->path().generic_string());
                     }
                 }
             }
             catch (const std::filesystem::filesystem_error& exc) {
-                JC_LOG_TES_API_ERROR(JContainsers, contentsOfDirectoryAtPath, "throws '%s'", exc.what());
+                JC_LOG_TES_API_ERROR(JContainsers, contentsOfDirectoryAtPath, "tes_jc throws '%s'", exc.what());
             }
 
             fs::path root(directoryPath);
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "cwd = %s", fs::current_path().generic_string().c_str());
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "root = %s", fs::absolute(root).generic_string().c_str());
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "exists = %d directory = %d",
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "JContainers cwd = %s", fs::current_path().generic_string().c_str());
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "JContainers exists = %d directory = %d",
                        fs::exists(root),
                        fs::is_directory(root));
             
@@ -149,6 +148,7 @@ namespace tes_api_3 {
         }
 
         static skse::string_ref _userDirectory() {
+	        JC_LOG_API ("");
             return skse::string_ref(userDirectory().c_str());
         }
         REGISTERF_STATELESS(_userDirectory, "userDirectory", "", std::string{"A path to user-specific directory - "} + std::string{user_files()});
@@ -170,6 +170,7 @@ endfunction
 
     TEST(tes_jcontainers, userDirectory)
     {
+	    JC_LOG_API ("");
         tes_context_standalone ctx;
 
         auto write_file = [&](const std::filesystem::path& path) {
@@ -201,6 +202,7 @@ endfunction
 
     TEST(tes_jcontainers, contentsOfDirectoryAtPath)
     {
+	    JC_LOG_API ("");
         std::vector<std::string> vec;
         EXPECT_NO_THROW(vec = tes_jcontainers::contentsOfDirectoryAtPath<decltype(vec)>(":invaliddir"));
         EXPECT_TRUE(vec.empty());

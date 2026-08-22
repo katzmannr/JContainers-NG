@@ -167,7 +167,6 @@ public:
             s_pluginHandle = skse->GetPluginHandle();
             JC_log_full(IDebugLog::kLevel_DebugMessage, "skse callback: Query Handle: 0x%X", s_pluginHandle );
 
-            //JC_log(JC_PLUGIN_NAME " " JC_VERSION_STR);
 
             if (skse->IsEditor()) {
                 JC_log_full(IDebugLog::kLevel_Error, "skse callback: loaded in editor, marking as incompatible");
@@ -216,7 +215,7 @@ public:
             // This old check could be useful in a rare case of multiple mixed version build
             // messaging && messaging->interfaceVersion >= SKSE::MessagingInterface::kVersion)
 
-            JC_log("%s %s", plugin_name().data(), JC_VERSION_STR);
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "registering All functions of %s Version %s", plugin_name().data(), JC_VERSION_STR);
 
             jc_assert(vm);
             if (vm==nullptr) {
@@ -355,7 +354,7 @@ bool SKSEPlugin_Query(
     a_info->version =
         static_cast<std::uint32_t>(
             SKSEPlugin_Version.GetVersion().pack());
-    JC_log_full(IDebugLog::kLevel_DebugMessage, "%s %s, %s, %s", plugin_name().data(), JC_VERSION_STR, a_info->name);
+    JC_log_full(IDebugLog::kLevel_DebugMessage, "Query: %s %s", a_info->name, JC_VERSION_STR);
 
     return true;
 }
@@ -377,6 +376,8 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
         return false;
     }
     SKSE::Init(a_skse);
+
+    JC_log_full(IDebugLog::kLevel_Message, "%s Version %s", plugin_name().data(), JC_VERSION_STR);
 
     // No local variable (destroyed in unload)
     // any type of smart pointer is removed after return
