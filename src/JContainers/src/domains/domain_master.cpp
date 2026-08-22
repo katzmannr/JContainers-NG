@@ -2,14 +2,11 @@
 #include <map>
 #include <functional>
 #include <exception>
-#include <type_traits>
 
-#include "boost/filesystem/path.hpp"
-#include "boost/filesystem/operations.hpp"
 #include "boost/archive/binary_oarchive.hpp"
 
 #include "jansson.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "common/IDebugLog.h"
 
 #include "jcontainers_constants.h"
@@ -19,10 +16,9 @@
 #include "iarchive_with_blob.h"
 
 #include "object/object_context.h"
-#include "domains/domain_master.h"
+#include "domain_master_serialization.h"
 
 
-#include "domains/domain_master_serialization.h"
 
 namespace domain_master {
 
@@ -172,9 +168,6 @@ namespace domain_master {
 
         auto read_from_stream(master& self, std::istream& stream) -> void {
             //_context.read_from_stream(s);
-
-            stream.flags(stream.flags() | std::ios::binary);
-
 #       if 0
             std::ofstream file("dump", std::ios::binary | std::ios::out);
             std::copy(
@@ -250,8 +243,6 @@ namespace domain_master {
         }
 
         auto write_to_stream(master& self, std::ostream& stream) -> void {
-            stream.flags(stream.flags() | std::ios::binary);
-
             activity_stopper s{ self };
             {
                 // we can also cleanup objects here

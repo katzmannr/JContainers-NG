@@ -4,7 +4,7 @@
 #include <boost/noncopyable.hpp>
 //#include <boost/thread/tss.hpp>
 #include <boost/optional.hpp>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <utility>
@@ -22,15 +22,15 @@ extern "C" {
 
 #include "meta.h"
 #include "util/util.h"
-#include "gtest.h"
+#include <gtest/gtest.h>
 #include "util/spinlock.h"
 #include "reflection/reflection.h"
 #include "jcontainers_constants.h"
 
-#include "collections/collections.h"
-#include "collections/context.h"
-#include "collections/functions.h"
-#include "collections/access.h"
+#include "collections.h"
+#include "context.h"
+#include "functions.h"
+#include "access.h"
 
 // Module imports:
 
@@ -299,7 +299,7 @@ namespace lua { namespace aux_wip {
 
         EXPECT_TRUE(*testTransporting("return 10") == 10.0f);
         EXPECT_TRUE(*testTransporting("return 'die'") == std::string("die"));
-        EXPECT_TRUE(*testTransporting("return Form(20)") == cl::make_weak_form_id(FormId(20), tc));
+        EXPECT_TRUE(*testTransporting("return Form(20)") == cl::make_weak_form_id(RE::FormID(20), tc));
 
 
         auto& db = tc.root();

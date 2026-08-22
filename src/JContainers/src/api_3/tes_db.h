@@ -1,3 +1,13 @@
+#pragma once
+
+#include "api_3/master.h"
+#include "api_3/tes_object.h"
+#include "api_3/tes_map.h"
+#include "collections/collections.h"
+#include "collections/context.h"
+#include "reflection/tes_binding.h"
+
+
 namespace tes_api_3 {
 
 /// Redefine in each logging module
@@ -55,7 +65,7 @@ JDB.solveObj(\".frostfall.arrayC\") will return the array containing [\"stringVa
         REGISTERF(solveSetter<form_ref>, "solveFormSetter", "path value createMissingKeys=false", nullptr);
 
 
-        static void setObj(tes_context& ctx, const char *path, object_stack_ref& obj)
+        static void setObj(tes_context& ctx, const char *path, object_stack_ref obj)
         {
             JC_LOG_API ("%s, ...", path ? path : "");
 

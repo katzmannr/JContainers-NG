@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: >
+          cmake -B build
+          -S .
+          -A x64
+
+      - name: Build
+        run: >
+          cmake --build build
+          --config Release
+          --parallel
+          --verbose
+
+      - name: Inspect LuaJIT install
+        shell: cmd
+        run: |
+          echo ==== INSTALL DIR ====
+          dir /s "build\extern-luajit\install"
+          echo.
+          echo ==== INCLUDE DIR ====
+          dir "build\extern-luajit\install\include"
+
+      - name: Upload LuaJIT install
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luajit-install
+          path: build/extern-luajit/install
+
+      - name: Upload JContainers install
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jcontainers-install
+          path: build/src/JContainers/Release

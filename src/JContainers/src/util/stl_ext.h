@@ -44,17 +44,18 @@ namespace util {
         return static_cast<typename std::underlying_type<E>::type>(e);
     }
 
-    template<
-        typename Enum,
-        typename Number = typename aux::copy_const_qual < Enum, typename std::underlying_type<Enum>::type >::type
-    >
-    inline auto to_integral_ref(Enum & e) -> Number & {
-        return reinterpret_cast<Number &>(e);
-    }
+    // Replacement RE::FormID makes this obsolete
+    // template<
+    //     typename Enum,
+    //     typename Number = typename aux::copy_const_qual < Enum, typename std::underlying_type<Enum>::type >::type
+    // >
+    // inline auto to_integral_ref(Enum & e) -> Number & {
+    //     return reinterpret_cast<Number &>(e);
+    // }
 
     template<typename Enum, typename Integer>
     inline auto to_enum(Integer && value) -> Enum {
-        static_assert(sizeof Enum >= sizeof Integer, "Enum should have enough room");
+        static_assert(sizeof(Enum) >= sizeof(Integer), "Enum should have enough room");
         return static_cast<Enum>(value);
     }
 

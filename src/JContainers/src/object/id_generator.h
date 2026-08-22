@@ -1,5 +1,16 @@
 #pragma once
 
+#include "object/object_base.h"
+#include <algorithm>
+#include <boost/core/noncopyable.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/version.hpp>
+#include <gtest/gtest.h>
+#include <cstdint>
+#include <ctime>
+#include <deque>
+
 namespace collections {
 
     template<
@@ -176,7 +187,7 @@ namespace collections {
     typedef id_generator<HandleT, 1, 0x7FFFFFFF - 1> id_generator_type;
 
 
-#   ifndef TEST_COMPILATION_DISABLED
+#   ifdef TEST_COMPILATION_ENABLED
 
     TEST(id_generator, t)
     {

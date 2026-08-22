@@ -1,18 +1,17 @@
 #pragma once
 
 #include <functional>
-#include <type_traits>
 #include <boost/optional.hpp>
 #include <boost/variant/variant.hpp>
 
-#include "collections/collections.h"
-#include "collections/default_value.h"
+#include "collections.h"
+#include "collections/context.h"
+#include "default_value.h"
 
 namespace collections
 {
     class item;
     class object_base;
-    class tes_context;
 
     namespace path_resolving {
 

@@ -1,5 +1,14 @@
+#pragma once
+
+#include "master.h"
+#include "tes_map.h"
+#include "tes_db.h"
 #include "boost_extras.h"
 #include <boost/algorithm/string.hpp>
+
+#include "collections/context.h"
+#include "forms/form_observer.h"
+#include "reflection/tes_binding.h"
 
 namespace tes_api_3 {
 
@@ -91,7 +100,7 @@ namespace tes_api_3 {
             return name && *name;
         }
 
-        static void setEntry(tes_context& ctx, const char *storageName, key_cref formKey, object_stack_ref& entry)
+        static void setEntry(tes_context& ctx, const char *storageName, key_cref formKey, object_stack_ref entry)
         {
             JC_LOG_API ("%s, ..., ...", storageName ? storageName : "");
 
@@ -170,7 +179,7 @@ namespace tes_api_3 {
             "With 'createMissingKeys=true' it creates any missing path elements: JFormDB.solveIntSetter(formKey, \".frostfall.keyB\", 10, true) creates {frostfall: {keyB: 10}} structure");
         REGISTERF(solveSetter<SInt32>, "solveIntSetter", "fKey path value createMissingKeys=false", nullptr);
         REGISTERF(solveSetter<const char*>, "solveStrSetter", "fKey path value createMissingKeys=false", nullptr);
-        REGISTERF(solveSetter<object_stack_ref&>, "solveObjSetter", "fKey path value createMissingKeys=false", nullptr);
+        REGISTERF(solveSetter<object_stack_ref>, "solveObjSetter", "fKey path value createMissingKeys=false", nullptr);
         REGISTERF(solveSetter<form_ref>, "solveFormSetter", "fKey path value createMissingKeys=false", nullptr);
 
         static bool hasPath(tes_context& ctx, key_cref form, const char* path)
@@ -224,7 +233,7 @@ namespace tes_api_3 {
         REGISTERF(setItem<SInt32>, "setInt", "fKey key value", "creates key-value association. replaces existing value if any");
         REGISTERF(setItem<Float32>, "setFlt", "fKey key value", "");
         REGISTERF(setItem<const char *>, "setStr", "fKey key value", "");
-        REGISTERF(setItem<object_stack_ref&>, "setObj", "fKey key container", "");
+        REGISTERF(setItem<object_stack_ref>, "setObj", "fKey key container", "");
         REGISTERF(setItem<form_ref>, "setForm", "fKey key value", "");
     };
 
@@ -264,13 +273,13 @@ namespace tes_api_3 {
         const char *storageName = "forms";
 
         auto formStorage = tes_form_db::makeFormStorage(ctx, storageName);
-        EXPECT_NOT_NIL(formStorage);
+        EXPECT_NE((formStorage), nullptr);
         EXPECT_EQ(formStorage, tes_form_db::makeFormStorage(ctx, storageName));
 
-        auto fakeForm = make_lightweight_form_ref((FormId)0x14, ctx);
+        auto fakeForm = make_lightweight_form_ref((RE::FormID)0x14, ctx);
 
         auto entry = tes_form_db::makeMapEntry(ctx, storageName, fakeForm);
-        EXPECT_NOT_NIL(entry);
+        EXPECT_NE((entry), nullptr);
         EXPECT_EQ(entry, tes_form_db::makeMapEntry(ctx, storageName, fakeForm));
     }
 
@@ -279,13 +288,13 @@ namespace tes_api_3 {
     {
         tes_context_standalone ctx;
 
-        auto fakeForm = make_lightweight_form_ref((FormId)0x14, ctx);
+        auto fakeForm = make_lightweight_form_ref((RE::FormID)0x14, ctx);
 
         {
             const char *path = ".forms.object";
 
             auto ar = tes_array::objectWithSize(ctx, 0);
-            EXPECT_NOT_NIL(ar);
+            EXPECT_NE((ar), nullptr);
             tes_form_db::setItem(ctx, fakeForm, path, ar);
 
             EXPECT_TRUE(ar == tes_form_db::getItem<object_base*>(ctx, fakeForm, path));
@@ -295,7 +304,7 @@ namespace tes_api_3 {
             const char *path = ".forms.object2.key1";
 
             auto ar = tes_array::objectWithSize(ctx, 0);
-            EXPECT_NOT_NIL(ar);
+            EXPECT_NE((ar), nullptr);
             EXPECT_TRUE(tes_form_db::solveSetter<object_base*>(ctx, fakeForm, path, ar, true));
             EXPECT_TRUE(ar == tes_form_db::solveGetter<object_base*>(ctx, fakeForm, path));
         }

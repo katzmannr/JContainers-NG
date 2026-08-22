@@ -1,0 +1,14 @@
+diff --git a/dep/CommonLibSSE-NG/include/RE/R/ReferenceArray.h b/dep/CommonLibSSE-NG/include/RE/R/ReferenceArray.h
+index df9bdcbe..fa7987ab 100644
+--- a/dep/CommonLibSSE-NG/include/RE/R/ReferenceArray.h
++++ b/dep/CommonLibSSE-NG/include/RE/R/ReferenceArray.h
+@@ -123,7 +123,7 @@ namespace RE
+ 				if (_wrapped) {
+ 					const auto SIZE = static_cast<std::uint32_t>(_unwrapped.size());
+ 					for (std::uint32_t i = 0; i < SIZE; ++i) {
+-						(*_wrapped)[i].Pack(_unwrapped[i]);
++						(*_wrapped)[i].Pack(static_cast<T>(_unwrapped[i]));
+ 					}
+ 				}
+ 			}
+

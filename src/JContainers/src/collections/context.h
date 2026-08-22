@@ -8,7 +8,7 @@
 #include "object/object_context.h"
 
 #include "forms/form_observer.h"
-#include "collections/collections.h"
+#include "collections.h"
 
 namespace collections
 {

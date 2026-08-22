@@ -1,13 +1,13 @@
-#include "reflection/reflection.h"
 
 #include <map>
-#include "gtest.h"
+#include <gtest/gtest.h>
 #include "util/spinlock.h"
 #include "util/singleton.h"
-#include "skse64/PapyrusVM.h"
+#include <SKSE/SKSE.h>
 
 #include "reflection/detail/code_producer.hpp"
-#include "reflection/detail/type_traits.hpp"
+#include "reflection/reflection.h"
+#include "meta.h"
 
 namespace reflection {
 
@@ -15,7 +15,7 @@ namespace reflection {
         std::map<istring, class_info> classDB;
 
         for (auto & item : meta<class_info_creator>::getListConst()) {
-            class_info& info = item();
+            const class_info& info = item();
 
             auto found = classDB.find(info.className());
             if (found != classDB.end()) {

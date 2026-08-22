@@ -5,12 +5,14 @@
 #include <map>
 #include <jansson.h>
 #include <memory>
+#include <boost/filesystem.hpp>
 
-#include "collections.h"
-#include "form_handling.h"
-#include "boost_extras.h"
-#include "path_resolving.h"
-#include "boost/filesystem/path.hpp"
+#include "RE/B/BSCoreTypes.h"
+#include "collections/access.h"
+#include "collections/collections.h"
+#include "forms/form_handling.h"
+// File does not exist, source unknown
+//#include "path_resolving.h"
 
 namespace collections {
 
@@ -287,13 +289,13 @@ namespace collections {
                 if (!reference_serialization::is_special_string(string)) {
                     item = string;
                 } else {
-                    if (form_handling::is_form_string(string)) {
+                    if (forms::is_form_string(string)) {
                         /*  having dilemma here:
                             if string looks like form-string and plugin name can't be resolved:
                             a. lost info and convert it to FormZero
                             b. save info and convert it to string
                         */
-                        item = form_handling::from_string(string).get_value_or(FormZero);
+                        item = forms::string_to_form(string).get_value_or(0);
                     }
                     else if (schedule_ref_resolving(string, container, item_key)) { // otherwise it's reference string?
                         ;
@@ -478,16 +480,6 @@ namespace collections {
                     return json_real(val);
                 }
 
-                json_ref operator()(const FormId&  val) const {
-                    auto formStr = form_handling::to_string(val);
-                    if (formStr) {
-                        return (*this)(*formStr);
-                    }
-                    else {
-                        return null();
-                    }
-                }
-
                 json_ref operator()(const internal_object_ref & val) const {
                     object_base *obj = val.get();
 
@@ -503,9 +495,28 @@ namespace collections {
                     return node;
                 }
 
+                json_ref operator()(const RE::FormID& val) const
+                {
+                    auto formStr = forms::form_to_string(val);
+                    if (formStr)
+                        return json_string(formStr->c_str());
+
+                    return null();
+                }
+
+                json_ref operator()(const form_ref& val) const
+                {
+                    auto formStr = forms::form_to_string(val.get());
+
+                    if (formStr)
+                        return json_string(formStr->c_str());
+
+                    return null();
+                }
+
             } item_visitor = { *this };
 
-            json_ref val = item.var().apply_visitor(item_visitor);
+            json_ref val = std::visit(item_visitor, item.var());
             return val;
         }
 
@@ -533,9 +544,9 @@ namespace collections {
                     p.append(data);
                 }
 
-                void operator()(const FormId& fid) const {
+                void operator()(const RE::FormID& fid) const {
                     p.append("[");
-                    p.append(*form_handling::to_string(fid));
+                    p.append(*forms::form_to_string(fid));
                     p.append("]");
                 }
 

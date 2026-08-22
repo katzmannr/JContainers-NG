@@ -1,0 +1,102 @@
+// Do NOT use the statement below
+//#pragma once
+// The dumb MSVC compiler does not make a difference from SKSE.h and skse.h
+// Instead we are forced to use "old style" header guards.
+
+#ifndef JC_SKSE_H
+#define JC_SKSE_H
+
+#include <cstdint>
+#include <optional>
+
+namespace jc_skse
+{
+
+/**
+ * Lookup a mod by name and return actual form id.
+
+ * @see https://www.creationkit.com/index.php?title=GetFormFromFile_-_Game
+
+ * @param name of the mod (e.g. `Skyrim.esm`)
+ * @param form id to resolve, it is okay, if it is resolved already.
+ * @returns the form id if found, 0 if silent API, name[0] (if A-Z) for test API.
+ */
+
+std::optional<std::uint32_t> form_from_file (std::string_view const& name, std::uint32_t form);
+
+/**
+ * Forwards to SKSE `modList.loadedMods[idx]->name`.
+ * @returns the mod name if found, empty string if silent API, idx as char* (if A-Z) for test API.
+ */
+
+std::optional<std::string_view> loaded_mod_name (std::uint8_t idx);
+
+/**
+ * Forwards to SKSE `modList.loadedCCMods[idx]->name`.
+ * @returns the mod name if found, empty string if silent API, idx as char* (if A-Z) for test API.
+ */
+
+std::optional<std::string_view> loaded_light_mod_name (std::uint16_t idx);
+
+/**
+ * Forwards static forms to `SKSESerializationInterface::ResolveHandle`
+ * @returns the resolved handle or FormId#Zero on error (or if silent API), same handle if test
+ * or the input handle is for dynamic form.
+ */
+
+RE::FormID resolve_handle (RE::FormID handle);
+
+/**
+ * Valid handles are forwarded to `LookupByFormID`
+ * @returns the looked up handle, nullptr if silent API, random blob if test API
+ */
+
+RE::TESForm* lookup_form (RE::FormID handle);
+
+/**
+ * Uses SKSE `IObjectHandlePolicy::Resolve` and `AddRef`
+ * @returns true on successfully retained handle, or if silent/test API
+ */
+
+bool try_retain_handle (RE::FormID handle);
+
+/**
+ * Forwards to SKSE `IObjectHandlePolicy::Release` (ignored on silent/test API)
+ */
+
+void release_handle (RE::FormID handle);
+
+/**
+ * If there is a console manager will call its `VPrint` function (ignored on silent/test API).
+ */
+
+void console_print (const char * fmt, ...);
+
+/**
+ * If there is a console manager will call its `VPrint` function (ignored on silent/test API).
+ */
+
+void console_print (const char * fmt, const va_list& args);
+
+/**
+ * Binds the skse namespace calls to the real SKSE functions - normal mode for JC.
+ */
+
+void set_real_api ();
+
+/**
+ * Binds fake/test implementation of all skse calls.
+ */
+
+void set_fake_api ();
+
+/**
+ * Provides stub implementation of all skse calls - used at the normal JC runtime.
+ * @note investigate why
+ */
+
+void set_silent_api ();
+
+}
+
+#endif // JC_SKSE_H

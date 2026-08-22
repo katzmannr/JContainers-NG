@@ -1,6 +1,6 @@
 #pragma once
 
-#include "collections/collections.h"
+#include "collections.h"
 
 #include <thread>
 #include "meta.h"
@@ -29,14 +29,7 @@ namespace collections {
 #define COLLECTION_OPERATOR(func, descr) \
     static ::meta<coll_operator> g_collection_operator_##func(coll_operator::make(func, #func, descr));
 
-        template<class Key>
-        static coll_operator* get_operator(const Key& key) {
-            auto& omap = operators();
-            auto itr = omap.find(key);
-            return itr != omap.end() ? itr->second : nullptr;
-        }
-
-        static operator_map& operators() {
+        static operator_map& get_operators() {
 
             auto makeOperatorMap = []() -> operator_map {
                 operator_map omap;
@@ -49,6 +42,13 @@ namespace collections {
 
             static operator_map op_map = makeOperatorMap();
             return op_map;
+        }
+
+        template<class Key>
+        static coll_operator* get_operator(const Key& key) {
+            auto& omap = get_operators();
+            auto itr = omap.find(key);
+            return itr != omap.end() ? itr->second : nullptr;
         }
 
         void maxNum(const item& val, item& state) {

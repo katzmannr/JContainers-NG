@@ -1,89 +1,88 @@
 #pragma once
 
 #include <string>
-#include "skse64_common/Utilities.h"
+#include <SKSE/SKSE.h>
+#include <RE/T/TypeTraits.h>
+#include <RE/T/TypeInfo.h>
+#include <RE/P/PackUnpack.h>
+#include <string_view>
 
-namespace skse {
-
-    /// See `dep\skse64\src\skse64\GameTypes.h` and `StringCache`.
-    class string_ref {
-        const char* data = nullptr;
-
-        void assign(const char *buf) {
-            if (buf) {
-                CALL_MEMBER_FN(this, Set)(buf);
-            }
-            else {
-                release();
-            }
-        }
-
-        void release() {
-            if (data) {
-                CALL_MEMBER_FN(this, Release)();
-                data = nullptr;
-            }
-        }
-
-        MEMBER_FN_PREFIX(string_ref);
-
-#ifdef JC_SKSE_VR
-        DEFINE_MEMBER_FN(ctor, string_ref *, 0x00C6DB20, const char * buf);
-        DEFINE_MEMBER_FN(Set, string_ref *, 0x00C6DC90, const char * buf);
-        DEFINE_MEMBER_FN(Release, void, 0x00C6DC70);
-#elif JC_SKSE_GOG
-        DEFINE_MEMBER_FN(ctor, string_ref *, 0x00CEDFF0, const char * buf);
-        DEFINE_MEMBER_FN(Set, string_ref *, 0x00CEE180, const char * buf);
-        DEFINE_MEMBER_FN(Release, void, 0x00CEF3C0);
-#else
-        DEFINE_MEMBER_FN(ctor, string_ref *, 0x00CEC5D0, const char * buf);
-        DEFINE_MEMBER_FN(Set, string_ref *, 0x00CEC760, const char * buf);
-        DEFINE_MEMBER_FN(Release, void, 0x00CED9A0);
-#endif
-
+namespace skse
+{
+    class string_ref
+    {
     public:
+        string_ref() = default;
 
-        string_ref() { }
+        explicit string_ref(const char* val) :
+            _str(val)
+        {}
 
-        string_ref(const char * buf) {
-            CALL_MEMBER_FN(this, ctor)(buf);
-        }
+        explicit string_ref(const std::string_view& val) :
+            _str(val)
+        {}
 
-        template<class Tr, class Alloc>
-        string_ref(const std::basic_string<char, Tr, Alloc>& string) {
-            CALL_MEMBER_FN(this, ctor)(string.c_str());
-        }
+        string_ref(const string_ref&) = default;
+        string_ref(string_ref&&) = default;
 
-        ~string_ref() {
-            release();
-        }
+        string_ref& operator=(const string_ref&) = default;
+        string_ref& operator=(string_ref&&) = default;
 
-        string_ref(const string_ref& ref) { CALL_MEMBER_FN(this, ctor)(ref.data); }
-
-        string_ref& operator = (const string_ref& ref) { assign(ref.data); return *this; }
-
-        string_ref& operator = (const char* ref) { assign(ref); return *this; }
-
-        template<class Tr, class Alloc>
-        string_ref& operator = (const std::basic_string<char, Tr, Alloc>& string) {
-            assign(string.c_str());
+        string_ref& operator=(const char* val)
+        {
+            _str = val;
             return *this;
         }
 
-        string_ref(string_ref&& ref) {
-            std::swap(data, ref.data);
+        operator const RE::BSFixedString&() const
+        {
+            return _str;
         }
 
-        string_ref& operator = (string_ref&& ref) {
-            release();
-            std::swap(data, ref.data);
+        operator RE::BSFixedString() const
+        {
+            return _str;
+        }
+
+        // CommonLibSE internal representation of strings
+        operator std::string_view() const noexcept
+        {
+            return std::string_view{_str.c_str(), _str.size()};
+        }
+
+        template<class Tr, class Alloc>
+        explicit string_ref(const std::basic_string<char, Tr, Alloc>& str)
+            : _str(str.c_str())
+        {}
+
+        template <class Tr, class Alloc>
+        string_ref& operator=(const std::basic_string<char, Tr, Alloc>& str)
+        {
+            _str = str.c_str();
             return *this;
         }
 
-        bool operator==(const string_ref& lhs) const { return data == lhs.data; }
-
-        const char* c_str() const {
-            return data;
+        const char* c_str() const
+        {
+            return _str.c_str();
         }
+
+        bool operator==(const string_ref& rhs) const
+        {
+            return _str == rhs._str;
+        }
+
+    private:
+        RE::BSFixedString _str;
     };
 }
+
+// Inject our wrapper class for BSFixedString used for reflection and binding
+template<>
+struct RE::BSScript::GetRawType<skse::string_ref>
+{
+    constexpr RE::BSScript::TypeInfo::RawType operator()() const noexcept
+    {
+        return GetRawType<RE::BSFixedString>{}();
+    }
+};

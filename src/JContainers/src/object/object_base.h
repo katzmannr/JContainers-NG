@@ -4,8 +4,10 @@
 #include <atomic>
 #include <assert.h>
 #include <boost/optional/optional.hpp>
-#include "boost/noncopyable.hpp"
 
+#include "boost/core/noncopyable.hpp"
+#include "common/ITypes.h"
+#include "intrusive_ptr_serialization.hpp"
 #include "intrusive_ptr.hpp"
 #include "util/spinlock.h"
 #include "util/istring.h"

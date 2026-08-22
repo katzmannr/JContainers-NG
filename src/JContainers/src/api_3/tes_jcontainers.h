@@ -1,3 +1,18 @@
+#pragma once
+
+#include <filesystem>
+#include <cstring>
+#include <gtest/gtest.h>
+
+#include "boost/filesystem/directory.hpp"
+#include "master.h"
+#include "tes_string.h"
+#include "tes_lua.h"
+#include "collections/collections.h"
+#include "collections/bind_traits.h"
+
+#include <shlobj.h>
+
 namespace tes_api_3 {
 
 /// Redefine in each logging module
@@ -49,9 +64,7 @@ namespace tes_api_3 {
                 return false;
             }
 
-            struct _stat buf;
-            int result = _stat(filename, &buf);
-            return result == 0;
+            return std::filesystem::exists(filename);
         }
         REGISTERF2_STATELESS(fileExistsAtPath, "path", "Returns true if the file at a specified @path exists");
 
@@ -91,7 +104,7 @@ namespace tes_api_3 {
             return result;
         }
         REGISTERF_STATELESS(
-            contentsOfDirectoryAtPath<VMResultArray<skse::string_ref>>, "contentsOfDirectoryAtPath",
+            contentsOfDirectoryAtPath<std::vector<skse::string_ref>>, "contentsOfDirectoryAtPath",
             "directoryPath extension=\"\"", nullptr);
 
         static void removeFileAtPath(const char *filename)
@@ -113,7 +126,7 @@ namespace tes_api_3 {
                 return std::string();
             }
 
-            strcat_s(path, sizeof(path), "/" JC_USER_FILES);
+            strcat_s(path, sizeof(path), (std::string{"/"} + std::string{user_files()}).c_str());
 
             // race condition possible. hope it's not critical
             if (!boost::filesystem::exists(path) && (boost::filesystem::create_directories(path), !boost::filesystem::exists(path))) {
@@ -124,9 +137,9 @@ namespace tes_api_3 {
         }
 
         static skse::string_ref _userDirectory() {
-            return userDirectory().c_str();
+            return skse::string_ref(userDirectory().c_str());
         }
-        REGISTERF_STATELESS(_userDirectory, "userDirectory", "", "A path to user-specific directory - " JC_USER_FILES);
+        REGISTERF_STATELESS(_userDirectory, "userDirectory", "", std::string{"A path to user-specific directory - "} + std::string{user_files()});
 
         REGISTER_TEXT([]() {
             const char fmt[] = R"===(
@@ -150,12 +163,12 @@ endfunction
         auto write_file = [&](const boost::filesystem::path& path) {
             boost::filesystem::remove_all(path);
 
-            EXPECT_FALSE(boost::filesystem::is_regular(path));
+            EXPECT_FALSE(boost::filesystem::is_regular_file(path));
 
             object_stack_ref obj = tes_object::object<map>(ctx);
             tes_object::writeToFile(ctx, obj.get(), path.string().c_str());
 
-            EXPECT_TRUE(boost::filesystem::is_regular(path));
+            EXPECT_TRUE(boost::filesystem::is_regular_file(path));
 
             boost::filesystem::remove_all(path);
         };
