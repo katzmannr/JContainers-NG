@@ -3,6 +3,10 @@
 
 <img src="logo.png?raw=true" height="256">
 
+# License Change
+
+The original JContainers Code is and will remain MIT License until the point I created the Fork and I honour the work that has been done by all the original authors - especially ryobg, silverice. The complete work on the modernization and porting of their outstanding mod falls under a new license: GPL v3.0. Please be aware what this means if you want to use my code in your own projects. If you plan to publish a closed source software without adhering to this license, you must contact me first so we agree on different terms than GPLv3.0 for your software.
+
 # JContainers (64-bit)
 
 A project to extend [Skyrim's Papyrus
