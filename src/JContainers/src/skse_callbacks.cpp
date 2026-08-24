@@ -13,6 +13,8 @@
 
 #include "common/IDebugLog.h"
 #include "common/ITypes.h"
+#include "spdlog/common.h"
+#include <spdlog/sinks/basic_file_sink.h>
 #include "typedefs.h"
 #include "util/util.h"
 #include "jc_interface.h"
@@ -367,6 +369,23 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
         );
     gLog.SetPrintLevel(IDebugLog::kLevel_Error);
     gLog.SetLogLevel(IDebugLog::kLevel_DebugMessage);
+
+    // Logging of default spdlog output into a proper logfile.
+    // Known Bug: Paths are incorrect, Skyrim Root is missing
+    // Do not delete, needed for hard-to-reach spdlog output
+
+    // auto logger = spdlog::basic_logger_mt(
+    //     "JContainersDebug",
+    //     (std::string(skse_logs()) + std::string(plugin_name()) + "CL.log").c_str(),
+    //     true
+    //     );
+
+    // logger->set_level(spdlog::level::trace);
+    // logger->flush_on(spdlog::level::trace);
+    // spdlog::set_default_logger(logger);
+
+    // logger->info("Loading of JContainers commenced: {}", plugin_name());
+    // spdlog::default_logger()->flush();
 
     JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"skse callback: Loading JContainers Plugin");
 

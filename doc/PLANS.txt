@@ -3,35 +3,59 @@ JContainers64-NG
 
 This documents contains small summaries of planned changes.
 
-1) Port to CMake
+1) Port to CMake (done)
 
 Each part of the project will be moved to CMake. This wil remove the
 existing complex dependencies handling. All dependencies are on github
 making handling of new dependent packages much easier.
 
-2) Github Actions
+2) Github Actions (done
 
 The build for releases will always be done on github. The goal is to
 allow developers to work on the project without actually needing
 Visual Studio or even a compiler installed on the local machine and
 to provide a way to have consistant build independent of local installation.
 
-3) Switch to CommonLibSSE-NG
+3) Switch to CommonLibSSE-NG (done)
 
 Main goal of the project is to get rid of multiple separate builds for
 different Skyrim platforms. The CommonLibSSE-NG removes many headaches
 of the large Skyrim Release Platforms (Steam, GOG, VR). New platforms as
 well as different release are handled in this project as well.
 
-4) Issue tracking
+4) Issue tracking (set up)
 
 Issue tracking is done for issues only concerning the port. The team may
 provide preliminary support for stability issues only that are both based
 on issues in the original JContainers64 code as well as the port.
 
-5) Support
+5) Support  (set up)
 
 Support is limited to stability issues and the integration of JContainers64
 with CMake and github actions. Other problems and general JContainers64
 support will be provided on a dedicated page on Nexusmods.
+
+6) Port to CommonLibSSE-NG by alandtse
+
+A side goal is to check and hopefully perform a port to the latest
+supported CommonLibSSE-NG after CharmedBaryon abandoned the older 2022
+version that was the best entry point for JContainers-NG. Looking forward
+after the project switched license to GPLv3.0 only code itself is the
+final border. An issue was created for this.
+
+7) Support of Skyim 1.7.99
+
+This depends on 6) since changes in AdressLibrary and the fact that
+Skyrim SE now uses a new format v5 (coming back from other games like
+Fallout 4). A patch for the CharmedBaryon CommonLibSSE-NG was developed
+as inbetween way to let JContainers run there.
+
+8) API Extension
+
+There are two new JContainers projects that are both closed source
+and state to have added new API. Support for this API can be added
+when detailed information about this API is available. Since the
+main JContainers project preferred to make an incompatible API
+break, the actual behavior will need to be adapted to provide
+backward compatibility with existing mods.
 

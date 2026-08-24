@@ -1,0 +1,6 @@
+This folder contains all licenses of JContainers project.
+
+1) JContainers-MIT License for original code which formed the base of this fork
+2) GPLv3 COPYING for all changes done on top of the fork
+
+The overal project license is GPLv3.
