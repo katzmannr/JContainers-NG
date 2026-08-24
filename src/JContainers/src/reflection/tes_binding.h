@@ -315,9 +315,14 @@ namespace reflection { namespace binding {
 
             inline static std::unique_ptr<runtime_callback> callback;
 
-            static void initialize(State& state)
+            static void initialize(State& state, const char* className, const char*funcName)
             {
-                assert(!callback && "Function registered twice");
+                if( callback ) {
+                    JC_log_full(IDebugLog::kLevel_Error, "tes_binding: Function registered twice %s.%s (%p)",className, funcName, reinterpret_cast<void*>(&tes_func));
+                    //std::string output = std::format("Function {}.{} registered twice", className, funcName);
+                    //assert(!callback && output.c_str());
+                    return;
+                }
                 callback = std::make_unique<runtime_callback>(state);
             }
 
@@ -334,7 +339,7 @@ namespace reflection { namespace binding {
             static void bind(const bind_args& args)
             {
                 auto& state = *reinterpret_cast<State*>(args.shared_state);
-                initialize(state);
+                initialize(state, args.className.c_str(), args.functionName.c_str());
                 args.vm.RegisterFunction(
                     args.functionName.c_str(),
                     args.className.c_str(),

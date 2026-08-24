@@ -164,8 +164,13 @@ if(Patch_FOUND)
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     RESULT_VARIABLE PATCH_RESULT
   )
-  if(NOT PATCH_RESULT EQUAL 0)
-    message(FATAL_ERROR "Failed to apply CommonLibSSE-NG patch")
+  execute_process(
+    COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib2.patch
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE PATCH_RESULT2
+  )
+  if(NOT PATCH_RESULT EQUAL 0 OR NOT PATCH_RESULT2 EQUAL 0)
+    message("Failed to apply CommonLibSSE-NG patches")
   endif()
 else()
   message(FATAL_ERROR "This project requires patch for building")
@@ -207,4 +212,5 @@ target_link_libraries(JContainers
         Boost::thread
         Boost::serialization
         Boost::date_time
+        spdlog::spdlog
 )

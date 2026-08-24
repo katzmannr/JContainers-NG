@@ -192,4 +192,5 @@ target_link_libraries(${PROJECT_NAME}
         Boost::headers
         Boost::serialization
         Boost::date_time
+        spdlog::spdlog
 )

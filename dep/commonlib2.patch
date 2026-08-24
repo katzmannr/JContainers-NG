@@ -1,0 +1,205 @@
+diff --git a/dep/CommonLibSSE-NG/include/REL/Relocation.h b/dep/CommonLibSSE-NG/include/REL/Relocation.h
+index 12e8033c..388a39d4 100644
+--- a/dep/CommonLibSSE-NG/include/REL/Relocation.h
++++ b/dep/CommonLibSSE-NG/include/REL/Relocation.h
+@@ -905,6 +906,7 @@ namespace REL {
+                         _runtime = Runtime::VR;
+                         break;
+                     case 6:
++                    case 7:
+                         _runtime = Runtime::AE;
+                         break;
+                     default:
+@@ -1142,22 +1142,64 @@ namespace REL {
+ 
+         class header_t {
+         public:
+-            void read(istream_t &a_in, std::uint8_t a_formatVersion) {
+-                std::int32_t format{};
+-                a_in.readin(format);
+-                if (format != a_formatVersion) {
+-                    stl::report_and_fail(
+-                            fmt::format(
+-                                    "Unsupported address library format: {}\n"
+-                                    "This means this script extender plugin is incompatible with the address "
+-                                    "library available for this version of the game, and thus does not "
+-                                    "support it."sv,
+-                                    format));
++            [[nodiscard]]
++            std::int32_t format() const noexcept
++            {
++                return _format;
++            }
++
++            void read_v5(istream_t& a_in)
++            {
++                std::int32_t version[4]{};
++                a_in.readin(version);
++
++                for (std::size_t i = 0;
++                     i < std::extent_v<decltype(version)>;
++                     ++i) {
++                    _version[i] =
++                        static_cast<std::uint16_t>(version[i]);
++                }
++
++                // Fixed format-5 header:
++                // pointer_size @ 0x54
++                // address_count @ 0x58
++                // reserved @ 0x5C
++                a_in.ignore(0x54 - 0x14);
++
++                a_in.readin(_pointerSize);
++                a_in.ignore(4);
++                a_in.readin(_addressCount);
++            }
++
++            void read_v1_v2(istream_t& a_in)
++            {
++                a_in.readin(_format);
++
++                if (format() == 5) {
++                    std::int32_t version[4]{};
++                    a_in.readin(version);
++
++                    for (std::size_t i = 0; i < std::extent_v<decltype(version)>; ++i) {
++                        _version[i] = static_cast<std::uint16_t>(version[i]);
++                    }
++
++                    // Skip the remainder of the fixed-size format-5 header
++                    // up to pointer_size at 0x54.
++                    a_in.ignore(0x54 - 0x14);
++
++                    a_in.readin(_pointerSize);
++                    a_in.readin(_addressCount);
++
++                    // 0x5C..0x5F reserved.
++                    a_in.ignore(4);
++
++                    return;
+                 }
+ 
+                 std::int32_t version[4]{};
+-                std::int32_t nameLen{};
+                 a_in.readin(version);
++
++                std::int32_t nameLen{};
+                 a_in.readin(nameLen);
+                 a_in.ignore(nameLen);
+ 
+@@ -1169,6 +1211,30 @@ namespace REL {
+                 }
+             }
+ 
++            void read(istream_t& a_in)
++            {
++                a_in.readin(_format);
++
++                switch (format()) {
++                case 1:
++                case 2:
++                    read_v1_v2(a_in);
++                    break;
++
++                case 5:
++                    read_v5(a_in);
++                    break;
++
++                default:
++                    stl::report_and_fail(
++                        fmt::format(
++                            "Unsupported address library format: {}\n"
++                            "This means this script extender plugin is incompatible with the address "
++                            "library available for this version of the game, and thus does not support it."sv,
++                            format()));
++                }
++            }
++
+             [[nodiscard]] std::size_t address_count() const noexcept { return static_cast<std::size_t>(_addressCount); }
+ 
+             [[nodiscard]] std::uint64_t
+@@ -1180,6 +1246,7 @@ namespace REL {
+             Version _version;
+             std::int32_t _pointerSize{0};
+             std::int32_t _addressCount{0};
++            std::int32_t _format{0};
+         };
+ 
+         IDDatabase() = default;
+@@ -1213,15 +1280,15 @@ namespace REL {
+                                 fmt::format("Data/SKSE/Plugins/version-{}.bin"sv,
+                                             version.string()))
+                                 .value_or(L"<unknown filename>"s);
+-                load_file(filename, version, Module::IsAE() ? 2 : 1, true);
++                load_file(filename, version, true);
+             }
+         }
+ 
+-        bool load_file(stl::zwstring a_filename, Version a_version, std::uint8_t a_formatVersion, bool a_failOnError) {
++        bool load_file(stl::zwstring a_filename, Version a_version, bool a_failOnError) {
+             try {
+                 istream_t in(a_filename.data(), std::ios::in | std::ios::binary);
+                 header_t header;
+-                header.read(in, a_formatVersion);
++                header.read(in);
+                 if (header.version() != a_version) {
+                     return stl::report_and_error("version mismatch"sv, a_failOnError);
+                 }
+@@ -1229,20 +1296,24 @@ namespace REL {
+                 auto mapname = L"CommonLibSSEOffsets-v2-"s;
+                 mapname += a_version.wstring();
+                 const auto byteSize = static_cast<std::size_t>(header.address_count()) * sizeof(mapping_t);
+-				if (_mmap.open(mapname, byteSize)) {
+-					_id2offset = { static_cast<mapping_t*>(_mmap.data()), header.address_count() };
+-				} else if (_mmap.create(mapname, byteSize)) {
+-					_id2offset = { static_cast<mapping_t*>(_mmap.data()), header.address_count() };
+-					unpack_file(in, header, a_failOnError);
+-					std::sort(
+-						_id2offset.begin(),
+-						_id2offset.end(),
+-						[](auto&& a_lhs, auto&& a_rhs) {
+-							return a_lhs.id < a_rhs.id;
+-						});
+-				} else {
+-					return stl::report_and_error("failed to create shared mapping"sv, a_failOnError);
+-				}
++                if (_mmap.open(mapname, byteSize)) {
++                    _id2offset = { static_cast<mapping_t*>(_mmap.data()), header.address_count() };
++                } else if (_mmap.create(mapname, byteSize)) {
++                    _id2offset = { static_cast<mapping_t*>(_mmap.data()), header.address_count() };
++                    if (header.format() == 5) {
++                        unpack_file_v5(in);
++                    } else {
++                        unpack_file(in, header, a_failOnError);
++                    }
++                    std::sort(
++                        _id2offset.begin(),
++                        _id2offset.end(),
++                        [](auto&& a_lhs, auto&& a_rhs) {
++                            return a_lhs.id < a_rhs.id;
++                        });
++                } else {
++                    return stl::report_and_error("failed to create shared mapping"sv, a_failOnError);
++                }
+             } catch (const std::system_error &) {
+                 return stl::report_and_error(
+                         fmt::format(
+@@ -1303,6 +1374,18 @@ namespace REL {
+             return true;
+         }
+ 
++        void unpack_file_v5(istream_t& a_in)
++        {
++            for (std::size_t i = 0; i < _id2offset.size(); ++i) {
++                const auto offset = a_in.readout<std::uint32_t>();
++
++                _id2offset[i] = {
++                    static_cast<std::uint64_t>(i + 1),
++                    static_cast<std::uint64_t>(offset)
++                };
++            }
++        }
++
+         bool unpack_file(istream_t &a_in, header_t a_header, bool a_failOnError) {
+             std::uint8_t type = 0;
+             std::uint64_t id = 0;
