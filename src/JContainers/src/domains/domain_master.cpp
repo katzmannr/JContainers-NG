@@ -3,10 +3,7 @@
 #include <functional>
 #include <exception>
 
-#include "boost/archive/binary_oarchive.hpp"
-
 #include "jansson.h"
-#include <gtest/gtest.h>
 #include "common/IDebugLog.h"
 
 #include "util/to_underlying.hpp"
@@ -18,6 +15,8 @@
 #include "object/object_context.h"
 #include "domain_master_serialization.h"
 #include "jcontainers_constants.h"
+#include <gtest/gtest.h>
+#include "boost/archive/binary_oarchive.hpp"
 
 
 
@@ -28,7 +27,7 @@ namespace domain_master {
 
         std::set<util::istring> get_domains_from_fs () 
         {
-            using namespace boost::filesystem;
+            using namespace std::filesystem;
 
             std::set<util::istring> domains;
             path dir = util::relative_to_dll_path (JC_DATA_FILES "Domains/");

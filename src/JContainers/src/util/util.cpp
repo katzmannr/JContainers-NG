@@ -7,7 +7,7 @@ namespace util {
 
 #define countof(array) sizeof(array)/(sizeof(array[0]))
 
-    boost::filesystem::path dll_path() {
+    std::filesystem::path dll_path() {
         HMODULE hm = nullptr;
         auto result = GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
             GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
@@ -16,10 +16,10 @@ namespace util {
         assert(result && "GetModuleHandleExA failed");
         wchar_t path[MAX_PATH] = { '\0' };
         GetModuleFileNameW(hm, path, countof(path));
-        return boost::filesystem::path(path);
+        return std::filesystem::path(path);
     }
 
-    boost::filesystem::path relative_to_dll_path(const char *relative_path) {
+    std::filesystem::path relative_to_dll_path(const char *relative_path) {
         assert(relative_path);
         auto imagePath = dll_path();
         return (imagePath.remove_filename() /= relative_path);

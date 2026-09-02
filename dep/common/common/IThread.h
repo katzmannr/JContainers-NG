@@ -1,5 +1,7 @@
 #pragma once
 
+#include <wtypes.h>
+
 // TODO: I really don't like the interface for this
 
 class IThread

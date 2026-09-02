@@ -1,7 +1,5 @@
 #pragma once
 
-#include <assert.h>
-
 #include <boost/serialization/split_member.hpp>
 #include <boost/optional.hpp>
 
