@@ -10,11 +10,6 @@ FetchContent_Declare(
   OVERRIDE_FIND_PACKAGE
 )
 
-set(USE_PREBUILT_SHADERS ON CACHE BOOL "" FORCE)
-set(COMPILED_SHADERS
-   "${CMAKE_BINARY_DIR}/_deps/directxtk-build/Shaders/Compiled"
-   CACHE PATH "" FORCE
-)
 FetchContent_MakeAvailable(directxtk)
 add_library(Microsoft::DirectXTK ALIAS DirectXTK)
 unset(BUILD_TOOLS CACHE)
