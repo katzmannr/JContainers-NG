@@ -43,7 +43,7 @@ version that was the best entry point for JContainers-NG. Looking forward
 after the project switched license to GPLv3.0 only code itself is the
 final border. An issue was created for this.
 
-7) Support of Skyim 1.7.104
+7) Support of Skyim 1.7.104 (in progress)
 
 This depends on 6) since changes in AdressLibrary and the fact that
 Skyrim SE now uses a new format v5 (coming back from other games like
