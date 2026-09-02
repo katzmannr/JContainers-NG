@@ -225,13 +225,13 @@ const float kFloatEpsilon = 0.0001f;
 
 inline bool FloatEqual(float a, float b) { float magnitude = a - b; if(magnitude < 0) magnitude = -magnitude; return magnitude < kFloatEpsilon; }
 
-class Vector2
+class Vector2C
 {
 	public:
-		Vector2() { }
-		Vector2(const Vector2 & in)					{ x = in.x; y = in.y; }
-		Vector2(float inX, float inY)				{ x = inX; y = inY; }
-		~Vector2() { }
+		Vector2C() { }
+		Vector2C(const Vector2C & in)					{ x = in.x; y = in.y; }
+		Vector2C(float inX, float inY)				{ x = inX; y = inY; }
+		~Vector2C() { }
 
 		void	Set(float inX, float inY)			{ x = inX; y = inY; }
 		void	SetX(float inX)						{ x = inX; }
@@ -249,33 +249,33 @@ class Vector2
 
 		void	SwapBytes(void)	{ SwapFloat(&x); SwapFloat(&y); }
 
-		Vector2 &	operator+=(const Vector2 & rhs)	{ x += rhs.x; y += rhs.y; return *this; }
-		Vector2 &	operator-=(const Vector2 & rhs)	{ x -= rhs.x; y -= rhs.y; return *this; }
-		Vector2 &	operator*=(float rhs)			{ x *= rhs; y *= rhs; return *this; }
-		Vector2 &	operator/=(float rhs)			{ x /= rhs; y /= rhs; return *this; }
+		Vector2C &	operator+=(const Vector2C & rhs)	{ x += rhs.x; y += rhs.y; return *this; }
+		Vector2C &	operator-=(const Vector2C & rhs)	{ x -= rhs.x; y -= rhs.y; return *this; }
+		Vector2C &	operator*=(float rhs)			{ x *= rhs; y *= rhs; return *this; }
+		Vector2C &	operator/=(float rhs)			{ x /= rhs; y /= rhs; return *this; }
 
 		float	x;
 		float	y;
 };
 
-inline Vector2 operator+(const Vector2 & lhs, const Vector2 & rhs)
+inline Vector2C operator+(const Vector2C & lhs, const Vector2C & rhs)
 {
-	return Vector2(lhs.x + rhs.x, lhs.y + rhs.y);
+	return Vector2C(lhs.x + rhs.x, lhs.y + rhs.y);
 };
 
-inline Vector2 operator-(const Vector2 & lhs, const Vector2 & rhs)
+inline Vector2C operator-(const Vector2C & lhs, const Vector2C & rhs)
 {
-	return Vector2(lhs.x - rhs.x, lhs.y - rhs.y);
+	return Vector2C(lhs.x - rhs.x, lhs.y - rhs.y);
 };
 
-inline Vector2 operator*(const Vector2 & lhs, float rhs)
+inline Vector2C operator*(const Vector2C & lhs, float rhs)
 {
-	return Vector2(lhs.x * rhs, lhs.y * rhs);
+	return Vector2C(lhs.x * rhs, lhs.y * rhs);
 };
 
-inline Vector2 operator/(const Vector2 & lhs, float rhs)
+inline Vector2C operator/(const Vector2C & lhs, float rhs)
 {
-	return Vector2(lhs.x / rhs, lhs.y / rhs);
+	return Vector2C(lhs.x / rhs, lhs.y / rhs);
 };
 
 inline bool MaskCompare(void * lhs, void * rhs, void * mask, UInt32 size)
@@ -291,13 +291,13 @@ inline bool MaskCompare(void * lhs, void * rhs, void * mask, UInt32 size)
 	return true;
 }
 
-class Vector3
+class Vector3C
 {
 public:
-	Vector3()									{ }
-	Vector3(const Vector3 & in)					{ x = in.x; y = in.y; z = in.z; }
-	Vector3(float inX, float inY, float inZ)	{ x = inX; y = inY; z = inZ; }
-	~Vector3()									{ }
+	Vector3C()									{ }
+	Vector3C(const Vector3C & in)					{ x = in.x; y = in.y; z = in.z; }
+	Vector3C(float inX, float inY, float inZ)	{ x = inX; y = inY; z = inZ; }
+	~Vector3C()									{ }
 
 	void	Set(float inX, float inY, float inZ)			{ x = inX; y = inY; z = inZ; }
 	void	Get(float * outX, float * outY, float * outZ)	{ *outX = x; *outY = y; *outZ = z; }
@@ -309,10 +309,10 @@ public:
 
 	void	SwapBytes(void)	{ SwapFloat(&x); SwapFloat(&y); SwapFloat(&z); }
 
-	Vector3 &	operator+=(const Vector3 & rhs)	{ x += rhs.x; y += rhs.y; z += rhs.z; return *this; }
-	Vector3 &	operator-=(const Vector3 & rhs)	{ x -= rhs.x; y -= rhs.y; z -= rhs.z; return *this; }
-	Vector3 &	operator*=(const Vector3 & rhs)	{ x *= rhs.x; y *= rhs.y; z *= rhs.z; return *this; }
-	Vector3 &	operator/=(const Vector3 & rhs)	{ x /= rhs.x; y /= rhs.y; z /= rhs.z; return *this; }
+	Vector3C &	operator+=(const Vector3C & rhs)	{ x += rhs.x; y += rhs.y; z += rhs.z; return *this; }
+	Vector3C &	operator-=(const Vector3C & rhs)	{ x -= rhs.x; y -= rhs.y; z -= rhs.z; return *this; }
+	Vector3C &	operator*=(const Vector3C & rhs)	{ x *= rhs.x; y *= rhs.y; z *= rhs.z; return *this; }
+	Vector3C &	operator/=(const Vector3C & rhs)	{ x /= rhs.x; y /= rhs.y; z /= rhs.z; return *this; }
 
 	union
 	{
@@ -324,22 +324,22 @@ public:
 	};
 };
 
-inline Vector3 operator+(const Vector3 & lhs, const Vector3 & rhs)
+inline Vector3C operator+(const Vector3C & lhs, const Vector3C & rhs)
 {
-	return Vector3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
+	return Vector3C(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 }
 
-inline Vector3 operator-(const Vector3 & lhs, const Vector3 & rhs)
+inline Vector3C operator-(const Vector3C & lhs, const Vector3C & rhs)
 {
-	return Vector3(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+	return Vector3C(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
 }
 
-inline Vector3 operator*(const Vector3 & lhs, const Vector3 & rhs)
+inline Vector3C operator*(const Vector3C & lhs, const Vector3C & rhs)
 {
-	return Vector3(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
+	return Vector3C(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
 }
 
-inline Vector3 operator/(const Vector3 & lhs, const Vector3 & rhs)
+inline Vector3C operator/(const Vector3C & lhs, const Vector3C & rhs)
 {
-	return Vector3(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z);
+	return Vector3C(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z);
 }

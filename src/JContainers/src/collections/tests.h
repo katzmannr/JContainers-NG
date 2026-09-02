@@ -321,7 +321,7 @@ namespace collections { namespace {
 
         static void test() {
 
-            namespace fs = boost::filesystem;
+            namespace fs = std::filesystem;
 
             auto dir = util::relative_to_dll_path("test_data/json_loading_test");
             fs::directory_iterator end;
@@ -342,7 +342,7 @@ namespace collections { namespace {
 
         /// Expect that reading from string will cause an access violation when destroying an object's tag
         /// In fact tests, the JC istring serialization through Boost, making difference between istring and std::string
-        static void do_tag_allocator (boost::filesystem::path const& filepath)
+        static void do_tag_allocator (std::filesystem::path const& filepath)
         {
             tes_context_standalone ctx;
             Handle rootId = Handle::Null;

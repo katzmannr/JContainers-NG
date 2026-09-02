@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "util/to_underlying.hpp"
 #include "RE/Skyrim.h"
 
 #include <boost/optional.hpp>
@@ -8,10 +9,10 @@
 #include "collections/bind_traits.h"
 #include "reflection/detail/type_traits.hpp"
 #include "tes_object.h"
+#include "jcontainers_constants.h"
 #include "tes_form_db.h"
 #include "tes_jcontainers.h"
 // Required for string.h
-#include "jcontainers_constants.h"
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 #include "common/IPrefix.h"
