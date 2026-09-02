@@ -18,14 +18,14 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include "typedefs.h"
 #include "util/util.h"
-#include "jc_interface.h"
 #include "reflection/reflection.h"
-#include "jcontainers_constants.h"
 
 #include "collections/context.h"
 #include "forms/form_observer.h"
 
 #include "domains/domain_master.h"
+#include "jc_interface.h"
+#include "jcontainers_constants.h"
 
 namespace jc {
     extern root_interface root;

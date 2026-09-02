@@ -25,12 +25,12 @@ extern "C" {
 #include "util/spinlock.h"
 #include "util/to_underlying.hpp"
 #include "reflection/reflection.h"
-#include "jcontainers_constants.h"
 
 #include "collections.h"
 #include "context.h"
 #include "functions.h"
 #include "access.h"
+#include "jcontainers_constants.h"
 
 // Module imports:
 

@@ -12,6 +12,7 @@
 // Required for string.h
 #include "RE/Skyrim.h"
 #include "common/IPrefix.h"
+#include "jcontainers_constants.h"
 #include <shlobj.h>
 
 namespace collections {

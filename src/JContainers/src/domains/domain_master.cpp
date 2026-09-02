@@ -10,7 +10,6 @@
 #include "common/IDebugLog.h"
 
 #include "util/to_underlying.hpp"
-#include "jcontainers_constants.h"
 #include "util/singleton.h"
 #include "util/util.h"
 #include "util/istring.h"
@@ -18,6 +17,7 @@
 
 #include "object/object_context.h"
 #include "domain_master_serialization.h"
+#include "jcontainers_constants.h"
 
 
 

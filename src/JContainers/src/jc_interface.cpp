@@ -1,9 +1,9 @@
 #include "util/to_underlying.hpp"
-#include "jc_interface.h"
 
 #include "util/istring.h"
 #include "reflection/reflection.h"
 #include "domains/domain_master.h"
+#include "jc_interface.h"
 
 namespace jc { namespace {
 
