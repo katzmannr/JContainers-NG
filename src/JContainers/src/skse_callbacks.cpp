@@ -1,4 +1,5 @@
 #include <boost/iostreams/stream.hpp>
+#include "util/to_underlying.hpp"
 #include "RE/B/BSCoreTypes.h"
 #include "RE/Skyrim.h"
 #include "SKSE/API.h"
@@ -261,7 +262,7 @@ public:
                             func.name,
                             reinterpret_cast<reflection::bind_args::shared_state_t*>(&dom)
                         };
-                        JC_log_full(IDebugLog::kLevel_VerboseMessage,"skse callback: registerAllFunctions:\n class %s function %s", args.className.data(), args.functionName.data());
+                        JC_log_full(IDebugLog::kLevel_DebugMessage,"skse callback: registerAllFunctions:\n class %s function %s", args.className.data(), args.functionName.data());
                         func.registrator(args);
                         // Replaces setting NoWait flag using SetFunctionFlags
                         vm->SetCallableFromTasklets(args.className.c_str(),
@@ -374,18 +375,18 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
     // Known Bug: Paths are incorrect, Skyrim Root is missing
     // Do not delete, needed for hard-to-reach spdlog output
 
-    // auto logger = spdlog::basic_logger_mt(
-    //     "JContainersDebug",
-    //     (std::string(skse_logs()) + std::string(plugin_name()) + "CL.log").c_str(),
-    //     true
-    //     );
+    auto logger = spdlog::basic_logger_mt(
+        "JContainersDebug",
+        (std::string(skse_logs()) + std::string(plugin_name()) + "CL.log").c_str(),
+        true
+        );
 
-    // logger->set_level(spdlog::level::trace);
-    // logger->flush_on(spdlog::level::trace);
-    // spdlog::set_default_logger(logger);
+    logger->set_level(spdlog::level::trace);
+    logger->flush_on(spdlog::level::trace);
+    spdlog::set_default_logger(logger);
 
-    // logger->info("Loading of JContainers commenced: {}", plugin_name());
-    // spdlog::default_logger()->flush();
+    logger->info("Loading of JContainers commenced: {}", plugin_name());
+    spdlog::default_logger()->flush();
 
     JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"skse callback: Loading JContainers Plugin");
 

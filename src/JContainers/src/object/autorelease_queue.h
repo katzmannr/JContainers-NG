@@ -4,7 +4,6 @@
 #include "util/singleton.h"
 #include "object_base.h"
 #include "object/object_registry.h"
-#include "common/IPrefix.h"
 #include "common/IThread.h"
 #include "intrusive_ptr_serialization.hpp"
 

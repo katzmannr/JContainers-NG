@@ -2,7 +2,6 @@
 
 #include <SKSE/SKSE.h>
 #include "REL/Relocation.h"
-#include <windows.h>
 #include <cstdint>
 
 using namespace std::literals;

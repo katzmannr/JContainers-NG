@@ -23,6 +23,7 @@ extern "C" {
 #include "util/util.h"
 #include <gtest/gtest.h>
 #include "util/spinlock.h"
+#include "util/to_underlying.hpp"
 #include "reflection/reflection.h"
 #include "jcontainers_constants.h"
 

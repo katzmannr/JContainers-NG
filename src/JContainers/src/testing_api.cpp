@@ -1,3 +1,4 @@
+#include "util/to_underlying.hpp"
 #include "jcontainers_constants.h"
 #include "reflection/reflection.h"
 #include <gtest/gtest.h>

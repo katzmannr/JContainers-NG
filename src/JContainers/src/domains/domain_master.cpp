@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include "common/IDebugLog.h"
 
+#include "util/to_underlying.hpp"
 #include "jcontainers_constants.h"
 #include "util/singleton.h"
 #include "util/util.h"

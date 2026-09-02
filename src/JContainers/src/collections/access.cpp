@@ -1,3 +1,4 @@
+#include "util/to_underlying.hpp"
 #include "access.h"
 
 #include <boost/algorithm/string.hpp>

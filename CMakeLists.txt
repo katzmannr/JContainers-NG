@@ -101,6 +101,8 @@ cmake_policy(SET CMP0167 OLD)
 #)
 find_package(googletest CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(directxtk CONFIG REQUIRED)
+find_package(directxmath CONFIG REQUIRED)
 
 ################################################################################
 # Use solution folders feature
@@ -157,24 +159,24 @@ find_package(rapidcsv CONFIG REQUIRED)
 # Patch CommonLibSSE-NG ReferenceArray.h to support bool arrays
 # Reverse Patch not checked, patch may be removed when updating CommonLib NG
 ################################################################################
-find_package(Patch)
-if(Patch_FOUND)
-  execute_process(
-    COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib.patch
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    RESULT_VARIABLE PATCH_RESULT
-  )
-  execute_process(
-    COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib2.patch
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    RESULT_VARIABLE PATCH_RESULT2
-  )
-  if(NOT PATCH_RESULT EQUAL 0 OR NOT PATCH_RESULT2 EQUAL 0)
-    message("Failed to apply CommonLibSSE-NG patches")
-  endif()
-else()
-  message(FATAL_ERROR "This project requires patch for building")
-endif()
+#find_package(Patch)
+# if(Patch_FOUND)
+#   execute_process(
+#     COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib.patch
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#     RESULT_VARIABLE PATCH_RESULT
+#   )
+#   execute_process(
+#     COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib2.patch
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#     RESULT_VARIABLE PATCH_RESULT2
+#   )
+#   if(NOT PATCH_RESULT EQUAL 0 OR NOT PATCH_RESULT2 EQUAL 0)
+#     message("Failed to apply CommonLibSSE-NG patches")
+#   endif()
+# else()
+#   message(FATAL_ERROR "This project requires patch for building")
+# endif()
 
 ################################################################################
 # Sub-projects

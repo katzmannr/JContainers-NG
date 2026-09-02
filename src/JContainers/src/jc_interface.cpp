@@ -1,3 +1,4 @@
+#include "util/to_underlying.hpp"
 #include "jc_interface.h"
 
 #include "util/istring.h"

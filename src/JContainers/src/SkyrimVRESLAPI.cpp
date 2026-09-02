@@ -1,4 +1,5 @@
 #include <utility>
+#include "util/to_underlying.hpp"
 #include "SkyrimVRESLAPI.h"
 #include "RE/T/TESDataHandler.h"
 // Interface code based on https://github.com/adamhynek/higgs

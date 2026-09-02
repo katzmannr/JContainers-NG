@@ -35,7 +35,7 @@ Support is limited to stability issues and the integration of JContainers64
 with CMake and github actions. Other problems and general JContainers64
 support will be provided on a dedicated page on Nexusmods.
 
-6) Port to CommonLibSSE-NG by alandtse
+6) Port to CommonLibSSE-NG by alandtse (in progres)
 
 A side goal is to check and hopefully perform a port to the latest
 supported CommonLibSSE-NG after CharmedBaryon abandoned the older 2022
@@ -43,7 +43,7 @@ version that was the best entry point for JContainers-NG. Looking forward
 after the project switched license to GPLv3.0 only code itself is the
 final border. An issue was created for this.
 
-7) Support of Skyim 1.7.99
+7) Support of Skyim 1.7.104
 
 This depends on 6) since changes in AdressLibrary and the fact that
 Skyrim SE now uses a new format v5 (coming back from other games like
@@ -59,3 +59,15 @@ main JContainers project preferred to make an incompatible API
 break, the actual behavior will need to be adapted to provide
 backward compatibility with existing mods.
 
+9) Make old CommonLib to support 1.7.99 (dropped)
+
+Format support needs to be analyzed and added to Relocation.h.
+The most time consuming part is actually finding out the real
+address offsets that have changed in 1.7.99. Address Library
+has offsets already, but we need probably the original offsets
+as well or another way to find out their meaning. I also saw
+that there are some address offsets used. These small offsets
+need to be separated from the official ones. They need to be
+documented. And praying that there is somewhere an official
+documentation about them (probably on project wiki). It sounds
+like more work than porting getting alandtse variant to work.

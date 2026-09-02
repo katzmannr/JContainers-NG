@@ -11,6 +11,7 @@
 #include "tes_jcontainers.h"
 // Required for string.h
 #include "RE/Skyrim.h"
+#include "common/IPrefix.h"
 #include <shlobj.h>
 
 namespace collections {
