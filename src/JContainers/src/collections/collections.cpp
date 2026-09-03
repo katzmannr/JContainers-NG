@@ -33,6 +33,7 @@
 
 #include "object/object_base_serialization.h"
 
+#include "util/to_underlying.hpp"
 #include "forms/form_handling.h"
 
 #include "collections.h"

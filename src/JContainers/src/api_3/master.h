@@ -1,7 +1,7 @@
 #pragma once
 
-#include "reflection/reflection.h"
 #include "jcontainers_constants.h"
+#include "reflection/reflection.h"
 
 namespace tes_api_3 {
 

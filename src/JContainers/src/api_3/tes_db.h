@@ -90,13 +90,13 @@ for ex. JDB.setObj(\"frostfall\", frostFallInformation) will associate 'frostall
         REGISTERF2(hasPath, "path", "Returns true, if JDB capable resolve given @path, i.e. if it able to execute solve* or solver*Setter functions successfully");
 
         static object_base* allKeys(tes_context& ctx) {
-            JC_LOG_API ("");
+            JC_LOG_API ("size %d",ctx.object_count());
             return tes_map::allKeys(ctx, &ctx.root());
         }
         REGISTERF2(allKeys, "*", "returns new array containing all JDB keys");
 
         static object_base* allValues(tes_context& ctx) {
-            JC_LOG_API ("");
+            JC_LOG_API ("size %d",ctx.object_count());
             return tes_map::allValues(ctx, &ctx.root());
         }
         REGISTERF2(allValues, "*", "returns new array containing all containers associated with JDB");
@@ -108,7 +108,7 @@ for ex. JDB.setObj(\"frostfall\", frostFallInformation) will associate 'frostall
         REGISTERF2(writeToFile, "path", "writes storage data into JSON file at given path");
 
         static object_base* root(tes_context& ctx) {
-            JC_LOG_API ("");
+            JC_LOG_API ("size %d",ctx.object_count());
             return &ctx.root();
         }
         REGISTERF2(root, "", "Returns underlying JDB's container - an instance of JMap.\nThe object being owned (retained) internally, so you don't have to (but can) retain or release it.")

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string.h>
+#include <string>
+#include "typedefs.h"
 
 namespace util {
 

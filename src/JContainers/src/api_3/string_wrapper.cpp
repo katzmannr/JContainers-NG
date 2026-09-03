@@ -14,6 +14,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/range/iterator_range.hpp>
+#include "typedefs.h"
 
 namespace tes_api_3 {
 

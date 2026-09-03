@@ -7,7 +7,7 @@
 #include <jansson.h>
 #include <stdio.h>
 #include <conio.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 int errorCounter = 0;
 int filesTotal = 0;
@@ -59,7 +59,7 @@ void validate_file(const _TCHAR *path) {
 }
 
 void handle_path(_TCHAR *path) {
-    namespace fs = boost::filesystem;
+    namespace fs = std::filesystem;
 
     if (!path || !fs::exists( path )) {
         return;

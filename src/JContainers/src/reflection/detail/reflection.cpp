@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include "util/spinlock.h"
 #include "util/singleton.h"
+#include "util/to_underlying.hpp"
 #include <SKSE/SKSE.h>
 
 #include "reflection/detail/code_producer.hpp"

@@ -36,7 +36,7 @@ namespace tes_api_3 {
         REGISTERF2_STATELESS(__isInstalled, nullptr, "It's NOT part of public API");
 
         static UInt32 APIVersion() {
-            JC_LOG_API ("");
+            JC_LOG_API ("version %d",consts::api_version);
             return (UInt32)consts::api_version;
         }
         REGISTERF2_STATELESS(APIVersion, nullptr, []() {
@@ -51,7 +51,7 @@ namespace tes_api_3 {
         });
 
         static UInt32 featureVersion() {
-            JC_LOG_API ("");
+            JC_LOG_API ("version %d",consts::feature_version);
             return (UInt32)consts::feature_version;
         }
         REGISTERF2_STATELESS(featureVersion, nullptr, nullptr);
@@ -130,7 +130,7 @@ namespace tes_api_3 {
 
         static std::string userDirectory()
         {
-            JC_LOG_API ("");
+            JC_LOG_API ("dir %s","custom");
 
             char path[MAX_PATH];
             if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path))) {
@@ -148,7 +148,7 @@ namespace tes_api_3 {
         }
 
         static skse::string_ref _userDirectory() {
-	        JC_LOG_API ("");
+	        JC_LOG_API ("dir %s",userDirectory().c_str());
             return skse::string_ref(userDirectory().c_str());
         }
         REGISTERF_STATELESS(_userDirectory, "userDirectory", "", std::string{"A path to user-specific directory - "} + std::string{user_files()});
@@ -170,7 +170,7 @@ endfunction
 
     TEST(tes_jcontainers, userDirectory)
     {
-	    JC_LOG_API ("");
+        JC_LOG_API ("dir %s",tes_jcontainers::userDirectory().c_str());
         tes_context_standalone ctx;
 
         auto write_file = [&](const std::filesystem::path& path) {
@@ -202,7 +202,7 @@ endfunction
 
     TEST(tes_jcontainers, contentsOfDirectoryAtPath)
     {
-	    JC_LOG_API ("");
+	    JC_LOG_API ("%s","arrived at path");
         std::vector<std::string> vec;
         EXPECT_NO_THROW(vec = tes_jcontainers::contentsOfDirectoryAtPath<decltype(vec)>(":invaliddir"));
         EXPECT_TRUE(vec.empty());

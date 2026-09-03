@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
-################################################################################
+#################################################################################
 # Windows 10 is required. Do NOT increase this to Windows 11.
 ################################################################################
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
@@ -101,6 +101,8 @@ cmake_policy(SET CMP0167 OLD)
 #)
 find_package(googletest CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(directxtk CONFIG REQUIRED)
+find_package(directxmath CONFIG REQUIRED)
 
 ################################################################################
 # Use solution folders feature
@@ -164,12 +166,7 @@ if(Patch_FOUND)
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     RESULT_VARIABLE PATCH_RESULT
   )
-  execute_process(
-    COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib2.patch
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    RESULT_VARIABLE PATCH_RESULT2
-  )
-  if(NOT PATCH_RESULT EQUAL 0 OR NOT PATCH_RESULT2 EQUAL 0)
+  if(NOT PATCH_RESULT EQUAL 0)
     message("Failed to apply CommonLibSSE-NG patches")
   endif()
 else()

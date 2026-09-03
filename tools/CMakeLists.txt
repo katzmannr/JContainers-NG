@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
 message(STATUS "MSVC-WINE-Toolchain environment")
 include(CMake/msvc-wine-toolchain.cmake)
-################################################################################
+#################################################################################
 # Windows 10 is required. Do NOT increase this to Windows 11.
 ################################################################################
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
@@ -108,6 +108,8 @@ cmake_policy(SET CMP0167 OLD)
 #)
 find_package(googletest CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(directxtk CONFIG REQUIRED)
+find_package(directxmath CONFIG REQUIRED)
 
 ################################################################################
 # Use solution folders feature
@@ -172,7 +174,7 @@ if(Patch_FOUND)
     RESULT_VARIABLE PATCH_RESULT
   )
   if(NOT PATCH_RESULT EQUAL 0)
-    message(FATAL_ERROR "Failed to apply CommonLibSSE-NG patch")
+    message("Failed to apply CommonLibSSE-NG patches")
   endif()
 else()
   message(FATAL_ERROR "This project requires patch for building")
@@ -214,4 +216,5 @@ target_link_libraries(JContainers
         Boost::thread
         Boost::serialization
         Boost::date_time
+        spdlog::spdlog
 )

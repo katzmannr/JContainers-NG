@@ -10,7 +10,7 @@ using namespace std::literals;
 namespace collections {
 
 #   define JC_API_VERSION           0
-#   define JC_FEATURE_VERSION       1
+#   define JC_FEATURE_VERSION       2
 #   define JC_PATCH_VERSION         1
 #   define JC_REVISION_VERSION      0
 

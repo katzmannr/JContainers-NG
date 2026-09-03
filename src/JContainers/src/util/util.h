@@ -4,7 +4,7 @@
 #include <assert.h>
 #include "typedefs.h"
 #include <common/IDebugLog.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 // namespace boost { namespace filesystem {
 
@@ -13,8 +13,8 @@
 
 namespace util {
 
-    boost::filesystem::path dll_path();
-    boost::filesystem::path relative_to_dll_path(const char *relative_path);
+    std::filesystem::path dll_path();
+    std::filesystem::path relative_to_dll_path(const char *relative_path);
 
     template<class T>
     void do_with_timing(const char *operation_name, T&& func) {

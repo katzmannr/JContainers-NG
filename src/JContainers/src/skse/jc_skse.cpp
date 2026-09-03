@@ -1,3 +1,4 @@
+#include "util/to_underlying.hpp"
 #include <SKSE/SKSE.h>
 
 #include "RE/B/BSCoreTypes.h"
@@ -6,7 +7,7 @@
 #include "RE/T/TESDataHandler.h"
 #include "RE/T/TESForm.h"
 #include "SkyrimVRESLAPI.h"
-#include "common/IDebugLog.h"
+#include "typedefs.h"
 
 #include <gtest/gtest.h>
 

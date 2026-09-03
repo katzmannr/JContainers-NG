@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <assert.h>
 #include <vector>
 #include <fstream>
@@ -107,7 +107,7 @@ namespace reflection {
 
         void produceClassToFile(const class_info& self, const std::string& directoryPath) {
 
-            boost::filesystem::path p(directoryPath);
+            std::filesystem::path p(directoryPath);
 
             p /= self.className().c_str();
             p += ".psc";
@@ -123,7 +123,7 @@ namespace reflection {
 
             auto fileName = scriptname;
 
-            boost::filesystem::path p(directoryPath);
+            std::filesystem::path p(directoryPath);
             p /= fileName;
             p += ".psc";
 

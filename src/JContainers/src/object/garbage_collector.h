@@ -1,8 +1,8 @@
 #pragma once
 
-#include "object/autorelease_queue.h"
 #include "object/object_base.h"
 #include "object/object_registry.h"
+#include "object/autorelease_queue.h"
 #include <deque>
 #include <unordered_set>
 

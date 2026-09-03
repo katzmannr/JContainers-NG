@@ -1,14 +1,7 @@
 #include "lua_module.h"
 
-#include <boost/noncopyable.hpp>
-//#include <boost/thread/tss.hpp>
-#include <boost/optional.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/lockfree/queue.hpp>
-
 #include <utility>
 #include <string>
-#include <sstream>
 #include <mutex>
 #include <algorithm>
 #include <thread>
@@ -20,16 +13,25 @@ extern "C" {
 }
 
 #include "meta.h"
-#include "util/util.h"
-#include <gtest/gtest.h>
-#include "util/spinlock.h"
+#include "util/to_underlying.hpp"
 #include "reflection/reflection.h"
-#include "jcontainers_constants.h"
+#include "util/util.h"
+#include "util/spinlock.h"
+#include "util/to_underlying.hpp"
+
+#include <boost/noncopyable.hpp>
+//#include <boost/thread/tss.hpp>
+#include <boost/optional.hpp>
+#include <boost/lockfree/queue.hpp>
 
 #include "collections.h"
 #include "context.h"
 #include "functions.h"
 #include "access.h"
+#include "jcontainers_constants.h"
+#include <gtest/gtest.h>
+#include <sstream>
+#include <filesystem>
 
 // Module imports:
 
@@ -138,7 +140,7 @@ namespace lua { namespace aux_wip {
         }
 
         static bool setupLuaContext(lua_State *l, tes_context& context) {
-            typedef boost::filesystem::path path;
+            typedef std::filesystem::path path;
 
             auto initScriptPath = util::relative_to_dll_path(JC_DATA_FILES "InternalLuaScripts/init.lua");
 

@@ -84,7 +84,7 @@ Accepts ASCII and UTF-8 encoded strings only");
     public:
         static std::string generateUUID ()
         {
-            JC_LOG_API ("");
+            JC_LOG_API ("uuid %d",0x815);
             auto uuid = [] {
                 std::lock_guard<util::spinlock> guard (generateUUID_lock);
                 return generateUUID_gen ();

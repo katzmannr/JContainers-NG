@@ -3,13 +3,10 @@
 #include <functional>
 #include <exception>
 
-#include "boost/archive/binary_oarchive.hpp"
-
 #include "jansson.h"
-#include <gtest/gtest.h>
 #include "common/IDebugLog.h"
 
-#include "jcontainers_constants.h"
+#include "util/to_underlying.hpp"
 #include "util/singleton.h"
 #include "util/util.h"
 #include "util/istring.h"
@@ -17,6 +14,9 @@
 
 #include "object/object_context.h"
 #include "domain_master_serialization.h"
+#include "jcontainers_constants.h"
+#include <gtest/gtest.h>
+#include "boost/archive/binary_oarchive.hpp"
 
 
 
@@ -27,7 +27,7 @@ namespace domain_master {
 
         std::set<util::istring> get_domains_from_fs () 
         {
-            using namespace boost::filesystem;
+            using namespace std::filesystem;
 
             std::set<util::istring> domains;
             path dir = util::relative_to_dll_path (JC_DATA_FILES "Domains/");
@@ -355,7 +355,7 @@ namespace domain_master {
         /*
         TEST(master, backward_compatibility)
         {
-            namespace fs = boost::filesystem;
+            namespace fs = std::filesystem;
 
             fs::path dir = util::relative_to_dll_path("test_data/backward_compatibility");
             bool atLeastOneTested = false;

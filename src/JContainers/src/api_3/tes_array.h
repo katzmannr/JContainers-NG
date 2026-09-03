@@ -75,7 +75,7 @@ namespace tes_api_3 {
         template<class TesType, class JCType = TesType>
         static object_base* fromArray(tes_context& ctx, reflection::binding::rbArray<TesType> arr)
         {
-            JC_LOG_API ("...");
+            JC_LOG_API ("size %d",ctx.object_count());
             if (std::is_same_v<TesType, form_ref> || std::is_same_v<TesType, RE::TESForm*>) {
                 JC_log_full(IDebugLog::kLevel_DebugMessage,"tes_array fromArray");
             }
