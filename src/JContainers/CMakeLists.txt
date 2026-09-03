@@ -46,10 +46,6 @@ include(${CMAKE_SOURCE_DIR}/dep/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
 #    VERSION 0.1.1.0)
 add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 
-target_precompile_headers(${PROJECT_NAME} PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/jcontainers_pch.h>"
-)
-
 #use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set(ROOT_NAMESPACE plugin_example)
 
