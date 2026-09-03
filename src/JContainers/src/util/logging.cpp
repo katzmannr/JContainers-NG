@@ -8,7 +8,7 @@
 #include "util/to_underlying.hpp"
 #include <RE/Skyrim.h>
 #include "skse/jc_skse.h"
-#include "common/IDebugLog.h"
+#include "typedefs.h"
 
 using namespace jc_skse;
 

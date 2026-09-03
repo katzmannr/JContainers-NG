@@ -7,7 +7,7 @@
 #include "RE/T/TESDataHandler.h"
 #include "RE/T/TESForm.h"
 #include "SkyrimVRESLAPI.h"
-#include "common/IDebugLog.h"
+#include "typedefs.h"
 
 #include <gtest/gtest.h>
 
