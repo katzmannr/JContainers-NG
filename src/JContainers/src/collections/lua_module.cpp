@@ -1,10 +1,5 @@
 #include "lua_module.h"
 
-#include <boost/noncopyable.hpp>
-//#include <boost/thread/tss.hpp>
-#include <boost/optional.hpp>
-#include <boost/lockfree/queue.hpp>
-
 #include <utility>
 #include <string>
 #include <mutex>
@@ -18,10 +13,16 @@ extern "C" {
 }
 
 #include "meta.h"
+#include "util/to_underlying.hpp"
 #include "reflection/reflection.h"
 #include "util/util.h"
 #include "util/spinlock.h"
 #include "util/to_underlying.hpp"
+
+#include <boost/noncopyable.hpp>
+//#include <boost/thread/tss.hpp>
+#include <boost/optional.hpp>
+#include <boost/lockfree/queue.hpp>
 
 #include "collections.h"
 #include "context.h"
