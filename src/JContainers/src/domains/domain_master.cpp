@@ -355,7 +355,7 @@ namespace domain_master {
         /*
         TEST(master, backward_compatibility)
         {
-            namespace fs = boost::filesystem;
+            namespace fs = std::filesystem;
 
             fs::path dir = util::relative_to_dll_path("test_data/backward_compatibility");
             bool atLeastOneTested = false;

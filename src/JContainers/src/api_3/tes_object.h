@@ -6,7 +6,7 @@
 #include <reflection/reflection.h>
 #include "collections/bind_traits.h"
 #include "master.h"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include "collections/json_serialization.h"
 // Could be moved to context.h, but it is used here.
 #include "object/object_context.hpp"
@@ -273,11 +273,11 @@ JValue.cleanPool(\"uniquePoolName\")"
             map* files = nullptr;
             try
             {
-                filesystem::path root(dirPath);
+                std::filesystem::path root(dirPath);
 
                 files = &map::object(context);
 
-                for (filesystem::directory_iterator itr(root), end_itr; itr != end_itr; ++itr) {
+                for (std::filesystem::directory_iterator itr(root), end_itr; itr != end_itr; ++itr) {
 
                     if (!*extension || itr->path().extension().generic_string().compare(extension) == 0) {
                         auto asniString = itr->path().generic_string();
@@ -289,7 +289,7 @@ JValue.cleanPool(\"uniquePoolName\")"
                     }
                 }
             }
-            catch (const boost::filesystem::filesystem_error& exc) {
+            catch (const std::filesystem::filesystem_error& exc) {
                 JC_LOG_TES_API_ERROR(JValue, readFromDirectory, "throws '%s'", exc.what());
             }
 
@@ -313,10 +313,10 @@ JValue.cleanPool(\"uniquePoolName\")"
             if (!cpath || !obj)
                 return;
 
-            boost::filesystem::path path(cpath);
+            std::filesystem::path path(cpath);
             auto& dir = path.remove_filename();
-            if (!dir.empty() && !boost::filesystem::exists(dir) &&
-                (boost::filesystem::create_directories(dir), !boost::filesystem::exists(dir)))
+            if (!dir.empty() && !std::filesystem::exists(dir) &&
+                (std::filesystem::create_directories(dir), !std::filesystem::exists(dir)))
             {
                 return;
             }

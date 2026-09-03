@@ -1,4 +1,4 @@
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <common/ITypes.h>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -31,7 +31,7 @@ namespace util {
 //////////////////////////////////////////////////////////////////////////
 
 static void init_boost() {
-    boost::filesystem::path p("dummy");
+    std::filesystem::path p("dummy");
 }
 
 BOOL APIENTRY DllMain(HMODULE /* hModule */,

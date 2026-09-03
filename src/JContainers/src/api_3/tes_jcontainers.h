@@ -130,7 +130,7 @@ namespace tes_api_3 {
 
         static std::string userDirectory()
         {
-            JC_LOG_API ("size %d",ctx.object_count());
+            JC_LOG_API ("dir %s","custom");
 
             char path[MAX_PATH];
             if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path))) {

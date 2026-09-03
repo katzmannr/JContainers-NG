@@ -7,7 +7,6 @@
 
 #include <utility>
 #include <string>
-#include <sstream>
 #include <mutex>
 #include <algorithm>
 #include <thread>
@@ -30,7 +29,8 @@ extern "C" {
 #include "access.h"
 #include "jcontainers_constants.h"
 #include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
+#include <sstream>
+#include <filesystem>
 
 // Module imports:
 
@@ -139,7 +139,7 @@ namespace lua { namespace aux_wip {
         }
 
         static bool setupLuaContext(lua_State *l, tes_context& context) {
-            typedef boost::filesystem::path path;
+            typedef std::filesystem::path path;
 
             auto initScriptPath = util::relative_to_dll_path(JC_DATA_FILES "InternalLuaScripts/init.lua");
 

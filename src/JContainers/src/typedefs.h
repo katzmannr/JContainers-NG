@@ -1,9 +1,9 @@
 #pragma once
 
-#include <assert.h>
 #include <cstdarg>
 #include <type_traits>
 #include <common/IDebugLog.h>
+#include <assert.h>
 
 #   define STR(...)     __STR(__VA_ARGS__)
 #   define __STR(...)   #__VA_ARGS__

@@ -2,13 +2,13 @@
 
 #include <string>
 #include <vector>
-#include <assert.h>
 #include <algorithm>
 #include <stdint.h>
 #include <utility>
 
 #include <SKSE/SKSE.h>
 #include "util/istring.h"
+#include <assert.h>
 
 namespace reflection {
 

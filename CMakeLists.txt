@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
-################################################################################
+#################################################################################
 # Windows 10 is required. Do NOT increase this to Windows 11.
 ################################################################################
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
@@ -159,24 +159,24 @@ find_package(rapidcsv CONFIG REQUIRED)
 # Patch CommonLibSSE-NG ReferenceArray.h to support bool arrays
 # Reverse Patch not checked, patch may be removed when updating CommonLib NG
 ################################################################################
-#find_package(Patch)
-# if(Patch_FOUND)
-#   execute_process(
-#     COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib.patch
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-#     RESULT_VARIABLE PATCH_RESULT
-#   )
+find_package(Patch)
+if(Patch_FOUND)
+  execute_process(
+    COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib.patch
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE PATCH_RESULT
+  )
 #   execute_process(
 #     COMMAND ${Patch_EXECUTABLE} -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/dep/commonlib2.patch
 #     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 #     RESULT_VARIABLE PATCH_RESULT2
 #   )
-#   if(NOT PATCH_RESULT EQUAL 0 OR NOT PATCH_RESULT2 EQUAL 0)
-#     message("Failed to apply CommonLibSSE-NG patches")
-#   endif()
-# else()
-#   message(FATAL_ERROR "This project requires patch for building")
-# endif()
+  if(NOT PATCH_RESULT EQUAL 0) # OR NOT PATCH_RESULT2 EQUAL 0
+    message("Failed to apply CommonLibSSE-NG patches")
+  endif()
+else()
+  message(FATAL_ERROR "This project requires patch for building")
+endif()
 
 ################################################################################
 # Sub-projects

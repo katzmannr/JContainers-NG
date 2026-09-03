@@ -5,7 +5,7 @@
 #include <map>
 #include <jansson.h>
 #include <memory>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include "RE/B/BSCoreTypes.h"
 #include "collections/access.h"
@@ -112,7 +112,7 @@ namespace collections {
             return json_deserializer(context)._object_from_json( json.get() );
         }
 
-        static object_base* object_from_file(tes_context& context, const boost::filesystem::path& path) {
+        static object_base* object_from_file(tes_context& context, const std::filesystem::path& path) {
             return object_from_file(context, path.generic_string().c_str());
         }
 

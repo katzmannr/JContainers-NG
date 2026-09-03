@@ -13,7 +13,7 @@
 #include "tes_form_db.h"
 #include "tes_jcontainers.h"
 // Required for string.h
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <gtest/gtest.h>
 #include "common/IPrefix.h"
 #include <shlobj.h>
