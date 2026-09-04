@@ -36,6 +36,16 @@ namespace {
 using namespace collections;
 using namespace domain_master;
 
+class jc_init {
+
+public:
+    jc_init() {
+        plugin_name_init();
+    }
+};
+
+static jc_init jcInit;
+
 class skse_callbacks {
 
 public:
@@ -332,9 +342,9 @@ SKSE::PluginHandle skse_callbacks::s_pluginHandle = static_cast<SKSE::PluginHand
 skse_callbacks *g_callbacks;
 
 extern "C" [[maybe_unused]] __declspec(dllexport)
-constinit SKSE::PluginDeclaration SKSEPlugin_Version({
+const SKSE::PluginDeclaration SKSEPlugin_Version({
     .Version = { JC_FILE_VERSION },
-    .Name = JC_PLUGIN_NAME,
+    .Name = plugin_name(),
    .Author = ""sv,
     .SupportEmail = ""sv,
     .StructCompatibility = SKSE::StructCompatibility::Independent,
@@ -389,6 +399,11 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
     spdlog::default_logger()->flush();
 
     JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"skse callback: Loading JContainers Plugin");
+
+    auto pluginData = SKSE::PluginVersionData::GetSingleton();
+
+    std::string pname(pluginData->GetPluginName());
+    JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"Name: %s, Version %s", pname.c_str(), pluginData->GetPluginVersion().string().c_str());
 
     // SKSE::Init does the check, but no return value
     if (!a_skse) {

@@ -25,6 +25,7 @@ namespace collections {
 #   define JC_PLUGIN_NAME           "JContainers"sv
 
 // Previous constant have been replaced with inline functions (since we have one dll)
+static std::string jc_plugin_name;
 
 // Added function for CommonLibSSE-NG that require SkyrimSE.exe
 
@@ -59,21 +60,27 @@ inline REL::Module::Runtime runtime()
     return REL::Module::GetRuntime();
 }
 
-inline std::string_view plugin_name()
+const inline std::string plugin_name() {
+    return jc_plugin_name;
+}
+
+inline std::string_view plugin_name_init()
 {
     if (is_vr()) {
-        return "JContainersVR";
+        jc_plugin_name = std::string("JContainersVR");
+    } else {
+        if (runtime() == REL::Module::Runtime::AE) {
+            auto runtimeversion = (host_mode() ? REL::Version("1.6.0") : REL::Module::get().version());
+            // Since API does only differentiate between version, 1170 GOG release is unsupported
+            // Which means it can be used, but is treated as a Steam release, not a GOG release.
+            if (runtimeversion.patch() == 659 || runtimeversion.patch() == 1179)
+                jc_plugin_name = std::string("JContainersGOG");
+        }
+        else {
+            jc_plugin_name = std::string("JContainers64");
+        }
     }
-
-    if (runtime() == REL::Module::Runtime::AE) {
-        auto runtimeversion = (host_mode() ? REL::Version("1.6.0") : REL::Module::get().version());
-        // Since API does only differentiate between version, 1170 GOG release is unsupported
-        // Which means it can be used, but is treated as a Steam release, not a GOG release.
-        if (runtimeversion.patch() == 659 || runtimeversion.patch() == 1179)
-            return "JContainersGOG";
-    }
-
-    return "JContainers64";
+    return jc_plugin_name;
 }
 
 inline std::string_view skse_logs()
