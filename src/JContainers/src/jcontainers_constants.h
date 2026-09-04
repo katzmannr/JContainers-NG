@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string_view>
 #include <SKSE/SKSE.h>
 #include "REL/Relocation.h"
 #include <windows.h>
@@ -23,6 +24,18 @@ namespace collections {
 
 #   define JC_DATA_FILES            "JCData/"
 #   define JC_PLUGIN_NAME           "JContainers"sv
+
+std::string_view plugin_name_init();
+
+class jc_init {
+
+public:
+    jc_init() {
+        plugin_name_init();
+    }
+};
+
+static jc_init jcInit;
 
 // Previous constant have been replaced with inline functions (since we have one dll)
 static std::string jc_plugin_name;
@@ -64,7 +77,7 @@ const inline std::string plugin_name() {
     return jc_plugin_name;
 }
 
-inline std::string_view plugin_name_init()
+static inline std::string_view plugin_name_init()
 {
     if (is_vr()) {
         jc_plugin_name = std::string("JContainersVR");

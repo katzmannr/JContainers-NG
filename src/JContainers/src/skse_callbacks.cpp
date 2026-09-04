@@ -36,16 +36,6 @@ namespace {
 using namespace collections;
 using namespace domain_master;
 
-class jc_init {
-
-public:
-    jc_init() {
-        plugin_name_init();
-    }
-};
-
-static jc_init jcInit;
-
 class skse_callbacks {
 
 public:
@@ -344,8 +334,8 @@ skse_callbacks *g_callbacks;
 extern "C" [[maybe_unused]] __declspec(dllexport)
 const SKSE::PluginDeclaration SKSEPlugin_Version({
     .Version = { JC_FILE_VERSION },
-    .Name = plugin_name(),
-   .Author = ""sv,
+    .Name = plugin_name().c_str(),
+    .Author = ""sv,
     .SupportEmail = ""sv,
     .StructCompatibility = SKSE::StructCompatibility::Independent,
     .RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary,
