@@ -73,7 +73,7 @@ inline REL::Module::Runtime runtime()
     return REL::Module::GetRuntime();
 }
 
-const inline std::string plugin_name() {
+const inline std::string &plugin_name() {
     return jc_plugin_name;
 }
 
