@@ -334,7 +334,7 @@ skse_callbacks *g_callbacks;
 extern "C" [[maybe_unused]] __declspec(dllexport)
 const SKSE::PluginDeclaration SKSEPlugin_Version({
     .Version = { JC_FILE_VERSION },
-    .Name = plugin_name().c_str(),
+    .Name = plugin_name(),
     .Author = ""sv,
     .SupportEmail = ""sv,
     .StructCompatibility = SKSE::StructCompatibility::Independent,
