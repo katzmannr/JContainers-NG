@@ -118,7 +118,7 @@ if __name__ == '__main__':
             print ("Usage: install.py <target-directory>")
             exit (1)
 
-        JCLib.name = "JContainers.dll"
+        JCLib.name = "JContainersNG.dll"
 
         config = Config (sys.argv[1])
 

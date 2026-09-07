@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 # Get rid of overly annoying errors even though qmake is in PATH
 set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
-message(STATUS "MSVC-WINE-Toolchain environment")
-include(CMake/msvc-wine-toolchain.cmake)
+# Use IDE for specifying cmake option -DCMAKE_TOOLCHAIN_FILE=CMake/msvc-wine-toolchain.cmake
+#message(STATUS "MSVC-WINE-Toolchain environment")
+#include(CMake/msvc-wine-toolchain.cmake)
 #################################################################################
 # Windows 10 is required. Do NOT increase this to Windows 11.
 ################################################################################
@@ -30,9 +31,9 @@ message("64bit architecture in use")
 ################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################
-#if(NOT WIN32)
-#    message(FATAL_ERROR "Only WIN32 is supported")
-#endif()
+if(NOT WIN32)
+    message(FATAL_ERROR "Only WIN32 is supported")
+endif()
 
 if(NOT MSVC)
     message(WARNING "Compiler mismatch. Continue at your own risk.")
@@ -205,7 +206,7 @@ add_subdirectory(src/DebugJC)
 ###############################################################################
 # C++ Linker Dependencies
 ###############################################################################
-target_link_libraries(JContainers
+target_link_libraries(JContainersNG
     PRIVATE
         jc::common
         jansson
