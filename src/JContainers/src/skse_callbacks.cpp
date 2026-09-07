@@ -218,7 +218,7 @@ public:
             // This old check could be useful in a rare case of multiple mixed version build
             // messaging && messaging->interfaceVersion >= SKSE::MessagingInterface::kVersion)
 
-            JC_log_full(IDebugLog::kLevel_DebugMessage, "registering All functions of %s Version %s", plugin_name().data(), JC_VERSION_STR);
+            JC_log_full(IDebugLog::kLevel_DebugMessage, "registering All functions of %s Version %s API %s", plugin_name().data(), JC_VERSION_STR, JC_API_VERSION_STR);
 
             jc_assert(vm);
             if (vm==nullptr) {
@@ -330,12 +330,13 @@ public:
 const SKSE::MessagingInterface *skse_callbacks::s_messaging = nullptr;
 SKSE::PluginHandle skse_callbacks::s_pluginHandle = static_cast<SKSE::PluginHandle>(-1);
 skse_callbacks *g_callbacks;
+jc_constants jcConstants;
 
 extern "C" [[maybe_unused]] __declspec(dllexport)
 constinit SKSE::PluginDeclaration SKSEPlugin_Version({
     .Version = { JC_FILE_VERSION },
-    .Name = JC_PLUGIN_NAME,
-   .Author = ""sv,
+    .Name = { JC_PLUGIN_NAME },
+    .Author = ""sv,
     .SupportEmail = ""sv,
     .StructCompatibility = SKSE::StructCompatibility::Independent,
     .RuntimeCompatibility = SKSE::VersionIndependence::AddressLibrary,
@@ -375,9 +376,15 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
     // Known Bug: Paths are incorrect, Skyrim Root is missing
     // Do not delete, needed for hard-to-reach spdlog output
 
+    auto logPath = SKSE::log::log_directory();
+    if (!logPath) {
+        return false;
+    }
+
+    // Second log file. ToDo: Switch JContainers own log to spdlog
     auto logger = spdlog::basic_logger_mt(
         "JContainersDebug",
-        (std::string(skse_logs()) + std::string(plugin_name()) + "CL.log").c_str(),
+        (std::string(logPath->string()) + std::string(plugin_name()) + "CSL.log").c_str(),
         true
         );
 
@@ -385,10 +392,15 @@ SKSEPluginLoad(const SKSE::LoadInterface *a_skse)
     logger->flush_on(spdlog::level::trace);
     spdlog::set_default_logger(logger);
 
-    logger->info("Loading of JContainers commenced: {}", plugin_name());
+    logger->info("Loading of JContainers commenced: {}", plugin_name().data());
     spdlog::default_logger()->flush();
 
     JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"skse callback: Loading JContainers Plugin");
+
+    auto pluginData = SKSE::PluginVersionData::GetSingleton();
+
+    std::string pname(pluginData->GetPluginName());
+    JC_log_full(IDebugLog::LogLevel::kLevel_DebugMessage,"Name: %s, Version %s", pname.c_str(), pluginData->GetPluginVersion().string().c_str());
 
     // SKSE::Init does the check, but no return value
     if (!a_skse) {

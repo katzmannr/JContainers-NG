@@ -118,7 +118,7 @@ if __name__ == '__main__':
             print ("Usage: install.py <target-directory>")
             exit (1)
 
-        JCLib.name = "JContainers.dll"
+        JCLib.name = "JContainersNG.dll"
 
         config = Config (sys.argv[1])
 
@@ -142,8 +142,8 @@ if __name__ == '__main__':
 
         # PDB Will be part of the main distribution until sufficient stability is reached.
         shutil.copy2(
-            os.path.join(config.origin, 'JContainers.pdb'),
-            os.path.join(os.path.dirname(dst), 'JContainers.pdb')
+            os.path.join(config.origin, 'JContainersNG.pdb'),
+            os.path.join(os.path.dirname(dst), 'JContainersNG.pdb')
         )
         print ("Generate and compile scripts...")
         config.jcLib.produce_code (config.pscDir)

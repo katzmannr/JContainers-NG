@@ -198,7 +198,7 @@ add_subdirectory(src/DebugJC)
 ###############################################################################
 # C++ Linker Dependencies
 ###############################################################################
-target_link_libraries(JContainers
+target_link_libraries(JContainersNG
     PRIVATE
         jc::common
         jansson

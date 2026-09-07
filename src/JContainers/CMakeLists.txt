@@ -1,4 +1,4 @@
-set(PROJECT_NAME JContainers)
+set(PROJECT_NAME JContainersNG)
 
 ################################################################################
 # Source folders: - src - src/domain - src/forms - src/object  - src/reflection - src/skse - src/util
