@@ -41,7 +41,7 @@ namespace collections {
 
 #   define JC_DATA_FILES            "JCData/"
 // Attention: Must be converted into string_view for initialization
-#   define JC_PLUGIN_NAME           "JContainers"
+#   define JC_PLUGIN_NAME           "JContainersNG"
 
 class jc_constants {
 public:
