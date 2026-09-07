@@ -4,6 +4,7 @@
 #include <cstring>
 #include <gtest/gtest.h>
 
+#include "jcontainers_constants.h"
 #include "master.h"
 #include <filesystem>
 #include "tes_string.h"
@@ -55,6 +56,42 @@ namespace tes_api_3 {
             return (UInt32)consts::feature_version;
         }
         REGISTERF2_STATELESS(featureVersion, nullptr, nullptr);
+
+        static UInt32 APIMinVersion() {
+            JC_LOG_API ("version %d",consts::api_minimum_version);
+            return (UInt32)consts::api_minimum_version;
+        }
+        REGISTERF2_STATELESS(APIMinVersion, nullptr, []() {
+            std::stringstream comm;
+            comm << "Version Minimum information.\n"
+                    "Use this to validate installed JContainers version when your version requirements are different:\n"
+                    "    bool isJCValid = JContainers.APIMinVersion() == minAV && JContainers.featureMinVersion() >= minFV\n"
+                    "where AV and FV are hardcoded API and feature version numbers.\n";
+            comm << "Current minimum API version is " << APIMinVersion() << std::endl;
+            comm << "Current minimum feature version is " << featureMinVersion();
+            return comm.str();
+        });
+
+        static UInt32 featureMinVersion() {
+            JC_LOG_API ("version %d",consts::feature_minimum_version);
+            return (UInt32)consts::feature_minimum_version;
+        }
+        REGISTERF2_STATELESS(featureMinVersion, nullptr, nullptr);
+
+        static UInt32 engineVersion() {
+            JC_LOG_API ("version %d",engine_version());
+            return (UInt32)engine_version();
+        }
+        REGISTERF2_STATELESS(engineVersion, nullptr, []() {
+            std::stringstream comm;
+            comm << "Engine Version information.\n"
+                    "Use this to validate use of a specific game engine:\n"
+                    "    bool isEngineValid = JContainers.engineVersion() == 1597\n"
+                    "where the number is the packed engine version, f.e. 1415 (VR), 1597 (SE), 161179 (GOG).\n"
+                    "Could be used with functionality that only exists in certain game engines.\n";
+            comm << "Current engine version is " << engineVersion() << std::endl;
+            return comm.str();
+        });
 
         static bool fileExistsAtPath(const char *filename)
         {
