@@ -312,6 +312,7 @@ RE::TESForm* lookup_form (RE::FormID handle)
         form = g_current_api->lookup_form (handle);
         if (form!=nullptr) {
 	        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse lookup_form: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(form->GetFormType()).data(), form->GetFormID(), form);
+        }
         if (g_current_api != &g_real_api) // Prevent crash on new game
         {
             form = nullptr; // This may cause test failures
