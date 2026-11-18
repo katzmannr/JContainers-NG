@@ -310,7 +310,9 @@ RE::TESForm* lookup_form (RE::FormID handle)
         JC_log_full(IDebugLog::kLevel_Warning,"jc_skse lookup_form: Invalid handle 0");
     } else {
         form = g_current_api->lookup_form (handle);
-        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse lookup_form: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(form->GetFormType()).data(), form->GetFormID(), form);
+        if (form!=nullptr) {
+	        JC_log_full(IDebugLog::kLevel_DebugMessage,"jc_skse lookup_form: Form Type %s, Id %d is 0x%X",RE::FormTypeToString(form->GetFormType()).data(), form->GetFormID(), form);
+        }
         if (g_current_api != &g_real_api) // Prevent crash on new game
         {
             form = nullptr; // This may cause test failures
